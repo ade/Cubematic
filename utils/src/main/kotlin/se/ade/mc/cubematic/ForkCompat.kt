@@ -1,7 +1,11 @@
 package se.ade.mc.cubematic
 
 import org.bukkit.block.Block
+import org.bukkit.block.EndGateway
+import org.bukkit.event.entity.EntityTeleportEvent
 import org.bukkit.inventory.ItemStack
+import org.bukkit.plugin.Plugin
+import se.ade.mc.cubematic.extensions.Aspect
 import se.ade.mc.cubematic.paper.PaperBukkitFork
 
 object ForkCompat: BukkitFork {
@@ -25,4 +29,7 @@ object ForkCompat: BukkitFork {
         = fork.getBlockDestroySpeed(block, tool)
     override fun isBlockReplaceable(block: Block): Boolean
         = fork.isBlockReplaceable(block)
+
+    override fun handleEntityEndGatewayTeleport(aspect: Aspect, handler: (EntityTeleportEvent, EndGateway) -> Unit)
+        = fork.handleEntityEndGatewayTeleport(aspect, handler)
 }

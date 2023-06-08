@@ -17,6 +17,8 @@ import org.bukkit.inventory.EquipmentSlot
 import org.bukkit.inventory.Inventory
 import org.bukkit.inventory.ItemStack
 import se.ade.mc.cubematic.extensions.getCenter
+import se.ade.mc.cubematic.extensions.getDropSlot
+import se.ade.mc.cubematic.extensions.setDropSlot
 
 private const val CUSTOM_NAME = "Sequence Dropper"
 private val ACTIVATOR_MATERIAL = Material.CLOCK

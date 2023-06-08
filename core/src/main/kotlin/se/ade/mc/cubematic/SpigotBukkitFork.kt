@@ -2,7 +2,11 @@ package se.ade.mc.cubematic
 
 import org.bukkit.Material
 import org.bukkit.block.Block
+import org.bukkit.block.EndGateway
+import org.bukkit.event.entity.EntityTeleportEvent
 import org.bukkit.inventory.ItemStack
+import org.bukkit.plugin.Plugin
+import se.ade.mc.cubematic.extensions.Aspect
 import se.ade.mc.cubematic.nms.destroyspeed.DestroySpeedShimFactory
 
 class SpigotBukkitFork: BukkitFork {
@@ -28,5 +32,9 @@ class SpigotBukkitFork: BukkitFork {
 
     override fun isBlockReplaceable(block: Block): Boolean {
         return replaceableBlocks.getOrDefault(block.type, false)
+    }
+
+    override fun handleEntityEndGatewayTeleport(aspect: Aspect, handler: (EntityTeleportEvent, EndGateway) -> Unit) {
+        //Not possible, will never call handler
     }
 }

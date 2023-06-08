@@ -4,10 +4,9 @@ import se.ade.mc.cubematic.breaking.BreakerAspect
 import se.ade.mc.cubematic.crafting.DispenseCraftingTableAspect
 import se.ade.mc.cubematic.crafting.SequenceInputDropperAspect
 import se.ade.mc.cubematic.placing.PlacingAspect
-import se.ade.mc.cubematic.portals.PortalTestAspect
-import se.ade.mc.cubematic.portals.ShriekerTest
 import org.bukkit.NamespacedKey
 import org.bukkit.plugin.java.JavaPlugin
+import se.ade.mc.cubematic.portals.PortalTestAspect
 
 class CubematicPlugin: JavaPlugin() {
     val namespaceKeys = Namespaces(
@@ -25,16 +24,8 @@ class CubematicPlugin: JavaPlugin() {
         server.pluginManager.registerEvents(BreakerAspect(this), this)
         server.pluginManager.registerEvents(PlacingAspect(this), this)
 
-        //server.pluginManager.registerEvents(PortalTestAspect(this), this)
+        server.pluginManager.registerEvents(PortalTestAspect(this), this)
         //server.pluginManager.registerEvents(ShriekerTest(this), this)
-
-        //server.pluginManager.registerEvents(FirstTestAspect(this), this)
-        //server.pluginManager.registerEvents(DispenserPistonCraftAspect(this), this)
-        //server.pluginManager.registerEvents(ChannelingDropperAspect(this), this)
-        //server.pluginManager.registerEvents(CheatAspect(this), this)
-        //server.pluginManager.registerEvents(ChannelingDropperCraftingRecipeAspect(this), this)
-        //server.pluginManager.registerEvents(ItemMoldingAspect(this), this)
-        //server.pluginManager.registerEvents(CreateAspect(this), this)
     }
 
     fun scheduleRun(delayTicks: Long = 0L, block: () -> Unit) {

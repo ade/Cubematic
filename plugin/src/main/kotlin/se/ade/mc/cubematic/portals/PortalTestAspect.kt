@@ -19,11 +19,12 @@ import org.bukkit.event.Listener
 import org.bukkit.event.block.Action
 import org.bukkit.event.block.BlockDispenseEvent
 import org.bukkit.event.entity.EntityPortalEnterEvent
-import org.bukkit.event.entity.EntityTeleportEvent
 import org.bukkit.event.player.PlayerInteractEvent
 import org.bukkit.event.player.PlayerPortalEvent
 import org.bukkit.event.player.PlayerTeleportEvent
 import org.bukkit.inventory.meta.CompassMeta
+import se.ade.mc.cubematic.ForkCompat
+import se.ade.mc.cubematic.extensions.Aspect
 import se.ade.mc.cubematic.extensions.getCenter
 import java.util.logging.Logger
 
@@ -51,10 +52,17 @@ private val flatNeighbors = arrayOf(
 
 private const val ALLOW_NON_PLAYER_ENTITIES = false
 private const val IMMEDIATE_MODE = true
-private val PORTAL_MATERIAL = Material.NETHER_PORTAL
+private val PORTAL_MATERIAL = Material.END_GATEWAY
 
-class PortalTestAspect(private val plugin: CubematicPlugin): Listener {
+class PortalTestAspect(private val cubematic: CubematicPlugin): Listener, Aspect(cubematic) {
     private val debug = true
+
+    init {
+        ForkCompat.handleEntityEndGatewayTeleport(this) { entityTeleportEvent, endGateway ->
+            entityTeleportEvent.isCancelled = true
+            cubematic.server.broadcastMessage("${entityTeleportEvent.entity.type}, ${endGateway.location}")
+        }
+    }
 
     @EventHandler
     fun onEvent(e: EntityPortalEnterEvent) {
@@ -72,13 +80,16 @@ class PortalTestAspect(private val plugin: CubematicPlugin): Listener {
 
     @EventHandler
     fun onEvent(e: PlayerTeleportEvent) {
-        plugin.server.broadcastMessage("PlayerTeleportEvent: $e")
+        cubematic.server.broadcastMessage("PlayerTeleportEvent: $e")
     }
 
+    /*
     @EventHandler
     fun onEvent(e: EntityTeleportEvent) {
         plugin.server.broadcastMessage("EntityTeleportEvent: $e")
     }
+
+     */
 
     private fun onPortalActivated(location: Location, player: Player): Boolean {
         val portalStart = if(location.block.type == PORTAL_MATERIAL) {
@@ -105,7 +116,7 @@ class PortalTestAspect(private val plugin: CubematicPlugin): Listener {
         if(player.foodLevel >= FOOD_BURN + 1) {
             player.foodLevel -= FOOD_BURN
 
-            plugin.scheduleRun {
+            cubematic.scheduleRun {
                 player.teleport(dest, PlayerTeleportEvent.TeleportCause.PLUGIN)
             }
         } else {
@@ -169,15 +180,15 @@ class PortalTestAspect(private val plugin: CubematicPlugin): Listener {
         val block = event.clickedBlock ?: return
 
         if(item.type == Material.COMPASS && block.type == Material.LODESTONE) {
-            plugin.scheduleRun {
-                plugin.server.broadcastMessage(item.itemMeta.toString())
+            cubematic.scheduleRun {
+                cubematic.server.broadcastMessage(item.itemMeta.toString())
             }
         }
     }
 
     @EventHandler
     fun onEvent(event: BlockDispenseEvent) {
-        val logger: Logger? = if(debug) plugin.logger else null
+        val logger: Logger? = if(debug) cubematic.logger else null
 
         if (event.block.type != Material.DISPENSER || event.item.type != Material.COMPASS)
             return
