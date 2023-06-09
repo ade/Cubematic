@@ -4,9 +4,10 @@ plugins {
     kotlin("jvm") version "1.8.0"
     `java-library`
     id("com.github.johnrengelman.shadow") version "7.1.2"
+    id("net.minecrell.plugin-yml.bukkit") version "0.5.3"
 }
 
-group = "cubematic"
+group = "se.ade.mc.cubematic"
 
 repositories {
     mavenCentral()
@@ -48,4 +49,16 @@ tasks.register<Copy>("deploy") {
     from(layout.buildDirectory.dir("libs/"))
     into(deployPath)
     include("*cubematic*$version*all.jar")
+}
+
+bukkit {
+    main = "se.ade.mc.cubematic.CubematicPlugin"
+    name = "Cubematic"
+    load = net.minecrell.pluginyml.bukkit.BukkitPluginDescription.PluginLoadOrder.POSTWORLD
+
+    author = "ade"
+    description = "auto-crafting, block-placing, block-breaking, teleportation"
+    version = project.version.toString()
+
+    apiVersion = "1.19"
 }
