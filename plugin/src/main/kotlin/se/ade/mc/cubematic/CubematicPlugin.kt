@@ -6,7 +6,7 @@ import se.ade.mc.cubematic.crafting.SequenceInputDropperAspect
 import se.ade.mc.cubematic.placing.PlacingAspect
 import org.bukkit.NamespacedKey
 import org.bukkit.plugin.java.JavaPlugin
-import se.ade.mc.cubematic.portals.PortalTestAspect
+import se.ade.mc.cubematic.portals.PortalAspect
 
 class CubematicPlugin: JavaPlugin() {
     val namespaceKeys = Namespaces(
@@ -24,7 +24,7 @@ class CubematicPlugin: JavaPlugin() {
         server.pluginManager.registerEvents(BreakerAspect(this), this)
         server.pluginManager.registerEvents(PlacingAspect(this), this)
 
-        server.pluginManager.registerEvents(PortalTestAspect(this), this)
+        server.pluginManager.registerEvents(PortalAspect(this), this)
         //server.pluginManager.registerEvents(ShriekerTest(this), this)
     }
 
