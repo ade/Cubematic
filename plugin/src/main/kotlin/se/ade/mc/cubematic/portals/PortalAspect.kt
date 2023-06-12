@@ -4,6 +4,7 @@ import se.ade.mc.cubematic.CubematicPlugin
 import org.bukkit.Axis
 import org.bukkit.Location
 import org.bukkit.Material
+import org.bukkit.Sound
 import org.bukkit.block.Block
 import org.bukkit.block.BlockFace
 import org.bukkit.block.EndGateway
@@ -16,6 +17,7 @@ import org.bukkit.event.player.PlayerInteractEvent
 import org.bukkit.event.player.PlayerTeleportEvent
 import org.bukkit.inventory.ItemStack
 import org.bukkit.inventory.meta.CompassMeta
+import org.bukkit.util.Vector
 import se.ade.mc.cubematic.ForkCompat
 import se.ade.mc.cubematic.extensions.Aspect
 import java.util.logging.Logger
@@ -31,23 +33,12 @@ private val adjacentFaces = arrayOf(
     BlockFace.WEST
 )
 
-private val flatNeighbors = arrayOf(
-    BlockFace.NORTH,
-    BlockFace.EAST,
-    BlockFace.SOUTH,
-    BlockFace.WEST,
-    BlockFace.NORTH_EAST,
-    BlockFace.NORTH_WEST,
-    BlockFace.SOUTH_EAST,
-    BlockFace.SOUTH_WEST,
-)
-
 private const val ALLOW_NON_PLAYER_ENTITIES = false
-private const val IMMEDIATE_MODE = true
 private const val MAX_PORTAL_SIZE = 21
 
 private val portalMaterial = Material.END_GATEWAY
 private val frameMaterial = Material.CRYING_OBSIDIAN
+private val targetOffset = Vector(0.0, 1.0, 0.0)
 
 class PortalAspect(private val cubematic: CubematicPlugin): Listener, Aspect(cubematic) {
     private val debug = true
@@ -65,6 +56,14 @@ class PortalAspect(private val cubematic: CubematicPlugin): Listener, Aspect(cub
     @EventHandler
     fun onEvent(e: PlayerTeleportEvent) {
         logger?.info("PlayerTeleportEvent: ${e.player}, ${e.cause}, from ${e.from}, to ${e.to}")
+        if(FOOD_BURN > 0) {
+            if(e.player.foodLevel >= FOOD_BURN + 1) {
+                e.player.foodLevel -= FOOD_BURN
+            } else {
+                e.player.playSound(e.player, Sound.ENTITY_PLAYER_BURP, 1f, 1f)
+                e.isCancelled = true
+            }
+        }
     }
 
     @EventHandler
@@ -85,7 +84,7 @@ class PortalAspect(private val cubematic: CubematicPlugin): Listener, Aspect(cub
 
         //Todo: Find disjoint groups of gateway blocks
         val gwStartBlock = gateways.first()
-        val target = (gwStartBlock.state as EndGateway).exitLocation?.clone()?.add(0.0, -1.0, 0.0)
+        val target = (gwStartBlock.state as EndGateway).exitLocation?.clone()?.subtract(targetOffset)
 
         logger?.info("Target: $target")
 
@@ -154,7 +153,7 @@ class PortalAspect(private val cubematic: CubematicPlugin): Listener, Aspect(cub
             if(portalMaterial == Material.END_GATEWAY) {
                 (it.state as EndGateway).also { gw ->
                     gw.isExactTeleport = true
-                    gw.exitLocation = compass.lodestone?.clone()?.add(0.0, 1.0, 0.0)
+                    gw.exitLocation = compass.lodestone?.clone()?.add(targetOffset)
                     gw.age = Long.MIN_VALUE
                     gw.update()
                 }
@@ -163,27 +162,6 @@ class PortalAspect(private val cubematic: CubematicPlugin): Listener, Aspect(cub
 
         return true
     }
-}
-
-private fun List<Location>.nearestOrNull(location: Location): Location? {
-    return if(this.isEmpty())
-        null
-    else
-        this.minBy { location.distance(it) }
-}
-
-fun Block.getNeighborsCubic(distance: Int): List<Block> {
-    val blocks = mutableListOf<Block>()
-    (-distance..distance).forEach { x ->
-        (-distance..distance).forEach { y ->
-            (-distance..distance).forEach { z ->
-                if(x != 0 || y != 0 || z != 0)
-                    blocks.add(this.getRelative(x,y,z))
-            }
-        }
-    }
-
-    return blocks
 }
 
 fun Block.findAllChaining(type: Material): Set<Block> {
@@ -214,25 +192,3 @@ fun Block.findAllChaining(type: Material): Set<Block> {
     } while (todo.isNotEmpty())
     return results
 }
-
-fun Block.findFirst(type: List<Material>, direction: BlockFace, limit: Int): Block? {
-    var block = this
-    (1..limit).forEach { _ ->
-        block = block.getRelative(direction)
-
-        if (block.type in type)
-            return block
-    }
-    return null
-}
-
-fun Block.column(that: Block): List<Block>? {
-    if(that.x != this.x || that.z != this.z)
-        return null
-
-    return (this.y..that.y).map {
-        this.world.getBlockAt(this.x, it, this.z)
-    }
-}
-
-data class PortalBlocks(val axis: Axis, val blocks: List<Block>)
