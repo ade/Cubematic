@@ -1,10 +1,11 @@
 import java.util.Properties
 
 plugins {
-    kotlin("jvm") version "1.8.0"
+    kotlin("jvm")
     `java-library`
     id("com.github.johnrengelman.shadow") version "7.1.2"
     id("net.minecrell.plugin-yml.bukkit") version "0.5.3"
+    alias(libs.plugins.kotlinx.serialization)
 }
 
 group = "se.ade.mc.cubematic"
@@ -20,6 +21,7 @@ dependencies {
     implementation(project(":paper"))
     api(project(":utils"))
 
+    implementation(libs.kaml)
     compileOnly("org.spigotmc:spigot-api:1.19.4-R0.1-SNAPSHOT")
 
     testImplementation(kotlin("test"))

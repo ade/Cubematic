@@ -6,9 +6,21 @@ import se.ade.mc.cubematic.crafting.SequenceInputDropperAspect
 import se.ade.mc.cubematic.placing.PlacingAspect
 import org.bukkit.NamespacedKey
 import org.bukkit.plugin.java.JavaPlugin
+import se.ade.mc.cubematic.config.CubeConfig
+import se.ade.mc.cubematic.config.CubeConfigProvider
 import se.ade.mc.cubematic.portals.PortalAspect
 
 class CubematicPlugin: JavaPlugin() {
+    private var currentConfig: CubeConfig? = null
+    val config: CubeConfig
+        get() {
+            return currentConfig ?: kotlin.run {
+                CubeConfigProvider.writeDefaultConfigIfDoesntExist()
+                return CubeConfigProvider.getConfig()
+                    ?: CubeConfig()
+            }
+        }
+
     val namespaceKeys = Namespaces(
         craftingDropper = createNamespacedKey("crafting_dropper"),
         dropSlot = createNamespacedKey("drop_slot"),
@@ -26,6 +38,10 @@ class CubematicPlugin: JavaPlugin() {
 
         server.pluginManager.registerEvents(PortalAspect(this), this)
         //server.pluginManager.registerEvents(ShriekerTest(this), this)
+
+        if(config.debug) {
+            logger.info("Initialized with debug mode enabled")
+        }
     }
 
     fun scheduleRun(delayTicks: Long = 0L, block: () -> Unit) {
