@@ -11,15 +11,11 @@ import se.ade.mc.cubematic.config.CubeConfigProvider
 import se.ade.mc.cubematic.portals.PortalAspect
 
 class CubematicPlugin: JavaPlugin() {
-    private var currentConfig: CubeConfig? = null
+    private val cubeConfigProvider by lazy {
+        CubeConfigProvider(this)
+    }
     val config: CubeConfig
-        get() {
-            return currentConfig ?: kotlin.run {
-                CubeConfigProvider.writeDefaultConfigIfDoesntExist()
-                return CubeConfigProvider.getConfig()
-                    ?: CubeConfig()
-            }
-        }
+        get() = cubeConfigProvider.current
 
     val namespaceKeys = Namespaces(
         craftingDropper = createNamespacedKey("crafting_dropper"),

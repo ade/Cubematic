@@ -3,14 +3,27 @@ package se.ade.mc.cubematic.config
 import com.charleskorn.kaml.Yaml
 import com.charleskorn.kaml.YamlComment
 import kotlinx.serialization.*
+import org.bukkit.plugin.Plugin
 import java.io.File
 
-private const val CONFIG_PATH = "plugins/cubematic"
-private const val CONFIG_FILE = "$CONFIG_PATH/cubematic-config.yml"
-object CubeConfigProvider {
+private const val CONFIG_FILE = "cubematic-config.yml"
+class CubeConfigProvider(private val plugin: Plugin) {
+    private var currentConfig: CubeConfig? = null
+    val current: CubeConfig
+        get() {
+            return currentConfig ?: kotlin.run {
+                getConfig()?.also {
+                    currentConfig = it
+                } ?: CubeConfig()
+            }
+        }
 
-    fun getConfig(): CubeConfig? {
-        val f = File(CONFIG_FILE)
+    init {
+        writeDefaultConfigIfDoesntExist()
+    }
+
+    private fun getConfig(): CubeConfig? {
+        val f = File(plugin.dataFolder, CONFIG_FILE)
         if(!f.exists()) {
             return null
         }
@@ -21,8 +34,8 @@ object CubeConfigProvider {
             null
         }
     }
-    fun writeDefaultConfigIfDoesntExist() {
-        val f = File(CONFIG_FILE)
+    private fun writeDefaultConfigIfDoesntExist() {
+        val f = File(plugin.dataFolder, CONFIG_FILE)
         if(f.exists()) {
             return
         }
@@ -30,8 +43,8 @@ object CubeConfigProvider {
         save(CubeConfig())
     }
     private fun save(config: CubeConfig) {
-        File(CONFIG_PATH).mkdirs()
-        File(CONFIG_FILE).writeText(Yaml.default.encodeToString(CubeConfig.serializer(), config))
+        plugin.dataFolder.mkdirs()
+        File(plugin.dataFolder, CONFIG_FILE).writeText(Yaml.default.encodeToString(CubeConfig.serializer(), config))
     }
 }
 @Serializable
