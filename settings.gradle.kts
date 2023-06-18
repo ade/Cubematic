@@ -1,5 +1,5 @@
 
-rootProject.name = "cubematic"
+rootProject.name = "Cubematic"
 
 include(
     "core",
