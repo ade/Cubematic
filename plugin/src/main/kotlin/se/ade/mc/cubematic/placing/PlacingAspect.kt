@@ -18,7 +18,6 @@ import org.bukkit.inventory.EquipmentSlot
 import org.bukkit.inventory.ItemStack
 import org.bukkit.persistence.PersistentDataContainer
 import org.bukkit.persistence.PersistentDataType
-import se.ade.mc.cubematic.ForkCompat
 import se.ade.mc.cubematic.extensions.getCenter
 
 private const val PLACER_NAME = "Placer"
@@ -48,7 +47,7 @@ class PlacingAspect(private val plugin: CubematicPlugin) : Listener {
 
             val allowed = targetBlock.canPlace(item.type.createBlockData())
             val unoccupied = targetBlock.type == Material.AIR
-                    || ForkCompat.isBlockReplaceable(targetBlock)
+                    || targetBlock.isReplaceable
 
             val noEntities = !item.type.isSolid ||
                 event.block.world.getNearbyEntities(targetBlock.location.add(0.5, 0.5, 0.5), 0.5, 0.5, 0.5)

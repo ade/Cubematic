@@ -9,9 +9,3 @@ fun Location.getCenter(): Location {
         it.z = blockZ + 0.5
     }
 }
-
-fun Location.setCompat(x: Double, y: Double, z: Double) = this.apply {
-    this.x = x
-    this.y = y
-    this.z = z
-}

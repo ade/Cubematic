@@ -8,7 +8,6 @@ import org.bukkit.block.BlockFace
 import org.bukkit.inventory.ItemStack
 import org.bukkit.util.Vector
 import se.ade.mc.cubematic.extensions.getCenter
-import se.ade.mc.cubematic.extensions.setCompat
 import kotlin.math.floor
 
 object ParticleFX {
@@ -27,7 +26,7 @@ object ParticleFX {
             z + (oz - z) / 2
         )
 
-        from.world?.spawnParticle(Particle.SMOKE_NORMAL, newLocation, 16, 0.1, 0.1, 0.1, 0.01)
+        from.world?.spawnParticle(Particle.SMOKE, newLocation, 16, 0.1, 0.1, 0.1, 0.01)
     }
 
     fun crackAllSides(location: Location, material: Material) {
@@ -37,11 +36,11 @@ object ParticleFX {
         }
     }
     private fun crack(location: Location, material: ItemStack) {
-        location.world?.spawnParticle(Particle.ITEM_CRACK, location, 2, 0.25, 0.25, 0.25, 0.05, material);
+        location.world?.spawnParticle(Particle.BLOCK, location, 2, 0.25, 0.25, 0.25, 0.05, material);
     }
 
     fun blockBroken(location: Location, material: ItemStack) {
-        location.world?.spawnParticle(Particle.ITEM_CRACK, location.getCenter(), 32, 0.2, 0.2, 0.2, 0.1, material);
+        location.world?.spawnParticle(Particle.BLOCK, location.getCenter(), 32, 0.2, 0.2, 0.2, 0.1, material);
     }
 
     fun convertToPlacerBlock(location: Location) {
@@ -108,11 +107,11 @@ private fun Location.allFaceCenters(): List<Location> {
     val z = floor(this.z)
 
     return listOf(
-        this.clone().setCompat(x + 0.5, y + 0.5, z), //Front
-        this.clone().setCompat(x, y + 0.5, z + 0.5), //Left
-        this.clone().setCompat(x + 1, y + 0.5, z + 0.5), //Right
-        this.clone().setCompat(x + 0.5, y + 0.5, z + 1), //Back
-        this.clone().setCompat(x + 0.5, y + 1, z + 0.5), //Top
-        this.clone().setCompat(x + 0.5, y, z + 0.5), //Bottom
+        this.clone().set(x + 0.5, y + 0.5, z), //Front
+        this.clone().set(x, y + 0.5, z + 0.5), //Left
+        this.clone().set(x + 1, y + 0.5, z + 0.5), //Right
+        this.clone().set(x + 0.5, y + 0.5, z + 1), //Back
+        this.clone().set(x + 0.5, y + 1, z + 0.5), //Top
+        this.clone().set(x + 0.5, y, z + 0.5), //Bottom
     )
 }

@@ -18,11 +18,10 @@ repositories {
 
 dependencies {
     implementation(project(":core"))
-    implementation(project(":paper"))
     api(project(":utils"))
 
     implementation(libs.kaml)
-    compileOnly("org.spigotmc:spigot-api:1.19.4-R0.1-SNAPSHOT")
+    compileOnly(libs.papermc.api)
 
     testImplementation(kotlin("test"))
 }
@@ -37,7 +36,7 @@ tasks {
     }
 }
 kotlin {
-    jvmToolchain(17)
+    jvmToolchain(21)
 }
 
 tasks.register<Copy>("deploy") {

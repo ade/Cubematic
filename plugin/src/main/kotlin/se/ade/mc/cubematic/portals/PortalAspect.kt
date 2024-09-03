@@ -1,8 +1,7 @@
 package se.ade.mc.cubematic.portals
 
+import com.destroystokyo.paper.event.entity.EntityTeleportEndGatewayEvent
 import se.ade.mc.cubematic.CubematicPlugin
-import org.bukkit.Axis
-import org.bukkit.Location
 import org.bukkit.Material
 import org.bukkit.Sound
 import org.bukkit.block.Block
@@ -18,8 +17,8 @@ import org.bukkit.event.player.PlayerTeleportEvent
 import org.bukkit.inventory.ItemStack
 import org.bukkit.inventory.meta.CompassMeta
 import org.bukkit.util.Vector
-import se.ade.mc.cubematic.ForkCompat
 import se.ade.mc.cubematic.extensions.Aspect
+import se.ade.mc.cubematic.extensions.listenTo
 import java.util.logging.Logger
 
 private const val FOOD_BURN = 4
@@ -45,11 +44,12 @@ class PortalAspect(private val cubematic: CubematicPlugin): Listener, Aspect(cub
     private val logger: Logger? = if(debug) cubematic.logger else null
 
     init {
-        ForkCompat.handleEntityEndGatewayTeleport(this) { entityTeleportEvent, endGateway ->
-            if(ALLOW_NON_PLAYER_ENTITIES) return@handleEntityEndGatewayTeleport
+        listenTo<EntityTeleportEndGatewayEvent> {
+            //Disable entities teleporting through the gateway, if configured so
+            if (ALLOW_NON_PLAYER_ENTITIES) return@listenTo
 
-            entityTeleportEvent.isCancelled = true
-            logger?.info("Cancel entity teleport: ${entityTeleportEvent.entity.type}, ${endGateway.location}")
+            it.isCancelled = true
+            logger?.info("Cancel entity teleport: ${it.entity.type}, ${it.gateway.location}")
         }
     }
 

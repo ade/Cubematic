@@ -11,9 +11,9 @@ repositories {
 }
 
 dependencies {
-    compileOnly("org.spigotmc:spigot-api:1.19.4-R0.1-SNAPSHOT")
+    compileOnly(libs.papermc.api)
 }
 
 kotlin {
-    jvmToolchain(17)
+    jvmToolchain(21)
 }

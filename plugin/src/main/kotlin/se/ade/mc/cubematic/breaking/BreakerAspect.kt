@@ -163,7 +163,7 @@ class BreakerAspect(private val plugin: CubematicPlugin): Listener {
             ?: throw IllegalArgumentException("Tool not damageable")
 
         val unbreakingLevel = meta.enchants.firstNotNullOfOrNull {
-            if(it.key == Enchantment.DURABILITY)
+            if(it.key == Enchantment.UNBREAKING)
                 it.value
             else null
         } ?: 0

@@ -3,7 +3,6 @@ package se.ade.mc.cubematic.rules
 import org.bukkit.block.Block
 import org.bukkit.enchantments.Enchantment
 import org.bukkit.inventory.ItemStack
-import se.ade.mc.cubematic.ForkCompat
 import kotlin.math.ceil
 
 object BlockBreaking {
@@ -11,13 +10,13 @@ object BlockBreaking {
         val canHarvest = !block.blockData.requiresCorrectToolForDrops() || block.blockData.isPreferredTool(tool)
 
         val efficiencyLevel = tool.itemMeta?.enchants?.firstNotNullOfOrNull {
-            if(it.key == Enchantment.DIG_SPEED)
+            if(it.key == Enchantment.EFFICIENCY)
                 it.value
             else null
         } ?: 0
 
         return getBreakTimeTicks(
-            toolMultiplier = ForkCompat.getBlockDestroySpeed(block, tool),
+            toolMultiplier = block.getDestroySpeed(tool),
             canHarvest = canHarvest,
             efficiencyLevel = efficiencyLevel,
             blockHardness = block.type.hardness
