@@ -10,6 +10,7 @@ import org.bukkit.block.data.BlockData
 import org.bukkit.inventory.ItemStack
 import org.bukkit.util.Vector
 import se.ade.mc.cubematic.extensions.getCenter
+import se.ade.mc.cubematic.extensions.scheduleRun
 import kotlin.math.floor
 
 object ParticleFX {

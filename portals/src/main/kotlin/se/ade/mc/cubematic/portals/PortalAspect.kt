@@ -1,7 +1,6 @@
 package se.ade.mc.cubematic.portals
 
 import com.destroystokyo.paper.event.entity.EntityTeleportEndGatewayEvent
-import se.ade.mc.cubematic.CubematicPlugin
 import org.bukkit.Material
 import org.bukkit.Sound
 import org.bukkit.block.Block
@@ -19,6 +18,7 @@ import org.bukkit.inventory.meta.CompassMeta
 import org.bukkit.util.Vector
 import se.ade.mc.cubematic.extensions.Aspect
 import se.ade.mc.cubematic.extensions.listenTo
+import se.ade.mc.cubematic.extensions.scheduleRun
 import java.util.logging.Logger
 
 private const val FOOD_BURN = 4
@@ -39,8 +39,10 @@ private val portalMaterial = Material.END_GATEWAY
 private val frameMaterial = Material.CRYING_OBSIDIAN
 private val targetOffset = Vector(0.0, 1.0, 0.0)
 
-class PortalAspect(private val cubematic: CubematicPlugin): Listener, Aspect(cubematic) {
-    private val debug = cubematic.config.debug
+class PortalAspect(
+    private val cubematic: CubePortalsPlugin,
+    private val debug: Boolean,
+): Listener, Aspect(cubematic) {
     private val logger: Logger? = if(debug) cubematic.logger else null
 
     init {

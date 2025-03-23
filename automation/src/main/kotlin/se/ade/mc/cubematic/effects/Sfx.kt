@@ -4,6 +4,7 @@ import se.ade.mc.cubematic.CubematicPlugin
 import org.bukkit.Location
 import org.bukkit.Sound
 import org.bukkit.block.Block
+import se.ade.mc.cubematic.extensions.scheduleRun
 
 object Sfx {
     fun blockBreak(block: Block) {

@@ -1,6 +1,5 @@
 package se.ade.mc.cubematic.portals
 
-import se.ade.mc.cubematic.CubematicPlugin
 import org.bukkit.GameEvent
 import org.bukkit.Material
 import org.bukkit.block.BlockFace
@@ -12,7 +11,7 @@ import org.bukkit.event.world.GenericGameEvent
 import org.bukkit.potion.PotionEffect
 import org.bukkit.potion.PotionEffectType
 
-class ShriekerTest(private val plugin: CubematicPlugin): Listener {
+class ShriekerTest(private val plugin: CubePortalsPlugin): Listener {
     @EventHandler
     fun onEvent(e: GenericGameEvent) {
         if(e.event != GameEvent.SHRIEK)

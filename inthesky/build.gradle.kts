@@ -3,8 +3,8 @@ import net.minecrell.pluginyml.bukkit.BukkitPluginDescription
 
 plugins {
     kotlin("jvm") version "2.1.10"
-    id("com.github.johnrengelman.shadow") version "8.1.1"
-    id("de.eldoria.plugin-yml.bukkit") version "0.7.1"
+    alias(libs.plugins.shadow)
+    alias(libs.plugins.pluginYmlBukkit)
 }
 
 group = "se.ade.mc.cubematic.inthesky"

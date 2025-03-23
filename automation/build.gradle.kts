@@ -60,7 +60,9 @@ tasks {
         // Your plugin's jar (or shadowJar if present) will be used automatically.
         minecraftVersion("1.21.4")
         dependsOn(":inthesky:shadowJar")
+        dependsOn(":portals:shadowJar")
         pluginJars(project(":inthesky").tasks.named("shadowJar").get().outputs.files.first())
+        pluginJars(project(":portals").tasks.named("shadowJar").get().outputs.files.first())
 
         runDirectory.set(rootProject.layout.projectDirectory.dir(".servers/papermc"))
     }

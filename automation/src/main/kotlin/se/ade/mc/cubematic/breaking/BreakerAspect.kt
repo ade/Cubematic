@@ -22,6 +22,7 @@ import org.bukkit.event.block.BlockRedstoneEvent
 import org.bukkit.inventory.Inventory
 import org.bukkit.inventory.ItemStack
 import org.bukkit.inventory.meta.Damageable
+import se.ade.mc.cubematic.extensions.scheduleRun
 import java.lang.IllegalArgumentException
 import kotlin.math.abs
 import kotlin.random.Random
