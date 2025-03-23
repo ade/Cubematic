@@ -8,7 +8,7 @@ import org.bukkit.generator.BiomeProvider
 import org.bukkit.generator.BlockPopulator
 import org.bukkit.generator.ChunkGenerator
 import org.bukkit.generator.WorldInfo
-import se.ade.mc.skyblock.AdeSkyblockPlugin
+import se.ade.mc.skyblock.CubeInTheSkyPlugin
 import java.util.*
 
 // TODO Configuration opportunity
@@ -20,7 +20,7 @@ private val supportedNetherBiomes = listOf(
 	Biome.BASALT_DELTAS
 )
 
-class NetherGenerator(private val plugin: AdeSkyblockPlugin) : ChunkGenerator() {
+class NetherGenerator(private val plugin: CubeInTheSkyPlugin) : ChunkGenerator() {
 	// TODO Configuration opportunity
 	private val islandY = 64
 

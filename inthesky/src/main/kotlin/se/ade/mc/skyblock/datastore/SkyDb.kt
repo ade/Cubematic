@@ -10,14 +10,14 @@ import org.jetbrains.exposed.sql.exists
 import org.jetbrains.exposed.sql.replace
 import org.jetbrains.exposed.sql.transactions.TransactionManager
 import org.jetbrains.exposed.sql.transactions.transaction
-import se.ade.mc.skyblock.AdeSkyblockPlugin
+import se.ade.mc.skyblock.CubeInTheSkyPlugin
 import se.ade.mc.skyblock.dream.PlayerStatus
 import se.ade.mc.skyblock.dream.inventory.PlayerHibernation
 import java.io.File
 import java.sql.Connection
 import java.util.UUID
 
-class SkyDb(private val plugin: AdeSkyblockPlugin) {
+class SkyDb(private val plugin: CubeInTheSkyPlugin) {
 
 	private val dbFile = File(plugin.dataFolder, "skyblock.db").absolutePath
 

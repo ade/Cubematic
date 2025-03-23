@@ -6,26 +6,19 @@ import org.bukkit.event.Listener
 import org.bukkit.event.world.WorldLoadEvent
 import org.bukkit.generator.ChunkGenerator
 import org.bukkit.plugin.java.JavaPlugin
+import se.ade.mc.cubematic.config.configProvider
 import se.ade.mc.skyblock.dream.DreamFacet
 import se.ade.mc.skyblock.generator.GeneratorSelector
 import se.ade.mc.skyblock.nether.NetherFacet
 
-class SkyblockListener(private val plugin: AdeSkyblockPlugin): Listener {
-    @EventHandler
-    fun onEvent(event: WorldLoadEvent) {
-        if(event.world.name == "world") {
-            plugin.dreamFacet = DreamFacet(plugin, event.world).also { it.onEnable() }
-        }
-    }
-}
-
-class AdeSkyblockPlugin: JavaPlugin(), CommandHandler {
+class CubeInTheSkyPlugin: JavaPlugin(), CommandHandler, Listener {
+    val config by configProvider { SkyConfig() }
     var dreamFacet: DreamFacet? = null
     val commandRegistrar = CommandRegistrar(this)
     val netherFacet = NetherFacet(this)
 
     override fun onEnable() {
-        server.pluginManager.registerEvents(SkyblockListener(this), this)
+        server.pluginManager.registerEvents(this, this)
         commandRegistrar.register(this)
         dreamFacet?.onEnable()
         netherFacet.onEnable()
@@ -35,6 +28,15 @@ class AdeSkyblockPlugin: JavaPlugin(), CommandHandler {
         super.onDisable()
         dreamFacet?.onDisable()
         netherFacet.onDisable()
+    }
+
+    @EventHandler
+    fun onEvent(event: WorldLoadEvent) {
+        if(event.world.name == "world") {
+            if(config.debug) {
+                dreamFacet = DreamFacet(this, event.world).also { it.onEnable() }
+            }
+        }
     }
 
     override fun getDefaultWorldGenerator(worldName: String, id: String?): ChunkGenerator {

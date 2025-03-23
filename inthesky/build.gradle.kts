@@ -5,6 +5,7 @@ plugins {
     kotlin("jvm") version "2.1.10"
     alias(libs.plugins.shadow)
     alias(libs.plugins.pluginYmlBukkit)
+    alias(libs.plugins.kotlinx.serialization)
 }
 
 group = "se.ade.mc.cubematic.inthesky"
@@ -14,9 +15,11 @@ repositories {
 }
 
 dependencies {
+    implementation(project(":core"))
     implementation(libs.paper)
     implementation(libs.sqlite)
     implementation(libs.bundles.exposed)
+    implementation(libs.kaml)
 
     testImplementation(kotlin("test"))
 }
@@ -48,7 +51,7 @@ tasks.register<Copy>("deploy") {
 }
 
 bukkit {
-    main = "se.ade.mc.skyblock.AdeSkyblockPlugin"
+    main = "se.ade.mc.skyblock.CubeInTheSkyPlugin"
     name = "Cubematic-InTheSky"
     load = BukkitPluginDescription.PluginLoadOrder.STARTUP
 

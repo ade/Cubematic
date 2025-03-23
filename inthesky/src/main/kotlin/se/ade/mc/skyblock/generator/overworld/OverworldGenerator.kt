@@ -7,12 +7,12 @@ import org.bukkit.generator.BiomeProvider
 import org.bukkit.generator.BlockPopulator
 import org.bukkit.generator.ChunkGenerator
 import org.bukkit.generator.WorldInfo
-import se.ade.mc.skyblock.AdeSkyblockPlugin
+import se.ade.mc.skyblock.CubeInTheSkyPlugin
 import se.ade.mc.skyblock.generator.overworld.biomes.AdeBiomeProvider
 import se.ade.mc.skyblock.generator.overworld.biomes.supportedBiomes
 import java.util.*
 
-class OverworldGenerator(private val plugin: AdeSkyblockPlugin) : ChunkGenerator() {
+class OverworldGenerator(private val plugin: CubeInTheSkyPlugin) : ChunkGenerator() {
 	private val worldSpawnX = 0
 	private val worldSpawnZ = 0
 	private val islandY = 64
