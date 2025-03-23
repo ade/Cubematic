@@ -4,6 +4,7 @@ plugins {
     kotlin("jvm") version "2.1.10"
     alias(libs.plugins.shadow)
     alias(libs.plugins.pluginYmlBukkit)
+    alias(libs.plugins.kotlinx.serialization)
 }
 
 group = "se.ade.mc.cubematic.portals"
@@ -16,6 +17,7 @@ dependencies {
     implementation(project(":core"))
     implementation(libs.paper)
     implementation(libs.sqlite)
+    implementation(libs.kaml)
 
     testImplementation(kotlin("test"))
 }

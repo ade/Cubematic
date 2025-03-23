@@ -6,13 +6,10 @@ import org.bukkit.NamespacedKey
 import org.bukkit.plugin.java.JavaPlugin
 import se.ade.mc.cubematic.config.CubeConfig
 import se.ade.mc.cubematic.config.CubeConfigProvider
+import se.ade.mc.cubematic.config.configProvider
 
 class CubematicPlugin: JavaPlugin() {
-    private val cubeConfigProvider by lazy {
-        CubeConfigProvider(this)
-    }
-    val config: CubeConfig
-        get() = cubeConfigProvider.current
+    val config: CubeConfig by configProvider { CubeConfig() }
 
     val namespaceKeys = Namespaces(
         craftingDropper = createNamespacedKey("crafting_dropper"),

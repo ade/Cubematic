@@ -57,3 +57,8 @@ When breaking a frame block:
 - Connected gateway blocks are removed
 - The compass drops that tracked the portal's destination
 - This compass can be used again to create another linked portal
+
+
+### Limitations
+- Interdimensional travel is not supported
+- Moving/destroying the lodestone does not affect the portal once created

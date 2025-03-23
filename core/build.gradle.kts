@@ -12,6 +12,7 @@ repositories {
 
 dependencies {
     implementation(libs.paper)
+    implementation(libs.kaml)
 }
 
 kotlin {

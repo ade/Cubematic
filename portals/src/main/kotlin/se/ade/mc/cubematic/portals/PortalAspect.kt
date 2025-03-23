@@ -39,10 +39,10 @@ private val frameMaterial = Material.CRYING_OBSIDIAN
 private val targetOffset = Vector(0.0, 1.0, 0.0)
 
 class PortalAspect(
-    private val cubematic: CubePortalsPlugin,
+    plugin: CubePortalsPlugin,
     private val debug: Boolean,
-): Listener, Aspect(cubematic) {
-    private val logger: Logger? = if(debug) cubematic.logger else null
+): Listener, Aspect(plugin) {
+    private val logger: Logger? = if(debug) plugin.logger else null
 
     @EventHandler
     fun onEvent(it: EntityTeleportEndGatewayEvent) {
@@ -116,8 +116,8 @@ class PortalAspect(
         val block = event.clickedBlock ?: return
 
         if(item.type == Material.COMPASS && block.type == Material.LODESTONE) {
-            cubematic.scheduleRun {
-                cubematic.server.broadcastMessage(item.itemMeta.toString())
+            this@PortalAspect.plugin.scheduleRun {
+                this@PortalAspect.plugin.server.broadcastMessage(item.itemMeta.toString())
             }
         }
 
@@ -128,6 +128,11 @@ class PortalAspect(
 
             if(!item.enchantments.containsKey(Enchantment.VANISHING_CURSE))
                 return
+
+            if(compass.lodestone == null) {
+                // TODO Is lodestone enchanted compass but lodestone is gone. Play Fizzle fx
+                return
+            }
 
             val activationBlock = block.getRelative(event.blockFace)
             event.isCancelled = true
