@@ -51,7 +51,7 @@ tasks.register<Copy>("deploy") {
 }
 
 bukkit {
-    main = "se.ade.mc.skyblock.CubeInTheSkyPlugin"
+    main = "se.ade.mc.skyblock.CubematicSkyPlugin"
     name = "Cubematic-InTheSky"
     load = BukkitPluginDescription.PluginLoadOrder.STARTUP
 

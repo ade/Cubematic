@@ -1,6 +1,6 @@
 package se.ade.mc.cubematic.effects
 
-import se.ade.mc.cubematic.CubematicPlugin
+import se.ade.mc.cubematic.CubematicAutomationPlugin
 import org.bukkit.Location
 import org.bukkit.Particle
 import org.bukkit.block.Block
@@ -48,7 +48,7 @@ object ParticleFX {
         }
     }
 
-    fun convertToSequential(location: Location, blockFace: BlockFace, plugin: CubematicPlugin) {
+    fun convertToSequential(location: Location, blockFace: BlockFace, plugin: CubematicAutomationPlugin) {
         val r1 = faceOrigin(blockFace).add(faceUp(blockFace).multiply(0.75))
         val r2 = faceOrigin(blockFace).add(faceUp(blockFace).multiply(0.5))
         val r3 = faceOrigin(blockFace).add(faceUp(blockFace).multiply(0.25))

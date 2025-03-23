@@ -9,7 +9,7 @@ import org.bukkit.event.Listener
 import org.bukkit.event.player.PlayerInteractEvent
 import org.bukkit.inventory.ItemStack
 
-class DebugAspect(private val plugin: CubematicPlugin): Listener {
+class DebugAspect(private val plugin: CubematicAutomationPlugin): Listener {
     @EventHandler
     fun onEvent(event: PlayerInteractEvent) {
         if(event.clickedBlock != null && event.item?.type == Material.STICK) {

@@ -34,7 +34,7 @@ kotlin {
 }
 
 bukkit {
-    main = "se.ade.mc.cubematic.CubematicPlugin"
+    main = "se.ade.mc.cubematic.CubematicAutomationPlugin"
     name = "Cubematic-Automation"
     load = net.minecrell.pluginyml.bukkit.BukkitPluginDescription.PluginLoadOrder.POSTWORLD
 

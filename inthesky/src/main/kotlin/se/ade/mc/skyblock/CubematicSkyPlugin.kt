@@ -11,7 +11,7 @@ import se.ade.mc.skyblock.dream.DreamFacet
 import se.ade.mc.skyblock.generator.GeneratorSelector
 import se.ade.mc.skyblock.nether.NetherFacet
 
-class CubeInTheSkyPlugin: JavaPlugin(), CommandHandler, Listener {
+class CubematicSkyPlugin: JavaPlugin(), CommandHandler, Listener {
     val config by configProvider { SkyConfig() }
     var dreamFacet: DreamFacet? = null
     val commandRegistrar = CommandRegistrar(this)

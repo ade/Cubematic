@@ -1,6 +1,6 @@
 package se.ade.mc.cubematic.effects
 
-import se.ade.mc.cubematic.CubematicPlugin
+import se.ade.mc.cubematic.CubematicAutomationPlugin
 import org.bukkit.Location
 import org.bukkit.Sound
 import org.bukkit.block.Block
@@ -23,7 +23,7 @@ object Sfx {
         }
     }
 
-    fun blockToSequential(location: Location, plugin: CubematicPlugin) {
+    fun blockToSequential(location: Location, plugin: CubematicAutomationPlugin) {
         val sound = Sound.BLOCK_DISPENSER_DISPENSE
         val world = location.world
             ?: return
@@ -35,7 +35,7 @@ object Sfx {
             }
         }
     }
-    fun blockToSequential2(location: Location, plugin: CubematicPlugin) {
+    fun blockToSequential2(location: Location, plugin: CubematicAutomationPlugin) {
         val sound = Sound.BLOCK_NOTE_BLOCK_BIT
         val world = location.world
             ?: return

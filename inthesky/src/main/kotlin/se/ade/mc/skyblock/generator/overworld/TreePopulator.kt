@@ -9,12 +9,12 @@ import org.bukkit.generator.BlockPopulator
 import org.bukkit.generator.LimitedRegion
 import org.bukkit.generator.WorldInfo
 import org.bukkit.inventory.ItemStack
-import se.ade.mc.skyblock.CubeInTheSkyPlugin
+import se.ade.mc.skyblock.CubematicSkyPlugin
 import java.util.Random
 
 private const val islandY = 64
 
-class TreePopulator(private val plugin: CubeInTheSkyPlugin) : BlockPopulator() {
+class TreePopulator(private val plugin: CubematicSkyPlugin) : BlockPopulator() {
 	override fun populate(worldInfo: WorldInfo, random: Random, chunkX: Int, chunkZ: Int, region: LimitedRegion) {
 		// Only add the tree in the spawn chunk
 		if (chunkX == 0 && chunkZ == 0) {

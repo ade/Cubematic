@@ -7,7 +7,7 @@ import org.bukkit.plugin.java.JavaPlugin
 import se.ade.mc.cubematic.config.configProvider
 import se.ade.mc.cubematic.extensions.commands
 
-class CubePortalsPlugin: JavaPlugin() {
+class CubematicPortalsPlugin: JavaPlugin() {
 	private val config by configProvider { PortalsConfig() }
 
 	override fun onEnable() {

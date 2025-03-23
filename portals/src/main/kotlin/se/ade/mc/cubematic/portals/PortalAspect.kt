@@ -39,7 +39,7 @@ private val frameMaterial = Material.CRYING_OBSIDIAN
 private val targetOffset = Vector(0.0, 1.0, 0.0)
 
 class PortalAspect(
-    plugin: CubePortalsPlugin,
+    plugin: CubematicPortalsPlugin,
     private val debug: Boolean,
 ): Listener, Aspect(plugin) {
     private val logger: Logger? = if(debug) plugin.logger else null

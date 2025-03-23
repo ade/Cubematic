@@ -12,7 +12,7 @@ import org.bukkit.event.EventHandler
 import org.bukkit.event.Listener
 import org.bukkit.event.entity.EntityDamageEvent
 import org.bukkit.event.player.PlayerBedEnterEvent
-import se.ade.mc.skyblock.CubeInTheSkyPlugin
+import se.ade.mc.skyblock.CubematicSkyPlugin
 import se.ade.mc.skyblock.DreamCommandHandler
 import se.ade.mc.skyblock.datastore.SkyDb
 import se.ade.mc.skyblock.dream.inventory.PlayerDreamInventories
@@ -22,8 +22,8 @@ import java.io.File
 private const val GLOBAL_DREAM_WORLD_NAME = "dreamworld"
 
 class DreamFacet(
-	private val plugin: CubeInTheSkyPlugin,
-	private val overworld: World
+    private val plugin: CubematicSkyPlugin,
+    private val overworld: World
 ) : Listener, DreamCommandHandler {
     private var dreamWorld: World? = null
 

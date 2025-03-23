@@ -36,7 +36,7 @@ tasks.shadowJar {
 }
 
 bukkit {
-    main = "se.ade.mc.cubematic.portals.CubePortalsPlugin"
+    main = "se.ade.mc.cubematic.portals.CubematicPortalsPlugin"
     name = "Cubematic-Portals"
     load = BukkitPluginDescription.PluginLoadOrder.POSTWORLD
 

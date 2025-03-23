@@ -22,7 +22,7 @@ import se.ade.mc.cubematic.extensions.getCenter
 import se.ade.mc.cubematic.extensions.scheduleRun
 
 private const val PLACER_NAME = "Placer"
-class PlacingAspect(private val plugin: CubematicPlugin) : Listener {
+class PlacingAspect(private val plugin: CubematicAutomationPlugin) : Listener {
 
     @EventHandler
     fun onEvent(event: BlockDispenseEvent) {
@@ -149,7 +149,7 @@ private fun Material.mapConcreteFromPowder(): Material {
         ?: this
 }
 
-private fun PersistentDataContainer.setIsPlacer(state: Boolean, plugin: CubematicPlugin) {
+private fun PersistentDataContainer.setIsPlacer(state: Boolean, plugin: CubematicAutomationPlugin) {
     if(state) {
         set(plugin.namespaceKeys.placerBlockTag, PersistentDataType.BYTE, 1)
     } else {
@@ -157,16 +157,16 @@ private fun PersistentDataContainer.setIsPlacer(state: Boolean, plugin: Cubemati
     }
 }
 
-private fun PersistentDataContainer.isPlacer(plugin: CubematicPlugin): Boolean {
+private fun PersistentDataContainer.isPlacer(plugin: CubematicAutomationPlugin): Boolean {
     val data = this.get(plugin.namespaceKeys.placerBlockTag, PersistentDataType.BYTE)
     return data == 1.toByte()
 }
 
-private fun Dispenser.setIsPlacer(state: Boolean, plugin: CubematicPlugin) {
+private fun Dispenser.setIsPlacer(state: Boolean, plugin: CubematicAutomationPlugin) {
     this.persistentDataContainer.setIsPlacer(state, plugin)
     this.update()
 }
-private fun Dispenser.isPlacer(plugin: CubematicPlugin): Boolean {
+private fun Dispenser.isPlacer(plugin: CubematicAutomationPlugin): Boolean {
     return this.persistentDataContainer.isPlacer(plugin)
 }
 

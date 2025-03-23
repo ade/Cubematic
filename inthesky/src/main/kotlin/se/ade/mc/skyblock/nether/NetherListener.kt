@@ -11,10 +11,10 @@ import org.bukkit.event.Listener
 import org.bukkit.event.entity.CreatureSpawnEvent
 import org.bukkit.event.entity.EntityDeathEvent
 import org.bukkit.inventory.ItemStack
-import se.ade.mc.skyblock.CubeInTheSkyPlugin
+import se.ade.mc.skyblock.CubematicSkyPlugin
 import kotlin.random.Random
 
-class NetherListener(private val plugin: CubeInTheSkyPlugin) : Listener {
+class NetherListener(private val plugin: CubematicSkyPlugin) : Listener {
 	// Drop tables for different mobs - material to probability mapping
 	private val mobDropTables = mapOf(
 		EntityType.ZOMBIFIED_PIGLIN to mapOf(

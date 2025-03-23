@@ -11,7 +11,7 @@ import org.bukkit.event.world.GenericGameEvent
 import org.bukkit.potion.PotionEffect
 import org.bukkit.potion.PotionEffectType
 
-class ShriekerTest(private val plugin: CubePortalsPlugin): Listener {
+class ShriekerTest(private val plugin: CubematicPortalsPlugin): Listener {
     @EventHandler
     fun onEvent(e: GenericGameEvent) {
         if(e.event != GameEvent.SHRIEK)

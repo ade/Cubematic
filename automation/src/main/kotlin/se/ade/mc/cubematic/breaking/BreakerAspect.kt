@@ -1,6 +1,6 @@
 package se.ade.mc.cubematic.breaking
 
-import se.ade.mc.cubematic.CubematicPlugin
+import se.ade.mc.cubematic.CubematicAutomationPlugin
 import se.ade.mc.cubematic.deleteOne
 import se.ade.mc.cubematic.effects.ParticleFX
 import se.ade.mc.cubematic.effects.Sfx
@@ -17,17 +17,15 @@ import org.bukkit.event.EventHandler
 import org.bukkit.event.Listener
 import org.bukkit.event.block.BlockBreakEvent
 import org.bukkit.event.block.BlockDispenseEvent
-import org.bukkit.event.block.BlockDropItemEvent
 import org.bukkit.event.block.BlockRedstoneEvent
 import org.bukkit.inventory.Inventory
 import org.bukkit.inventory.ItemStack
 import org.bukkit.inventory.meta.Damageable
 import se.ade.mc.cubematic.extensions.scheduleRun
-import java.lang.IllegalArgumentException
 import kotlin.math.abs
 import kotlin.random.Random
 
-class BreakerAspect(private val plugin: CubematicPlugin): Listener {
+class BreakerAspect(private val plugin: CubematicAutomationPlugin): Listener {
     private val debug = false
     private val transactions = mutableMapOf<Long, BreakTransaction>()
     private var counter = 0L

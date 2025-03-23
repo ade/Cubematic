@@ -5,10 +5,9 @@ import se.ade.mc.cubematic.placing.PlacingAspect
 import org.bukkit.NamespacedKey
 import org.bukkit.plugin.java.JavaPlugin
 import se.ade.mc.cubematic.config.CubeConfig
-import se.ade.mc.cubematic.config.CubeConfigProvider
 import se.ade.mc.cubematic.config.configProvider
 
-class CubematicPlugin: JavaPlugin() {
+class CubematicAutomationPlugin: JavaPlugin() {
     val config: CubeConfig by configProvider { CubeConfig() }
 
     val namespaceKeys = Namespaces(
