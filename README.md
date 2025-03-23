@@ -1,4 +1,5 @@
 # Cubematic
+A few of my implementations of Minecraft plugins for Paper-based servers.
 
 ## Automation
 Automation plugin for Paper-based Minecraft servers.
@@ -26,7 +27,7 @@ Skyblock like plugin for Paper-based Minecraft servers.
 ## Portals
 This plugin creates a custom portal system in Minecraft with the following features:
 
-## Portal Structure
+### Portal Structure
 - **Frame Material**: Nether portal shape but made of Crying Obsidian
 - **Portal Material**: End Gateway blocks
 - **Orientations**: Works in all three planes (XY, ZY, XZ)
@@ -35,7 +36,7 @@ This plugin creates a custom portal system in Minecraft with the following featu
   - no custom teleportation code
   - works even if plugin is disabled
 
-## Creation Process
+### Creation Process
 1. Player builds a rectangular frame from Crying Obsidian
 2. Player obtains a special compass with:
   - Lodestone tracking set to destination
@@ -45,13 +46,13 @@ This plugin creates a custom portal system in Minecraft with the following featu
   - Gateways are configured to teleport to the compass's destination
   - The compass vanishes at activation
 
-## Teleportation
+### Teleportation
 - Using a portal costs 4 hunger points
 - If player has insufficient food, teleportation fails
 - Non-player entities can be teleported but are blocked by default (because it would be op
   in farms, but can be enabled (todo: config file))
 
-## Breaking Portals
+### Breaking Portals
 When breaking a frame block:
 - Connected gateway blocks are removed
 - The compass drops that tracked the portal's destination
