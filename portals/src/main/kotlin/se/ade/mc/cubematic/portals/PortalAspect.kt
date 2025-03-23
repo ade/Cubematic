@@ -17,7 +17,6 @@ import org.bukkit.inventory.ItemStack
 import org.bukkit.inventory.meta.CompassMeta
 import org.bukkit.util.Vector
 import se.ade.mc.cubematic.extensions.Aspect
-import se.ade.mc.cubematic.extensions.listenTo
 import se.ade.mc.cubematic.extensions.scheduleRun
 import java.util.logging.Logger
 
@@ -45,14 +44,13 @@ class PortalAspect(
 ): Listener, Aspect(cubematic) {
     private val logger: Logger? = if(debug) cubematic.logger else null
 
-    init {
-        listenTo<EntityTeleportEndGatewayEvent> {
-            //Disable entities teleporting through the gateway, if configured so
-            if (ALLOW_NON_PLAYER_ENTITIES) return@listenTo
+    @EventHandler
+    fun onEvent(it: EntityTeleportEndGatewayEvent) {
+        //Disable entities teleporting through the gateway, if configured so
+        if (ALLOW_NON_PLAYER_ENTITIES) return
 
-            it.isCancelled = true
-            logger?.info("Cancel entity teleport: ${it.entity.type}, ${it.gateway.location}")
-        }
+        it.isCancelled = true
+        logger?.info("Cancel entity teleport: ${it.entity.type}, ${it.gateway.location}")
     }
 
     @EventHandler

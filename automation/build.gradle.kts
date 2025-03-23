@@ -18,7 +18,6 @@ repositories {
 
 dependencies {
     implementation(project(":core"))
-    api(project(":utils"))
 
     implementation(libs.kaml)
     implementation(libs.paper)

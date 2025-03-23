@@ -9,5 +9,4 @@ include(
     "automation",
     "inthesky",
     "portals",
-    "utils"
 )

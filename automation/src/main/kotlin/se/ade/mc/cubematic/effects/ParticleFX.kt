@@ -2,12 +2,9 @@ package se.ade.mc.cubematic.effects
 
 import se.ade.mc.cubematic.CubematicPlugin
 import org.bukkit.Location
-import org.bukkit.Material
 import org.bukkit.Particle
 import org.bukkit.block.Block
 import org.bukkit.block.BlockFace
-import org.bukkit.block.data.BlockData
-import org.bukkit.inventory.ItemStack
 import org.bukkit.util.Vector
 import se.ade.mc.cubematic.extensions.getCenter
 import se.ade.mc.cubematic.extensions.scheduleRun

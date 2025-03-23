@@ -7,6 +7,7 @@ import org.bukkit.plugin.Plugin
 import org.bukkit.plugin.java.JavaPlugin
 
 open class Aspect(val plugin: Plugin): Listener
+
 inline fun <reified T: Event> Aspect.listenTo(noinline handler: (T) -> Unit) {
     this.plugin.server.pluginManager.registerEvent(
         T::class.java,
@@ -16,7 +17,6 @@ inline fun <reified T: Event> Aspect.listenTo(noinline handler: (T) -> Unit) {
         this.plugin
     )
 }
-
 
 fun JavaPlugin.scheduleRun(delayTicks: Long = 0L, block: () -> Unit) {
     server.scheduler.runTaskLater(this, Runnable { block() }, delayTicks)
