@@ -71,12 +71,16 @@ class BreakerAspect(private val plugin: CubematicPlugin): Listener {
                     onTransactionExecute(transaction)
                 }
 
+
+                /* Broken
                 val animations = transaction.durationTicks / 20
                 (0..animations).forEach {
                     plugin.scheduleRun(it * 20.toLong()) {
                         animateProgress(transaction)
                     }
                 }
+                */
+
             } else {
                 ParticleFX.fizzle(event.block.location, event.block.getRelative(BlockFace.UP).location)
             }

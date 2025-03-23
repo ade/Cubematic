@@ -26,13 +26,13 @@ class CubematicPlugin: JavaPlugin() {
         super.onEnable()
         //server.pluginManager.registerEvents(DebugAspect(this), this)
 
-        server.pluginManager.registerEvents(DispenseCraftingTableAspect(this), this)
-        server.pluginManager.registerEvents(SequenceInputDropperAspect(this), this)
+        //server.pluginManager.registerEvents(DispenseCraftingTableAspect(this), this)
+        //server.pluginManager.registerEvents(SequenceInputDropperAspect(this), this)
 
         server.pluginManager.registerEvents(BreakerAspect(this), this)
         server.pluginManager.registerEvents(PlacingAspect(this), this)
 
-        server.pluginManager.registerEvents(PortalAspect(this), this)
+        //server.pluginManager.registerEvents(PortalAspect(this), this)
         //server.pluginManager.registerEvents(ShriekerTest(this), this)
 
         if(config.debug) {

@@ -40,7 +40,8 @@ object ParticleFX {
     }
 
     fun blockBroken(location: Location, material: ItemStack) {
-        location.world?.spawnParticle(Particle.BLOCK, location.getCenter(), 32, 0.2, 0.2, 0.2, 0.1, material);
+        //borkd
+        //location.world?.spawnParticle(Particle.BLOCK, location.getCenter(), 32, 0.2, 0.2, 0.2, 0.1, material);
     }
 
     fun convertToPlacerBlock(location: Location) {
