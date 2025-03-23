@@ -5,7 +5,6 @@ plugins {
 buildscript {
     repositories {
         mavenCentral()
-        google()
         maven("https://repo.papermc.io/repository/maven-public/")
     }
 }
@@ -13,7 +12,6 @@ buildscript {
 allprojects {
     repositories {
         mavenCentral()
-        google()
         maven("https://repo.papermc.io/repository/maven-public/")
     }
 }

@@ -1,0 +1,23 @@
+[versions]
+kotlin = "2.1.10"
+paper = "1.21.4-R0.1-SNAPSHOT"
+exposed = "0.60.0"
+sqlite = "3.44.1.0"
+
+[plugins]
+shadow = { id = "com.github.johnrengelman.shadow", version = "8.1.1" }
+pluginYmlBukkit = { id = "de.eldoria.plugin-yml.bukkit", version = "0.7.1" }
+runPaper = { id = "xyz.jpenilla.run-paper", version = "2.3.1" }
+kotlinx-serialization = { id = "org.jetbrains.kotlin.plugin.serialization", version.ref = "kotlin" }
+
+[libraries]
+paper = { group = "io.papermc.paper", name = "paper-api", version.ref = "paper" }
+exposed-core = { group = "org.jetbrains.exposed", name = "exposed-core", version.ref = "exposed" }
+exposed-dao = { group = "org.jetbrains.exposed", name = "exposed-dao", version.ref = "exposed" }
+exposed-jdbc = { group = "org.jetbrains.exposed", name = "exposed-jdbc", version.ref = "exposed" }
+sqlite = { group = "org.xerial", name = "sqlite-jdbc", version.ref = "sqlite" }
+
+kaml = { group = "com.charleskorn.kaml", name = "kaml", version = "0.54.0" }
+
+[bundles]
+exposed = [ "exposed-core", "exposed-dao", "exposed-jdbc" ]

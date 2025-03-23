@@ -13,7 +13,7 @@ repositories {
 dependencies {
     implementation(project(":core"))
     testImplementation(kotlin("test"))
-    compileOnly(libs.papermc.api)
+    implementation(libs.paper)
 }
 
 kotlin {

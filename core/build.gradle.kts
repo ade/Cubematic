@@ -11,7 +11,7 @@ repositories {
 }
 
 dependencies {
-    compileOnly(libs.papermc.api)
+    implementation(libs.paper)
 }
 
 kotlin {
