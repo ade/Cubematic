@@ -4,7 +4,9 @@ import se.ade.mc.cubematic.CubematicPlugin
 import org.bukkit.Location
 import org.bukkit.Material
 import org.bukkit.Particle
+import org.bukkit.block.Block
 import org.bukkit.block.BlockFace
+import org.bukkit.block.data.BlockData
 import org.bukkit.inventory.ItemStack
 import org.bukkit.util.Vector
 import se.ade.mc.cubematic.extensions.getCenter
@@ -29,19 +31,17 @@ object ParticleFX {
         from.world?.spawnParticle(Particle.SMOKE, newLocation, 16, 0.1, 0.1, 0.1, 0.01)
     }
 
-    fun crackAllSides(location: Location, material: Material) {
-        val item = ItemStack(material)
+    fun crackAllSides(location: Location, block: Block) {
         location.allFaceCenters().forEach {
-            crack(it, item)
+            crack(it, block)
         }
     }
-    private fun crack(location: Location, material: ItemStack) {
-        location.world?.spawnParticle(Particle.BLOCK, location, 2, 0.25, 0.25, 0.25, 0.05, material);
+    private fun crack(location: Location, block: Block) {
+        location.world?.spawnParticle(Particle.BLOCK, location, 2, 0.25, 0.25, 0.25, 0.05, block.blockData);
     }
 
-    fun blockBroken(location: Location, material: ItemStack) {
-        //borkd
-        //location.world?.spawnParticle(Particle.BLOCK, location.getCenter(), 32, 0.2, 0.2, 0.2, 0.1, material);
+    fun blockBroken(location: Location, block: Block) {
+        location.world?.spawnParticle(Particle.BLOCK, location.getCenter(), 32, 0.2, 0.2, 0.2, 0.1, block.blockData)
     }
 
     fun convertToPlacerBlock(location: Location) {

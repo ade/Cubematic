@@ -3,7 +3,7 @@
 - Updated to papermc 1.21.4
 - Added InTheSky plugin
 - developer qol improvements
-- Particles effects for breaker are temporary disabled because they broke
+- Fixed animations
 
 0.3.0 (wip)
 -----

@@ -71,15 +71,12 @@ class BreakerAspect(private val plugin: CubematicPlugin): Listener {
                     onTransactionExecute(transaction)
                 }
 
-
-                /* Broken
                 val animations = transaction.durationTicks / 20
                 (0..animations).forEach {
                     plugin.scheduleRun(it * 20.toLong()) {
                         animateProgress(transaction)
                     }
                 }
-                */
 
             } else {
                 ParticleFX.fizzle(event.block.location, event.block.getRelative(BlockFace.UP).location)
@@ -157,7 +154,7 @@ class BreakerAspect(private val plugin: CubematicPlugin): Listener {
     }
 
     private fun performBlockBreak(block: Block, tool: ItemStack) {
-        ParticleFX.blockBroken(block.location, ItemStack(block.type))
+        ParticleFX.blockBroken(block.location, block)
         Sfx.blockBreak(block)
         block.breakNaturally(tool)
     }
@@ -201,7 +198,7 @@ class BreakerAspect(private val plugin: CubematicPlugin): Listener {
         if(!transactions.contains(transaction.id))
             return
 
-        ParticleFX.crackAllSides(transaction.breakee, transaction.breakee.block.type)
+        ParticleFX.crackAllSides(transaction.breakee, transaction.breakee.block)
     }
 
     private fun validateBreakerPower(tx: BreakTransaction) {
