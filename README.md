@@ -37,14 +37,14 @@ This plugin creates a custom portal system in Minecraft with the following featu
   - works even if plugin is disabled
 
 ### Creation Process
-1. Player builds a rectangular frame from Crying Obsidian
-2. Player obtains a special compass with:
-  - Lodestone tracking set to destination
-  - Vanishing Curse enchantment
-3. Right-clicking the frame with this compass activates the portal:
+1. Player creates a lodestone at the intended destination
+2. Player obtains a lodestone compass pointed at the lodestone
+3. Enchant the compass with Curse of Vanishing
+4. Build a rectangular frame from Crying Obsidian, as if building a nether portal
+5. Holding the compass, right-click INSIDE the frame (as if you were lighting a nether portal):
   - Interior fills with End Gateway blocks
   - Gateways are configured to teleport to the compass's destination
-  - The compass vanishes at activation
+  - The compass vanishes
 
 ### Teleportation
 - Using a portal costs 4 hunger points
