@@ -6,6 +6,7 @@ plugins {
 
 include(
     "core",
-    "plugin",
+    "automation",
+    "inthesky",
     "utils"
 )

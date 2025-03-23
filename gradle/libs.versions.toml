@@ -3,6 +3,7 @@ kotlin = "2.1.10"
 paper = "1.21.4-R0.1-SNAPSHOT"
 exposed = "0.60.0"
 sqlite = "3.44.1.0"
+minecraft = "1.21.4"
 
 [plugins]
 shadow = { id = "com.github.johnrengelman.shadow", version = "8.1.1" }

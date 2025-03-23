@@ -1,3 +1,9 @@
+0.3.1
+-----
+- Updated to papermc 1.21.4
+- Added InTheSky plugin
+- developer qol improvements
+
 0.3.0 (wip)
 -----
 - Dropped spigot support. Paper is now the default and only supported server type.
