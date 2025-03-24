@@ -15,10 +15,8 @@ repositories {
 }
 
 dependencies {
+    compileOnly(libs.paper)
     implementation(project(":core"))
-    implementation(libs.paper)
-    implementation(libs.sqlite)
-    implementation(libs.bundles.exposed)
     implementation(libs.kaml)
 
     testImplementation(kotlin("test"))
@@ -58,20 +56,6 @@ bukkit {
     author = "ade"
     description = "tbd"
     version = project.version.toString()
-
-    permissions {
-        register("skyblock.command") {
-            description = "Allows the player to use the skyblock command"
-            default = BukkitPluginDescription.Permission.Default.OP
-        }
-    }
-
-    commands {
-        register("dream") {
-            description = "Dreamcommand"
-            permission = "skyblock.command"
-        }
-    }
 
     apiVersion = "1.21"
 }

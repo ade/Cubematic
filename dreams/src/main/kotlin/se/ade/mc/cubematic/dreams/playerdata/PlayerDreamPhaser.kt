@@ -1,10 +1,10 @@
-package se.ade.mc.skyblock.dream.playerdata
+package se.ade.mc.cubematic.dreams.playerdata
 
 import org.bukkit.World
 import org.bukkit.entity.Player
-import se.ade.mc.skyblock.datastore.SkyDb
-import se.ade.mc.skyblock.dream.PlayerStatus
-import se.ade.mc.skyblock.dream.inventory.PlayerDreamInventories
+import se.ade.mc.cubematic.dreams.PlayerStatus
+import se.ade.mc.cubematic.dreams.datastore.SkyDb
+import se.ade.mc.cubematic.dreams.inventory.PlayerDreamInventories
 import java.util.logging.Logger
 
 class PlayerDreamPhaser(

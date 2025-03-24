@@ -13,6 +13,12 @@ class CubematicPortalsPlugin: JavaPlugin() {
 	override fun onEnable() {
 		server.pluginManager.registerEvents(PortalAspect(this, config.debug), this)
 
+		if(config.debug) {
+			addCommands()
+		}
+	}
+
+	private fun addCommands() {
 		commands {
 			command("cubematic") {
 				subcommand("portals") {

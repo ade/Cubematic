@@ -1,4 +1,4 @@
-package se.ade.mc.skyblock.dream
+package se.ade.mc.cubematic.dreams
 
 import org.bukkit.Location
 import org.bukkit.Material

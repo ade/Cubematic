@@ -1,4 +1,4 @@
-package se.ade.mc.skyblock.datastore
+package se.ade.mc.cubematic.dreams.datastore
 
 import org.jetbrains.exposed.sql.Table
 

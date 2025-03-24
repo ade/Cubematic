@@ -14,8 +14,9 @@ repositories {
 }
 
 dependencies {
+    compileOnly(libs.paper)
+
     implementation(project(":core"))
-    implementation(libs.paper)
     implementation(libs.sqlite)
     implementation(libs.kaml)
 

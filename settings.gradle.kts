@@ -7,6 +7,7 @@ plugins {
 include(
     "core",
     "automation",
+    "dreams",
     "inthesky",
     "portals",
 )

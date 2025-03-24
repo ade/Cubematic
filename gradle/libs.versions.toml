@@ -17,6 +17,7 @@ exposed-core = { group = "org.jetbrains.exposed", name = "exposed-core", version
 exposed-dao = { group = "org.jetbrains.exposed", name = "exposed-dao", version.ref = "exposed" }
 exposed-jdbc = { group = "org.jetbrains.exposed", name = "exposed-jdbc", version.ref = "exposed" }
 sqlite = { group = "org.xerial", name = "sqlite-jdbc", version.ref = "sqlite" }
+multiverse2 = { group = "com.onarandombox.multiversecore", name = "multiverse-core", version = "4.3.14" }
 
 kaml = { group = "com.charleskorn.kaml", name = "kaml", version = "0.54.0" }
 

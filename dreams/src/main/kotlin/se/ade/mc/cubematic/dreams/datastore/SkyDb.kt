@@ -1,7 +1,8 @@
-package se.ade.mc.skyblock.datastore
+package se.ade.mc.cubematic.dreams.datastore
 
 import org.bukkit.Location
 import org.bukkit.World
+import org.bukkit.plugin.java.JavaPlugin
 import org.jetbrains.exposed.sql.Database
 import org.jetbrains.exposed.sql.SchemaUtils.create
 import org.jetbrains.exposed.sql.Transaction
@@ -10,14 +11,13 @@ import org.jetbrains.exposed.sql.exists
 import org.jetbrains.exposed.sql.replace
 import org.jetbrains.exposed.sql.transactions.TransactionManager
 import org.jetbrains.exposed.sql.transactions.transaction
-import se.ade.mc.skyblock.CubematicSkyPlugin
-import se.ade.mc.skyblock.dream.PlayerStatus
-import se.ade.mc.skyblock.dream.inventory.PlayerHibernation
+import se.ade.mc.cubematic.dreams.PlayerStatus
+import se.ade.mc.cubematic.dreams.inventory.PlayerHibernation
 import java.io.File
 import java.sql.Connection
 import java.util.UUID
 
-class SkyDb(private val plugin: CubematicSkyPlugin) {
+class SkyDb(private val plugin: JavaPlugin) {
 
 	private val dbFile = File(plugin.dataFolder, "skyblock.db").absolutePath
 
@@ -102,9 +102,9 @@ class SkyDb(private val plugin: CubematicSkyPlugin) {
 		tx {
 			PlayerStatusTable.replace {
 				it[PlayerStatusTable.uuid] = uuid.toString()
-				it[PlayerStatusTable.health] = status.health
-				it[PlayerStatusTable.food] = status.food
-				it[PlayerStatusTable.air] = status.air
+				it[health] = status.health
+				it[food] = status.food
+				it[air] = status.air
 			}
 		}
 	}

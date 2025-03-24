@@ -1,6 +1,5 @@
-package se.ade.mc.skyblock.dream
+package se.ade.mc.cubematic.dreams
 
-import net.kyori.adventure.util.TriState
 import org.bukkit.ChatColor
 import org.bukkit.GameRule
 import org.bukkit.World
@@ -12,30 +11,34 @@ import org.bukkit.event.EventHandler
 import org.bukkit.event.Listener
 import org.bukkit.event.entity.EntityDamageEvent
 import org.bukkit.event.player.PlayerBedEnterEvent
-import se.ade.mc.skyblock.CubematicSkyPlugin
-import se.ade.mc.skyblock.DreamCommandHandler
-import se.ade.mc.skyblock.datastore.SkyDb
-import se.ade.mc.skyblock.dream.inventory.PlayerDreamInventories
-import se.ade.mc.skyblock.dream.playerdata.PlayerDreamPhaser
+import org.bukkit.plugin.java.JavaPlugin
+import se.ade.mc.cubematic.dreams.datastore.SkyDb
+import se.ade.mc.cubematic.dreams.inventory.PlayerDreamInventories
+import se.ade.mc.cubematic.dreams.playerdata.PlayerDreamPhaser
 import java.io.File
 
 private const val GLOBAL_DREAM_WORLD_NAME = "dreamworld"
 
-class DreamFacet(
-    private val plugin: CubematicSkyPlugin,
-    private val overworld: World
-) : Listener, DreamCommandHandler {
+class DreamFacet(private val plugin: JavaPlugin) : Listener {
     private var dreamWorld: World? = null
 
     private val server = plugin.server
     private val logger = plugin.logger
     private val db = SkyDb(plugin)
     private val dreamInventory = PlayerDreamInventories(db, logger)
-    private val phaser = PlayerDreamPhaser(overworld, dreamInventory, db, logger)
+    private lateinit var phaser: PlayerDreamPhaser
+
+    private val overworld by lazy {
+        server.getWorld("world")
+            server.worlds.first { it.environment == World.Environment.NORMAL }
+            ?: throw IllegalStateException("Could not find an overworld (either named 'world' or type NORMAL)")
+    }
 
     fun onEnable() {
         // Register events and commands
         server.pluginManager.registerEvents(this, plugin)
+
+        phaser = PlayerDreamPhaser(overworld, dreamInventory, db, logger)
 
         logger.info("DreamFacet enabled for world: '${overworld.name}'")
     }
@@ -55,30 +58,30 @@ class DreamFacet(
         logger.info("DreamBlock plugin disabled")
     }
 
-    override fun onCreateDreamWorldCommand() {
+    fun onCreateDreamWorldCommand() {
         createDreamWorld()
     }
 
-    override fun onEnterDreamWorldCommand(player: Player) {
+    fun onEnterDreamWorldCommand(player: Player) {
         player.sendMessage("Starting dream")
         beginDream(player)
     }
 
-    override fun onLeaveDreamWorldCommand(player: Player) {
+    fun onLeaveDreamWorldCommand(player: Player) {
         player.sendMessage("Ending dream")
         endDream(player)
     }
 
-    override fun onDestroyDreamWorldCommand() {
+    fun onDestroyDreamWorldCommand() {
         destroyDreamWorld()
     }
 
-    override fun onStashInventoryCommand(player: Player) {
+    fun onStashInventoryCommand(player: Player) {
         dreamInventory.stash(player)
         player.sendMessage("Inventory stashed")
     }
 
-    override fun onPopInventoryCommand(player: Player) {
+    fun onPopInventoryCommand(player: Player) {
         dreamInventory.pop(player)
         player.sendMessage("Inventory restored")
     }
@@ -124,14 +127,13 @@ class DreamFacet(
 
         val world = WorldCreator(worldName)
             .environment(World.Environment.NORMAL)
-            .type(WorldType.FLAT)
+            .type(WorldType.NORMAL)
             .generator(DreamChunkGenerator())
             .generateStructures(false)
-            .keepSpawnLoaded(TriState.FALSE)
             .createWorld()!!
 
 
-        world.setSpawnLocation(0, 100, 0)
+        world.setSpawnLocation(8, 64, 8)
         world.time = 1000 // Early morning
         world.setStorm(false)
         world.setGameRule(GameRule.DO_WEATHER_CYCLE, false)

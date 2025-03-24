@@ -1,4 +1,4 @@
-package se.ade.mc.skyblock.dream.inventory
+package se.ade.mc.cubematic.dreams.inventory
 
 data class PlayerHibernation(
 	val uuid: String,

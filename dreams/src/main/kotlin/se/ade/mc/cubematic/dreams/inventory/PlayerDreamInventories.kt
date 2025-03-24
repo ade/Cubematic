@@ -1,8 +1,8 @@
-package se.ade.mc.skyblock.dream.inventory
+package se.ade.mc.cubematic.dreams.inventory
 
 import org.bukkit.entity.Player
 import org.bukkit.inventory.ItemStack
-import se.ade.mc.skyblock.datastore.SkyDb
+import se.ade.mc.cubematic.dreams.datastore.SkyDb
 import java.util.logging.Logger
 
 class PlayerDreamInventories(
