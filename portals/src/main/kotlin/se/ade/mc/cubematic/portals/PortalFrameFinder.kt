@@ -15,11 +15,13 @@ sealed class PortalPlane(val directions: List<BlockFace>) {
  * @param frameMaterial The material of the outside frame
  * @param origin the first block to start searching from. Must be a block inside the frame (typically an air block)
  * @param limit the maximum inside width/height of the portal.
+ * @param allowActive if true, the frame may contain active portal blocks
  */
 class PortalFrameFinder(
     private val frameMaterial: Material,
     private val origin: Block,
-    private val limit: Int) {
+    private val limit: Int,
+    private val allowActive: Boolean = false) {
 
     /**
      * Searches outwards for a portal frame in all three planes and returns it if found.
@@ -36,7 +38,9 @@ class PortalFrameFinder(
 
         val frameBlocks = frame.blocks()
 
-        if(!frameBlocks.consistsOf(frameMaterial, Material.AIR))
+        val isActivePortal = frameBlocks.consistsOf(frameMaterial, Material.END_GATEWAY)
+
+        if(!frameBlocks.consistsOf(frameMaterial, Material.AIR) && !(allowActive && isActivePortal))
             return null
 
         return frameBlocks

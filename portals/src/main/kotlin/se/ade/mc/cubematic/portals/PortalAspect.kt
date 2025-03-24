@@ -1,6 +1,7 @@
 package se.ade.mc.cubematic.portals
 
 import com.destroystokyo.paper.event.entity.EntityTeleportEndGatewayEvent
+import com.destroystokyo.paper.event.player.PlayerTeleportEndGatewayEvent
 import org.bukkit.Material
 import org.bukkit.Sound
 import org.bukkit.block.Block
@@ -54,15 +55,21 @@ class PortalAspect(
     }
 
     @EventHandler
-    fun onEvent(e: PlayerTeleportEvent) {
-        logger?.info("PlayerTeleportEvent: ${e.player}, ${e.cause}, from ${e.from}, to ${e.to}")
-        if(FOOD_BURN > 0) {
-            if(e.player.foodLevel >= FOOD_BURN + 1) {
-                e.player.foodLevel -= FOOD_BURN
-            } else {
-                e.player.playSound(e.player, Sound.ENTITY_PLAYER_BURP, 1f, 1f)
-                e.isCancelled = true
+    fun onEvent(e: PlayerTeleportEndGatewayEvent) {
+        val portalFrame = PortalFrameFinder(frameMaterial, e.gateway.block, MAX_PORTAL_SIZE, true).find()
+
+        if(portalFrame != null) {
+            logger?.info("PORTAL: ${e.player}, ${e.cause}, from ${e.from}, to ${e.to}")
+            if(FOOD_BURN > 0) {
+                if(e.player.foodLevel >= FOOD_BURN + 1) {
+                    e.player.foodLevel -= FOOD_BURN
+                } else {
+                    e.player.playSound(e.player, Sound.ENTITY_PLAYER_BURP, 1f, 1f)
+                    e.isCancelled = true
+                }
             }
+        } else {
+            logger?.info { "No frame for this $e" }
         }
     }
 
