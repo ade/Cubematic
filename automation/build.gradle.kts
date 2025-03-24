@@ -65,6 +65,10 @@ tasks {
         pluginJars(project(":inthesky").tasks.named("shadowJar").get().outputs.files.first())
         pluginJars(project(":portals").tasks.named("shadowJar").get().outputs.files.first())
 
+        downloadPlugins {
+            url("https://github.com/Multiverse/Multiverse-Core/releases/download/4.3.14/multiverse-core-4.3.14.jar")
+        }
+
         runDirectory.set(rootProject.layout.projectDirectory.dir(".servers/papermc"))
     }
 }

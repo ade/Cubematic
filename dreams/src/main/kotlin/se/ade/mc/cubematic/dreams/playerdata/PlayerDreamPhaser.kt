@@ -1,5 +1,6 @@
 package se.ade.mc.cubematic.dreams.playerdata
 
+import com.onarandombox.MultiverseCore.MultiverseCore
 import org.bukkit.World
 import org.bukkit.entity.Player
 import se.ade.mc.cubematic.dreams.PlayerStatus
@@ -11,7 +12,8 @@ class PlayerDreamPhaser(
 	private val homeWorld: World,
 	private val inventories: PlayerDreamInventories,
 	private val db: SkyDb,
-	private val logger: Logger
+	private val logger: Logger,
+	private val multiverse: MultiverseCore
 ) {
 	fun begin(player: Player, dreamWorld: World) {
 		db.playerLocationStash(
@@ -30,7 +32,8 @@ class PlayerDreamPhaser(
 			)
 		)
 
-		player.teleport(dreamWorld.spawnLocation)
+		multiverse.teleportPlayer(player, player, dreamWorld.getBlockAt(8,100,8).location)
+		//player.teleport(dreamWorld.spawnLocation)
 	}
 
 	fun end(player: Player) {

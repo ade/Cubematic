@@ -1,10 +1,7 @@
 package se.ade.mc.cubematic.dreams
 
-import org.bukkit.ChatColor
-import org.bukkit.GameRule
-import org.bukkit.World
-import org.bukkit.WorldCreator
-import org.bukkit.WorldType
+import com.onarandombox.MultiverseCore.MultiverseCore
+import org.bukkit.*
 import org.bukkit.entity.Player
 import org.bukkit.event.Event
 import org.bukkit.event.EventHandler
@@ -15,7 +12,7 @@ import org.bukkit.plugin.java.JavaPlugin
 import se.ade.mc.cubematic.dreams.datastore.SkyDb
 import se.ade.mc.cubematic.dreams.inventory.PlayerDreamInventories
 import se.ade.mc.cubematic.dreams.playerdata.PlayerDreamPhaser
-import java.io.File
+
 
 private const val GLOBAL_DREAM_WORLD_NAME = "dreamworld"
 
@@ -27,6 +24,7 @@ class DreamFacet(private val plugin: JavaPlugin) : Listener {
     private val db = SkyDb(plugin)
     private val dreamInventory = PlayerDreamInventories(db, logger)
     private lateinit var phaser: PlayerDreamPhaser
+    private lateinit var multiverse: MultiverseCore
 
     private val overworld by lazy {
         server.getWorld("world")
@@ -38,7 +36,10 @@ class DreamFacet(private val plugin: JavaPlugin) : Listener {
         // Register events and commands
         server.pluginManager.registerEvents(this, plugin)
 
-        phaser = PlayerDreamPhaser(overworld, dreamInventory, db, logger)
+        multiverse = Bukkit.getServer().pluginManager.getPlugin("Multiverse-Core") as MultiverseCore?
+            ?: throw IllegalStateException("Multiverse-Core is required but plugin not found")
+
+        phaser = PlayerDreamPhaser(overworld, dreamInventory, db, logger, multiverse)
 
         logger.info("DreamFacet enabled for world: '${overworld.name}'")
     }
@@ -122,16 +123,21 @@ class DreamFacet(private val plugin: JavaPlugin) : Listener {
         // Clean up any existing dream world
         destroyDreamWorld()
 
-        // Create a new world
-        val worldName = GLOBAL_DREAM_WORLD_NAME
+        val result = multiverse.mvWorldManager.addWorld(
+            GLOBAL_DREAM_WORLD_NAME,    /* World Name */
+            World.Environment.NORMAL,   /* Environment */
+            null,                       /* Seed */
+            WorldType.NORMAL,           /* World Type */
+            false,                      /* Generate Structures */
+            "Cubematic-Dreams"     /* Generator */
+        )
 
-        val world = WorldCreator(worldName)
-            .environment(World.Environment.NORMAL)
-            .type(WorldType.NORMAL)
-            .generator(DreamChunkGenerator())
-            .generateStructures(false)
-            .createWorld()!!
 
+        val world = server.getWorld(GLOBAL_DREAM_WORLD_NAME)
+        if(!result || world == null) {
+            logger.warning("Failed to create dream world (world: $world, result: $result)")
+            return
+        }
 
         world.setSpawnLocation(8, 64, 8)
         world.time = 1000 // Early morning
@@ -143,15 +149,17 @@ class DreamFacet(private val plugin: JavaPlugin) : Listener {
         world.setGameRule(GameRule.DO_PATROL_SPAWNING, false)
         world.setGameRule(GameRule.DO_TRADER_SPAWNING, false)
         world.setGameRule(GameRule.DISABLE_RAIDS, true)
-
         world.isAutoSave = false
 
         dreamWorld = world
+        logger.info("Dream world created")
     }
 
     private fun destroyDreamWorld() {
         if(dreamWorld == null) {
-            dreamWorld = server.getWorld(GLOBAL_DREAM_WORLD_NAME)
+            if(multiverse.mvWorldManager.loadWorld(GLOBAL_DREAM_WORLD_NAME)) {
+                dreamWorld = server.getWorld(GLOBAL_DREAM_WORLD_NAME)
+            }
         }
         dreamWorld?.let { world ->
             // Make sure no players are in the world
@@ -160,17 +168,8 @@ class DreamFacet(private val plugin: JavaPlugin) : Listener {
             }
 
             // Unload the world
-            server.unloadWorld(world, false)
-
-            // Delete the world directory
-            try {
-                val worldFolder = world.worldFolder
-                if (worldFolder.exists() && worldFolder.isDirectory) {
-                    deleteRecursively(worldFolder)
-                }
-            } catch (e: Exception) {
-                logger.warning("Failed to delete dream world: ${e.message}")
-            }
+            multiverse.mvWorldManager.unloadWorld(GLOBAL_DREAM_WORLD_NAME)
+            multiverse.mvWorldManager.deleteWorld(GLOBAL_DREAM_WORLD_NAME)
         }
 
         dreamWorld = null
@@ -180,16 +179,6 @@ class DreamFacet(private val plugin: JavaPlugin) : Listener {
         logger.info { "teleportPlayerBack..." }
         val homeLocation = overworld.spawnLocation
         player.teleport(homeLocation)
-    }
-
-    private fun deleteRecursively(file: File) {
-        if (file.isDirectory) {
-            file.listFiles()?.forEach { deleteRecursively(it) }
-        }
-        logger.info {
-            "Deleting file: ${file.name}"
-        }
-        file.delete()
     }
 
     private fun beginDream(player: Player) {

@@ -1,5 +1,6 @@
 package se.ade.mc.cubematic.dreams
 
+import org.bukkit.generator.ChunkGenerator
 import org.bukkit.plugin.java.JavaPlugin
 import se.ade.mc.cubematic.extensions.commands
 
@@ -48,5 +49,9 @@ class CubematicDreamsPlugin: JavaPlugin() {
 
 	override fun onDisable() {
 		facet.onDisable()
+	}
+
+	override fun getDefaultWorldGenerator(worldName: String, id: String?): ChunkGenerator? {
+		return DreamChunkGenerator()
 	}
 }
