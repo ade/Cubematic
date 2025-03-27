@@ -27,16 +27,25 @@ Skyblock like plugin for Paper-based Minecraft servers.
 ## Portals
 This plugin creates a custom portal system in Minecraft with the following features:
 
-### Portal Structure
+### Breakable End Frame blocks
+End Frame blocks can be broken and picked up by the player with at least an iron pickaxe.
+When broken, the portal inside, if any, is destroyed. To reactivate the portal, a new frame block
+must be placed (in the correct direction) and be fed with an Eye of Ender. 
+  - To enable, set in config.yml: ```breakableEndFrames: true```
+
+
+### Custom Portal Structures
+Player-craftable portals that can be used to teleport between custom locations.
+
 - **Frame Material**: Nether portal shape but made of Crying Obsidian
-- **Portal Material**: End Gateway blocks
+- **Portal Material**: End Gateway blocks (added automatically upon activation and removed upon deactivation)
 - **Orientations**: Works in all three planes (XY, ZY, XZ)
 - **Size Limit**: Maximum portal side of 21 blocks
 - **Uses regular game mechanics for portals**
   - no custom teleportation code
   - works even if plugin is disabled
 
-### Creation Process
+#### Creation Process
 1. Player creates a lodestone at the intended destination
 2. Player obtains a lodestone compass pointed at the lodestone
 3. Enchant the compass with Curse of Vanishing
@@ -46,19 +55,19 @@ This plugin creates a custom portal system in Minecraft with the following featu
   - Gateways are configured to teleport to the compass's destination
   - The compass vanishes
 
-### Teleportation
+#### Teleportation
 - Using a portal costs 4 hunger points
 - If player has insufficient food, teleportation fails
 - Non-player entities can be teleported but are blocked by default (because it would be op
   in farms, but can be enabled (todo: config file))
 
-### Breaking Portals
+#### Breaking Portals
 When breaking a frame block:
 - Connected gateway blocks are removed
 - The compass drops that tracked the portal's destination
 - This compass can be used again to create another linked portal
 
 
-### Limitations
+#### Limitations
 - Interdimensional travel is not supported
 - Moving/destroying the lodestone does not affect the portal once created

@@ -9,14 +9,19 @@ import se.ade.mc.cubematic.extensions.commands
 
 class CubematicPortalsPlugin: JavaPlugin() {
 	private val config by configProvider { PortalsConfig() }
-	private val breakableEndFrameAspect = BreakableEndFrameAspect(this)
+	private val breakableEndFrameAspect by lazy {
+		BreakableEndFrameAspect(this)
+	}
 
 	override fun onEnable() {
 		server.pluginManager.registerEvents(PortalAspect(this, config.debug), this)
-		breakableEndFrameAspect.enable()
 
 		if(config.debug) {
 			addCommands()
+		}
+
+		if(config.breakableEndFrames) {
+			breakableEndFrameAspect.enable()
 		}
 	}
 
