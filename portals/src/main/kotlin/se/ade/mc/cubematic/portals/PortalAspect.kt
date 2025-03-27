@@ -2,6 +2,7 @@ package se.ade.mc.cubematic.portals
 
 import com.destroystokyo.paper.event.entity.EntityTeleportEndGatewayEvent
 import com.destroystokyo.paper.event.player.PlayerTeleportEndGatewayEvent
+import org.bukkit.Location
 import org.bukkit.Material
 import org.bukkit.Sound
 import org.bukkit.block.Block
@@ -40,18 +41,34 @@ private val frameMaterial = Material.CRYING_OBSIDIAN
 private val targetOffset = Vector(0.0, 1.0, 0.0)
 
 class PortalAspect(
-    plugin: CubematicPortalsPlugin,
+    private val plugin: CubematicPortalsPlugin,
     private val debug: Boolean,
-): Listener, Aspect(plugin) {
+): Listener {
     private val logger: Logger? = if(debug) plugin.logger else null
 
     @EventHandler
     fun onEvent(it: EntityTeleportEndGatewayEvent) {
         //Disable entities teleporting through the gateway, if configured so
-        if (ALLOW_NON_PLAYER_ENTITIES) return
+        if (ALLOW_NON_PLAYER_ENTITIES)
+            return
+
+        // Make sure the portal is a cubematic portal or return
+        if (!isCustomPortal(it.gateway.location))
+            return
 
         it.isCancelled = true
         logger?.info("Cancel entity teleport: ${it.entity.type}, ${it.gateway.location}")
+    }
+
+    private fun isCustomPortal(location: Location): Boolean {
+        val block = location.block
+        if(block.type != Material.END_GATEWAY)
+            return false
+
+        val portalFrame = PortalFrameFinder(frameMaterial, block, MAX_PORTAL_SIZE, true).find()
+            ?: return false
+
+        return true
     }
 
     @EventHandler

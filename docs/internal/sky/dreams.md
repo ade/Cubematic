@@ -45,11 +45,6 @@ Sometimes when sleeping, players get sent to a dream world.
 - Inventory, armor, health, food, etc is snapshot and saved when going to dreamworld.
     - When returning, the player is restored to the state they were in when they left.
 
-Some things to consider:
-- Turn off Trader spawning in destination
-- Turn off mob spawning in destination?
-  
-
 # Technical notes
 ## Inventory management
 - The player's inventory can be saved when they go through the portal by calling
