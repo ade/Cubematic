@@ -50,4 +50,5 @@ val graph = buildGraph {
 			crafting(3 of Material.IRON_INGOT)
 		}
 	}
+
 }

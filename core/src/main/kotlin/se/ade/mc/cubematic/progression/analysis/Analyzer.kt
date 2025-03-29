@@ -7,11 +7,22 @@ class DependencyAnalyzer(
 	private val initialItems: Map<Material, Int>
 ) {
 	private val derivable = mutableSetOf<Material>()
-	private val inProgress = mutableSetOf<Material>() // Prevents cycles
+	private val inProgress = mutableSetOf<Material>()
+	private val craftingPaths = mutableMapOf<Material, CraftingPath>()
+
+	data class CraftingPath(
+		val material: Material,
+		val ingredients: List<Material> = emptyList(),
+		val tools: List<Material> = emptyList(),
+		val isInitial: Boolean = false
+	)
 
 	init {
-		// Start with items we already have
 		derivable.addAll(initialItems.keys)
+		// Mark initial items in crafting paths
+		initialItems.keys.forEach { material ->
+			craftingPaths[material] = CraftingPath(material, isInitial = true)
+		}
 	}
 
 	fun analyze(): Set<Material> {
@@ -39,38 +50,6 @@ class DependencyAnalyzer(
 		return newItemFound
 	}
 
-	fun canDerive(material: Material): Boolean {
-		// Already have it or previously derived it
-		if (derivable.contains(material)) return true
-
-		// Prevent infinite recursion
-		if (inProgress.contains(material)) return false
-
-		// Find node for this material
-		val node = graph.nodes.find { it is Node.Item && it.material == material } as? Node.Item
-			?: return false
-
-		inProgress.add(material)
-
-		// Check each possible way to create this item
-		val canMake = node.sources.any { source ->
-			canSatisfySource(source)
-		}
-
-		inProgress.remove(material)
-		return canMake
-	}
-
-	private fun canSatisfySource(source: Source): Boolean {
-		// Check if any transformation can be performed
-		return source.transforms.any { transform ->
-			// Check all inputs are available
-			transform.input.all { req -> canSatisfyRequirement(req) } &&
-					// Check all tools are available
-					transform.tools.all { tool -> canSatisfyRequirement(tool) }
-		}
-	}
-
 	private fun canSatisfyRequirement(req: ProcessRequirement): Boolean {
 		return when (req) {
 			is ProcessRequirement.Type -> {
@@ -85,23 +64,89 @@ class DependencyAnalyzer(
 			}
 		}
 	}
-}
 
-fun main() {
-	val initialItems = mapOf(
-		Material.COBBLESTONE to 64,
-		Material.BIRCH_LOG to 64,
-	)
-
-	val analyzer = DependencyAnalyzer(graph, initialItems)
-	val derivableItems = analyzer.analyze()
-
-	println("Derivable items:")
-	derivableItems.forEach { material ->
-		println("- $material")
+	private fun canSatisfySource(source: Source): Boolean {
+		return source.transforms.any { transform ->
+			transform.input.all { req -> canSatisfyRequirement(req) } &&
+					transform.tools.all { tool -> canSatisfyRequirement(tool) }
+		}
 	}
 
-	// Check if specific item is derivable
-	val canDeriveSmoothStone = analyzer.canDerive(Material.SMOOTH_STONE)
-	println("\nCan derive SMOOTH_STONE: $canDeriveSmoothStone")
+	// Modified to track the path when a material can be derived
+	fun canDerive(material: Material): Boolean {
+		if (derivable.contains(material)) return true
+		if (inProgress.contains(material)) return false
+
+		val node = graph.nodes.find { it is Node.Item && it.material == material } as? Node.Item
+			?: return false
+
+		inProgress.add(material)
+
+		for (source in node.sources) {
+			for (transform in source.transforms) {
+				val inputsMet = transform.input.all { canSatisfyRequirement(it) }
+				val toolsMet = transform.tools.all { canSatisfyRequirement(it) }
+
+				if (inputsMet && toolsMet) {
+					val inputMaterials = transform.input.mapNotNull {
+						when (it) {
+							is ProcessRequirement.Type -> it.material
+							is ProcessRequirement.Any -> it.group.anyOf.find { m ->
+								initialItems.containsKey(m) || craftingPaths.containsKey(m)
+							}
+						}
+					}
+
+					val toolMaterials = transform.tools.mapNotNull {
+						when (it) {
+							is ProcessRequirement.Type -> it.material
+							is ProcessRequirement.Any -> it.group.anyOf.find { m ->
+								initialItems.containsKey(m) || craftingPaths.containsKey(m)
+							}
+						}
+					}
+
+					craftingPaths[material] = CraftingPath(
+						material = material,
+						ingredients = inputMaterials,
+						tools = toolMaterials
+					)
+
+					inProgress.remove(material)
+					return true
+				}
+			}
+		}
+
+		inProgress.remove(material)
+		return false
+	}
+
+	// New method to print paths
+	fun printPathTo(material: Material, indent: String = "") {
+		val path = craftingPaths[material] ?: run {
+			println("$indent$material - Not derivable")
+			return
+		}
+
+		if (path.isInitial) {
+			println("$indent$material - Initial item")
+			return
+		}
+
+		println("$indent$material can be created with:")
+
+		println("$indent  Ingredients:")
+		path.ingredients.forEach { ingredient ->
+			printPathTo(ingredient, "$indent    ")
+		}
+
+		if (path.tools.isNotEmpty()) {
+			println("$indent  Tools:")
+			path.tools.forEach { tool ->
+				printPathTo(tool, "$indent    ")
+			}
+		}
+	}
 }
+
