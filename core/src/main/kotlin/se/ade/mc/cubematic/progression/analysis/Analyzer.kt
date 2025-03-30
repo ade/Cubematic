@@ -1,48 +1,50 @@
 package se.ade.mc.cubematic.progression.analysis
 
 import org.bukkit.Material
+import se.ade.mc.cubematic.progression.analysis.Node.Item
+import se.ade.mc.cubematic.progression.analysis.key.NodeKey
 
 class DependencyAnalyzer(
 	private val graph: DependencyGraph,
-	private val initialItems: Map<Material, Int>
+	private val initialItems: Set<NodeKey>
 ) {
-	private val derivable = mutableSetOf<Material>()
-	private val inProgress = mutableSetOf<Material>()
-	private val craftingPaths = mutableMapOf<Material, CraftingPath>()
+	private val unlocked = mutableSetOf<NodeKey>()
+	private val inProgress = mutableSetOf<NodeKey>()
+	private val craftingPaths = mutableMapOf<NodeKey, CraftingPath>()
 
 	data class CraftingPath(
-		val material: Material,
-		val ingredients: List<Material> = emptyList(),
-		val tools: List<Material> = emptyList(),
+		val node: NodeKey,
+		val ingredients: List<NodeKey> = emptyList(),
+		val tools: List<NodeKey> = emptyList(),
 		val isInitial: Boolean = false
 	)
 
 	init {
-		derivable.addAll(initialItems.keys)
+		unlocked.addAll(initialItems)
 		// Mark initial items in crafting paths
-		initialItems.keys.forEach { material ->
-			craftingPaths[material] = CraftingPath(material, isInitial = true)
+		initialItems.forEach { nodeId ->
+			craftingPaths[nodeId] = CraftingPath(nodeId, isInitial = true)
 		}
 	}
 
-	fun analyze(): Set<Material> {
+	fun analyze(): Set<NodeKey> {
 		// Keep finding new items until we can't derive any more
 		var changed = true
 		while (changed) {
 			changed = expandDerivableItems()
 		}
-		return derivable.toSet()
+		return unlocked.toSet()
 	}
 
 	private fun expandDerivableItems(): Boolean {
 		var newItemFound = false
 
 		for (node in graph.nodes) {
-			if (node !is Node.Item || derivable.contains(node.material))
+			if (unlocked.contains(node.id))
 				continue
 
-			if (canDerive(node.material)) {
-				derivable.add(node.material)
+			if (canDerive(node.id)) {
+				unlocked.add(node.id)
 				newItemFound = true
 			}
 		}
@@ -54,33 +56,28 @@ class DependencyAnalyzer(
 		return when (req) {
 			is ProcessRequirement.Type -> {
 				// Either we already have it or we can derive it recursively
-				initialItems.containsKey(req.material) || canDerive(req.material)
+				initialItems.contains(req.key) || canDerive(req.key)
 			}
 			is ProcessRequirement.Any -> {
 				// Any of the materials in the group will do
-				req.group.anyOf.any { material ->
-					initialItems.containsKey(material) || canDerive(material)
+				req.filter.anyOf.any { nodeKey ->
+					initialItems.contains(nodeKey) || canDerive(nodeKey)
 				}
+			}
+			is ProcessRequirement.Mechanic -> {
+				initialItems.contains(req.mechanic.key) || canDerive(req.mechanic.key)
 			}
 		}
 	}
 
-	private fun canSatisfySource(source: Source): Boolean {
-		return source.transforms.any { transform ->
-			transform.input.all { req -> canSatisfyRequirement(req) } &&
-					transform.tools.all { tool -> canSatisfyRequirement(tool) }
-		}
-	}
+	fun canDerive(nodeKey: NodeKey): Boolean {
+		if (unlocked.contains(nodeKey)) return true
+		if (inProgress.contains(nodeKey)) return false
 
-	// Modified to track the path when a material can be derived
-	fun canDerive(material: Material): Boolean {
-		if (derivable.contains(material)) return true
-		if (inProgress.contains(material)) return false
-
-		val node = graph.nodes.find { it is Node.Item && it.material == material } as? Node.Item
+		val node = graph.nodes.find { it.id == nodeKey }
 			?: return false
 
-		inProgress.add(material)
+		inProgress.add(node.id)
 
 		for (source in node.sources) {
 			for (transform in source.transforms) {
@@ -88,55 +85,61 @@ class DependencyAnalyzer(
 				val toolsMet = transform.tools.all { canSatisfyRequirement(it) }
 
 				if (inputsMet && toolsMet) {
-					val inputMaterials = transform.input.mapNotNull {
+					val input: List<NodeKey> = transform.input.mapNotNull {
 						when (it) {
-							is ProcessRequirement.Type -> it.material
-							is ProcessRequirement.Any -> it.group.anyOf.find { m ->
-								initialItems.containsKey(m) || craftingPaths.containsKey(m)
+							is ProcessRequirement.Type -> it.key
+							is ProcessRequirement.Any -> it.filter.anyOf.find { nodeKey ->
+								initialItems.contains(nodeKey) || craftingPaths.containsKey(nodeKey)
+							}
+							is ProcessRequirement.Mechanic -> {
+								it.mechanic.key
 							}
 						}
 					}
 
-					val toolMaterials = transform.tools.mapNotNull {
+					val tools = transform.tools.mapNotNull {
 						when (it) {
-							is ProcessRequirement.Type -> it.material
-							is ProcessRequirement.Any -> it.group.anyOf.find { m ->
-								initialItems.containsKey(m) || craftingPaths.containsKey(m)
+							is ProcessRequirement.Type -> it.key
+							is ProcessRequirement.Any -> it.filter.anyOf.find { m ->
+								initialItems.contains(m) || craftingPaths.containsKey(m)
+							}
+							is ProcessRequirement.Mechanic -> {
+								it.mechanic.key
 							}
 						}
 					}
 
-					craftingPaths[material] = CraftingPath(
-						material = material,
-						ingredients = inputMaterials,
-						tools = toolMaterials
+					craftingPaths[node.id] = CraftingPath(
+						node = node.id,
+						ingredients = input,
+						tools = tools
 					)
 
-					inProgress.remove(material)
+					inProgress.remove(node.id)
 					return true
 				}
 			}
 		}
 
-		inProgress.remove(material)
+		inProgress.remove(node.id)
 		return false
 	}
 
 	// New method to print paths
-	fun printPathTo(material: Material, indent: String = "") {
+	fun printPathTo(material: NodeKey, indent: String = "") {
 		val path = craftingPaths[material] ?: run {
 			println("$indent$material - Not derivable")
 			return
 		}
 
 		if (path.isInitial) {
-			println("$indent$material - Initial item")
+			println("$indent$material (available)")
 			return
 		}
 
-		println("$indent$material can be created with:")
+		println("$indent$material obtainable with:")
 
-		println("$indent  Ingredients:")
+		println("$indent  From:")
 		path.ingredients.forEach { ingredient ->
 			printPathTo(ingredient, "$indent    ")
 		}

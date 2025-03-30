@@ -1,12 +1,15 @@
 package se.ade.mc.cubematic.progression.analysis
 
 import org.bukkit.Material
+import se.ade.mc.cubematic.progression.analysis.key.NodeKey
 
 fun main() {
-	val initialItems = mapOf(
-		Material.COBBLESTONE to 64,
-		Material.BIRCH_SAPLING to 64,
-		Material.DIRT to 64
+	val initialItems = setOf(
+		NodeKey.Item(Material.COBBLESTONE),
+		NodeKey.Item(Material.OAK_SAPLING),
+		NodeKey.Item(Material.DIRT),
+		NodeKey.Item(Material.GOLD_INGOT),
+		NodeKey.Item(Material.IRON_INGOT)
 	)
 
 	val analyzer = DependencyAnalyzer(graph, initialItems)
@@ -18,9 +21,10 @@ fun main() {
 	}
 
 	// Check if specific item is derivable
-	val canDeriveSmoothStone = analyzer.canDerive(Material.SMOOTH_STONE)
-	println("\nCan derive SMOOTH_STONE: $canDeriveSmoothStone")
+	val key = NodeKey.Item(Material.EMERALD)
+	val canDeriveIt = analyzer.canDerive(key)
+	println("\nCan derive $key: $canDeriveIt")
 
-	println("\nPath to SMOOTH_STONE:")
-	analyzer.printPathTo(Material.SMOOTH_STONE)
+	println("\nPath to $key:")
+	analyzer.printPathTo(key)
 }
