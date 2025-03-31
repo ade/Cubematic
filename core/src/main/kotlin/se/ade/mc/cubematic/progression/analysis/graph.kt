@@ -26,15 +26,13 @@ val graph = buildGraph {
 	item(Material.OAK_LOG) {
 		from {
 			grow(plant = Material.OAK_SAPLING,
-				on = saplingSoils(),
-				yield = ProcessYield.Random(3, 5))
+				on = saplingSoils())
 		}
 	}
 	item(Material.BIRCH_LOG) {
 		from {
 			grow(plant = Material.BIRCH_SAPLING,
-				on = saplingSoils(),
-				yield = ProcessYield.Random(5, 7))
+				on = saplingSoils())
 		}
 	}
 	item(Material.STONE) {
@@ -94,15 +92,13 @@ val graph = buildGraph {
 	item(Material.APPLE) {
 		from {
 			grow(plant = Material.OAK_SAPLING,
-				on = saplingSoils(),
-				yield = ProcessYield.Random(1, 2))
+				on = saplingSoils())
 		}
 	}
 	item(Material.OAK_SAPLING) {
 		from {
 			grow(plant = Material.OAK_SAPLING,
-				on = saplingSoils(),
-				yield = ProcessYield.Random(1, 2))
+				on = saplingSoils())
 		}
 		from {
 			having(1 of Material.OAK_LEAVES)

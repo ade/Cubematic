@@ -1,6 +1,7 @@
 package se.ade.mc.cubematic.progression.analysis
 
 import org.bukkit.Material
+import org.bukkit.plugin.java.JavaPlugin
 import se.ade.mc.cubematic.progression.analysis.key.NodeKey
 
 fun main() {
@@ -27,4 +28,22 @@ fun main() {
 
 	println("\nPath to $key:")
 	analyzer.printPathTo(key)
+}
+
+fun testGraphWithPlugin(plugin: JavaPlugin) {
+	val graph = buildGraph {
+		standardRules()
+		importAll(plugin)
+	}
+
+	val analyzer = DependencyAnalyzer(graph, setOf(
+		NodeKey.Item(Material.OAK_LOG),
+		NodeKey.Item(Material.OAK_LEAVES),
+		NodeKey.Item(Material.DIRT),
+		NodeKey.Item(Material.LAVA_BUCKET),
+		NodeKey.Item(Material.WATER_BUCKET)
+	))
+
+	analyzer.analyze().forEach { plugin.logger.info { "Unlocked $it" } }
+	analyzer.printPathTo(NodeKey.Item(Material.CHISELED_BOOKSHELF))
 }

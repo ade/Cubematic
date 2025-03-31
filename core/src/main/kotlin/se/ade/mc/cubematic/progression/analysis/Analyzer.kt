@@ -1,7 +1,5 @@
 package se.ade.mc.cubematic.progression.analysis
 
-import org.bukkit.Material
-import se.ade.mc.cubematic.progression.analysis.Node.Item
 import se.ade.mc.cubematic.progression.analysis.key.NodeKey
 
 class DependencyAnalyzer(

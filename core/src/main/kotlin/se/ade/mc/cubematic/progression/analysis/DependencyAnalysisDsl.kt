@@ -16,7 +16,7 @@ interface DependencyGraphBuilderScope {
 @DependencyGraphDsl
 interface NodeBuilderScope {
 	val id: NodeKey
-	fun from(block: SourcesBuilder.() -> Unit)
+	fun from(description: String? = null, block: SourcesBuilder.() -> Unit)
 }
 
 @DependencyGraphDsl
@@ -24,10 +24,12 @@ interface SourcesBuilderScope {
 	fun crafting(vararg requirement: ProcessRequirement)
 	fun craftByHand(vararg requirement: ProcessRequirement)
 	fun spawnsIn(biome: Biome)
-	fun grow(item: Material, on: MaterialFilter, yield: ProcessYield)
+	fun grow(item: Material, on: MaterialFilter)
 	fun smelting(item: Material, with: MaterialFilter, yield: ProcessYield)
+	fun smelting(item: MaterialFilter, with: MaterialFilter)
 	fun villagerTrading(item: MaterialFilter = anyOf(Material.EMERALD))
 	fun having(vararg requirement: ProcessRequirement)
+	fun having(vararg materials: Material)
 }
 
 enum class MechanicType(val key: NodeKey) {
@@ -68,8 +70,8 @@ data class Transformable(
 class NodeItemBuilder(override val id: NodeKey, val material: Material): NodeBuilderScope {
 	val sources = mutableListOf<Source>()
 
-	override fun from(block: SourcesBuilder.() -> Unit) {
-		val source = SourcesBuilder()
+	override fun from(description: String?, block: SourcesBuilder.() -> Unit) {
+		val source = SourcesBuilder(description)
 		source.block()
 		sources.add(source.build())
 	}
@@ -82,8 +84,8 @@ class NodeItemBuilder(override val id: NodeKey, val material: Material): NodeBui
 class NodeMechanicBuilder(override val id: NodeKey): NodeBuilderScope {
 	val sources = mutableListOf<Source>()
 
-	override fun from(block: SourcesBuilder.() -> Unit) {
-		val source = SourcesBuilder()
+	override fun from(description: String?, block: SourcesBuilder.() -> Unit) {
+		val source = SourcesBuilder(description)
 		source.block()
 		sources.add(source.build())
 	}
@@ -121,7 +123,7 @@ fun buildGraph(block: DependencyGraphBuilderScope.() -> Unit): DependencyGraph {
 	return DependencyGraphBuilder().also { it.block() }.build()
 }
 
-class SourcesBuilder: SourcesBuilderScope {
+class SourcesBuilder(val description: String? = null): SourcesBuilderScope {
 	val spawnsInBiomes = mutableListOf<Biome>()
 	val transformable = mutableListOf<Transformable>()
 
@@ -158,16 +160,26 @@ class SourcesBuilder: SourcesBuilderScope {
 		)
 	}
 
+	override fun having(vararg materials: Material) {
+		transformable.add(
+			Transformable(
+				input = materials(*materials).toList(),
+				tools = emptyList(),
+				yield = ProcessYield.Fixed(0)
+			)
+		)
+	}
+
 	override fun spawnsIn(biome: Biome) {
 		spawnsInBiomes.add(biome)
 	}
 
-	override fun grow(plant: Material, on: MaterialFilter, yield: ProcessYield) {
+	override fun grow(plant: Material, on: MaterialFilter) {
 		transformable.add(
 			Transformable(
 				input = listOf(ProcessRequirement.Type(NodeKey.Item(plant), 1)),
 				tools = listOf(ProcessRequirement.Any(on, 1)),
-				yield = yield
+				yield = ProcessYield.Undefined
 			)
 		)
 	}
@@ -178,6 +190,16 @@ class SourcesBuilder: SourcesBuilderScope {
 				input = listOf(ProcessRequirement.Type(NodeKey.Item(item), 1)),
 				tools = listOf(ProcessRequirement.Any(with, 1)),
 				yield = yield
+			)
+		)
+	}
+
+	override fun smelting(item: MaterialFilter, with: MaterialFilter) {
+		transformable.add(
+			Transformable(
+				input = listOf(ProcessRequirement.Any(item, 1)),
+				tools = listOf(ProcessRequirement.Any(with, 1)),
+				yield = ProcessYield.Undefined
 			)
 		)
 	}
@@ -196,6 +218,10 @@ class SourcesBuilder: SourcesBuilderScope {
 	fun build(): Source {
 		return Source(transformable, spawnsInBiomes)
 	}
+}
+
+fun materials(vararg materials: Material): Array<ProcessRequirement.Type> {
+	return materials.map { ProcessRequirement.Type(NodeKey.Item(it), 1) }.toTypedArray()
 }
 
 sealed interface ProcessRequirement {
@@ -219,12 +245,23 @@ fun furnace() = MaterialFilter(anyOf = setOf(NodeKey.Item(Material.FURNACE)))
 sealed interface ProcessYield {
 	data class Fixed(val amount: Int): ProcessYield
 	data class Random(val min: Int, val max: Int, val avg: Int = (max + min) / 2): ProcessYield
+	data object Undefined: ProcessYield
 }
 
 fun exactly(fixed: Int) = ProcessYield.Fixed(fixed)
 
 fun anyOf(vararg materials: Material)
 	= MaterialFilter(anyOf = materials.map { NodeKey.Item(it) }.toSet())
+
+operator fun MaterialFilter.plus(other: Set<Material>) = MaterialFilter(
+	anyOf = this.anyOf + other.map { NodeKey.Item(it) }.toSet()
+)
+
+operator fun MaterialFilter.plus(other: MaterialFilter): MaterialFilter {
+	return MaterialFilter(
+		anyOf = this.anyOf + other.anyOf
+	)
+}
 
 fun saplingSoils() = anyOf(
 	Material.DIRT,
@@ -253,4 +290,19 @@ fun anyPlanks() = anyOf(
 	Material.PALE_OAK_PLANKS,
 	Material.CHERRY_PLANKS,
 	Material.MANGROVE_PLANKS,
+)
+
+val logTypes = setOf<Material>(
+	Material.OAK_LOG,
+	Material.SPRUCE_LOG,
+	Material.BIRCH_LOG,
+	Material.JUNGLE_LOG,
+	Material.ACACIA_LOG,
+	Material.DARK_OAK_LOG,
+	Material.CRIMSON_STEM,
+	Material.WARPED_STEM,
+	Material.BAMBOO_BLOCK,
+	Material.PALE_OAK_LOG,
+	Material.CHERRY_LOG,
+	Material.MANGROVE_LOG
 )
