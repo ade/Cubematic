@@ -294,6 +294,6 @@ private fun DependencyGraphBuilderScope.brewingStrong() {
 	}
 }
 
-private fun potion(type: PotionType): NodeKey.Item {
+internal fun potion(type: PotionType): NodeKey.Item {
 	return NodeKey.Item(Material.POTION, setOf(ItemTag.Potion(type)))
 }

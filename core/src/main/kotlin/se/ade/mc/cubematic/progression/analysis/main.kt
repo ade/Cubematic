@@ -45,5 +45,5 @@ fun testGraphWithPlugin(plugin: JavaPlugin) {
 	))
 
 	analyzer.analyze().forEach { plugin.logger.info { "Unlocked $it" } }
-	analyzer.printPathTo(NodeKey.Item(Material.CHISELED_BOOKSHELF))
+	analyzer.printPathTo(NodeKey.Item(Material.TNT))
 }

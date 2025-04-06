@@ -1,6 +1,8 @@
 package se.ade.mc.cubematic.progression.analysis
 
 import se.ade.mc.cubematic.progression.analysis.key.NodeKey
+import kotlin.collections.remove
+import kotlin.text.set
 
 class DependencyAnalyzer(
 	private val graph: DependencyGraph,
@@ -9,6 +11,9 @@ class DependencyAnalyzer(
 	private val unlocked = mutableSetOf<NodeKey>()
 	private val inProgress = mutableSetOf<NodeKey>()
 	private val craftingPaths = mutableMapOf<NodeKey, CraftingPath>()
+
+	// Track items we've attempted but couldn't derive in this analysis pass
+	private val attemptedThisPass = mutableSetOf<NodeKey>()
 
 	data class CraftingPath(
 		val node: NodeKey,
@@ -27,100 +32,164 @@ class DependencyAnalyzer(
 
 	fun analyze(): Set<NodeKey> {
 		// Keep finding new items until we can't derive any more
-		var changed = true
-		while (changed) {
-			changed = expandDerivableItems()
-		}
+		var itemsAddedInPass: Int
+		do {
+			attemptedThisPass.clear() // Reset for new pass
+			itemsAddedInPass = 0
+
+			for (node in graph.nodes) {
+				if (unlocked.contains(node.id))
+					continue
+
+				if (canDerive(node.id)) {
+					unlocked.add(node.id)
+					itemsAddedInPass++
+				}
+			}
+		} while (itemsAddedInPass > 0)
+
 		return unlocked.toSet()
 	}
 
-	private fun expandDerivableItems(): Boolean {
-		var newItemFound = false
-
-		for (node in graph.nodes) {
-			if (unlocked.contains(node.id))
-				continue
-
-			if (canDerive(node.id)) {
-				unlocked.add(node.id)
-				newItemFound = true
-			}
-		}
-
-		return newItemFound
-	}
-
-	private fun canSatisfyRequirement(req: ProcessRequirement): Boolean {
+	private fun canSatisfyRequirement(req: ProcessRequirement, currentPath: Set<NodeKey> = emptySet()): Boolean {
 		return when (req) {
 			is ProcessRequirement.Type -> {
-				// Either we already have it or we can derive it recursively
-				initialItems.contains(req.key) || canDerive(req.key)
+				initialItems.contains(req.key) ||
+						unlocked.contains(req.key) ||
+						canDerive(req.key, currentPath + req.key)
 			}
 			is ProcessRequirement.Any -> {
-				// Any of the materials in the group will do
+				// First check directly available items
 				req.filter.anyOf.any { nodeKey ->
-					initialItems.contains(nodeKey) || canDerive(nodeKey)
-				}
+					initialItems.contains(nodeKey) || unlocked.contains(nodeKey)
+				} ||
+						// Then try each alternative, but avoid those in the current path
+						req.filter.anyOf.any { nodeKey ->
+							!currentPath.contains(nodeKey) && canDerive(nodeKey, currentPath + nodeKey)
+						}
 			}
 			is ProcessRequirement.Mechanic -> {
-				initialItems.contains(req.mechanic.key) || canDerive(req.mechanic.key)
+				initialItems.contains(req.mechanic.key) ||
+						unlocked.contains(req.mechanic.key) ||
+						canDerive(req.mechanic.key, currentPath + req.mechanic.key)
 			}
 		}
 	}
 
-	fun canDerive(nodeKey: NodeKey): Boolean {
+	fun canDerive(nodeKey: NodeKey, currentPath: Set<NodeKey> = emptySet()): Boolean {
+		// Quick checks
 		if (unlocked.contains(nodeKey)) return true
 		if (inProgress.contains(nodeKey)) return false
+		if (currentPath.contains(nodeKey) && currentPath.size > 1) return false
 
-		val node = graph.nodes.find { it.id == nodeKey }
-			?: return false
+		val node = graph.nodes.find { it.id == nodeKey } ?: return false
 
 		inProgress.add(node.id)
+		attemptedThisPass.add(node.id)
 
-		for (source in node.sources) {
-			for (transform in source.transforms) {
-				val inputsMet = transform.input.all { canSatisfyRequirement(it) }
-				val toolsMet = transform.tools.all { canSatisfyRequirement(it) }
+		var canBeCreated = false
+		var ingredientsUsed = listOf<NodeKey>()
+		var toolsUsed = listOf<NodeKey>()
 
-				if (inputsMet && toolsMet) {
-					val input: List<NodeKey> = transform.input.mapNotNull {
-						when (it) {
-							is ProcessRequirement.Type -> it.key
-							is ProcessRequirement.Any -> it.filter.anyOf.find { nodeKey ->
-								initialItems.contains(nodeKey) || craftingPaths.containsKey(nodeKey)
-							}
-							is ProcessRequirement.Mechanic -> {
-								it.mechanic.key
-							}
+		try {
+			sourceLoop@ for (source in node.sources) {
+				transformLoop@ for (transform in source.transforms) {
+					// Check inputs
+					val satisfiedInputs = mutableListOf<NodeKey>()
+					val allInputsMet = transform.input.all { req ->
+						val met = canSatisfyRequirement(req, currentPath)
+						if (met && req is ProcessRequirement.Type) {
+							satisfiedInputs.add(req.key)
 						}
+						met
 					}
 
-					val tools = transform.tools.mapNotNull {
-						when (it) {
-							is ProcessRequirement.Type -> it.key
-							is ProcessRequirement.Any -> it.filter.anyOf.find { m ->
-								initialItems.contains(m) || craftingPaths.containsKey(m)
-							}
-							is ProcessRequirement.Mechanic -> {
-								it.mechanic.key
-							}
+					// Check tools
+					val satisfiedTools = mutableListOf<NodeKey>()
+					val allToolsMet = transform.tools.all { req ->
+						val met = canSatisfyRequirement(req, currentPath)
+						if (met && req is ProcessRequirement.Type) {
+							satisfiedTools.add(req.key)
 						}
+						met
 					}
 
-					craftingPaths[node.id] = CraftingPath(
-						node = node.id,
-						ingredients = input,
-						tools = tools
-					)
-
-					inProgress.remove(node.id)
-					return true
+					if (allInputsMet && allToolsMet) {
+						canBeCreated = true
+						ingredientsUsed = satisfiedInputs
+						toolsUsed = satisfiedTools
+						break@sourceLoop
+					}
 				}
 			}
+
+			// Record path if successful
+			if (canBeCreated) {
+				craftingPaths[node.id] = CraftingPath(
+					node = node.id,
+					ingredients = ingredientsUsed,
+					tools = toolsUsed,
+					isInitial = false
+				)
+			}
+		} finally {
+			inProgress.remove(node.id)
 		}
 
-		inProgress.remove(node.id)
-		return false
+		return canBeCreated
+	}
+
+	// Debug method to find issues in the crafting tree
+	fun debugDerivation(nodeKey: NodeKey, indent: String = ""): Boolean {
+		println("${indent}Trying to derive: $nodeKey")
+		if (unlocked.contains(nodeKey)) {
+			println("${indent}✓ Already unlocked")
+			return true
+		}
+
+		if (inProgress.contains(nodeKey)) {
+			println("${indent}✗ Cycle detected")
+			return false
+		}
+
+		val node = graph.nodes.find { it.id == nodeKey }
+		if (node == null) {
+			println("${indent}✗ Node not found")
+			return false
+		}
+
+		inProgress.add(nodeKey)
+		try {
+			for (source in node.sources) {
+				println("${indent}Source: ${source}")
+				for (transform in source.transforms) {
+					println("${indent}  Transform requirements:")
+
+					var allMet = true
+					for (req in transform.input) {
+						val met = canSatisfyRequirement(req)
+						println("${indent}    Input $req: ${if (met) "✓" else "✗"}")
+						if (!met) allMet = false
+					}
+
+					for (req in transform.tools) {
+						val met = canSatisfyRequirement(req)
+						println("${indent}    Tool $req: ${if (met) "✓" else "✗"}")
+						if (!met) allMet = false
+					}
+
+					if (allMet) {
+						println("${indent}✓ Can create $nodeKey")
+						return true
+					}
+				}
+			}
+
+			println("${indent}✗ Cannot create $nodeKey")
+			return false
+		} finally {
+			inProgress.remove(nodeKey)
+		}
 	}
 
 	// New method to print paths
@@ -136,8 +205,6 @@ class DependencyAnalyzer(
 		}
 
 		println("$indent$material obtainable with:")
-
-		println("$indent  From:")
 		path.ingredients.forEach { ingredient ->
 			printPathTo(ingredient, "$indent    ")
 		}

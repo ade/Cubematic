@@ -259,6 +259,16 @@ class SourcesBuilder(val description: String? = null): SourcesBuilderScope {
 		)
 	}
 
+	fun wanderingTrader(requirement: ProcessRequirement) {
+		transformable.add(
+			Transformable(
+				input = listOf(requirement),
+				tools = emptyList(),
+				yield = ProcessYield.Undefined
+			)
+		)
+	}
+
 	fun build(): Source {
 		return Source(transformable, spawnsInBiomes)
 	}
@@ -340,17 +350,22 @@ fun anyPlanks() = anyOf(
 	Material.MANGROVE_PLANKS,
 )
 
-val logTypes = setOf<Material>(
+val overworldLogTypes = setOf<Material>(
 	Material.OAK_LOG,
 	Material.SPRUCE_LOG,
 	Material.BIRCH_LOG,
 	Material.JUNGLE_LOG,
 	Material.ACACIA_LOG,
 	Material.DARK_OAK_LOG,
-	Material.CRIMSON_STEM,
-	Material.WARPED_STEM,
 	Material.BAMBOO_BLOCK,
 	Material.PALE_OAK_LOG,
 	Material.CHERRY_LOG,
 	Material.MANGROVE_LOG
 )
+
+val netherLogTypes = setOf<Material>(
+	Material.CRIMSON_STEM,
+	Material.WARPED_STEM
+)
+
+val logTypes = overworldLogTypes + netherLogTypes

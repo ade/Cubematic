@@ -6,7 +6,8 @@ import se.ade.mc.cubematic.progression.analysis.key.ItemTag
 
 fun DependencyGraphBuilderScope.standardRules() {
 	logGrowing()
-	otherGrowing()
+	growingRules()
+	wanderingTraderRules()
 
 	mechanic(MechanicType.VILLAGER_TRADING) {
 		from {
@@ -76,12 +77,5 @@ fun DependencyGraphBuilderScope.logGrowing() {
 	}
 	item(Material.CRIMSON_STEM) {
 		from { grow(plant = Material.CRIMSON_FUNGUS, on = saplingSoils() + anyOf(Material.WARPED_NYLIUM, Material.CRIMSON_NYLIUM, Material.SOUL_SOIL)) }
-	}
-}
-
-fun DependencyGraphBuilderScope.otherGrowing() {
-	item(Material.BAMBOO) {
-		from { grow(plant = Material.BAMBOO, on = saplingSoils() + anyOf(
-			Material.SAND, Material.RED_SAND, Material.GRAVEL, Material.SUSPICIOUS_SAND, Material.SUSPICIOUS_GRAVEL)) }
 	}
 }
