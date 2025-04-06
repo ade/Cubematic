@@ -1,6 +1,8 @@
 package se.ade.mc.cubematic.progression.analysis
 
 import org.bukkit.Material
+import org.bukkit.potion.PotionType
+import se.ade.mc.cubematic.progression.analysis.key.ItemTag
 
 fun DependencyGraphBuilderScope.standardRules() {
 	logGrowing()

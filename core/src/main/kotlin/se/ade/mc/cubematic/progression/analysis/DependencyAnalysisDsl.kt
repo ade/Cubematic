@@ -2,6 +2,7 @@ package se.ade.mc.cubematic.progression.analysis
 
 import org.bukkit.Material
 import org.bukkit.block.Biome
+import se.ade.mc.cubematic.progression.analysis.key.ItemTag
 import se.ade.mc.cubematic.progression.analysis.key.NodeKey
 
 @DslMarker
@@ -10,6 +11,8 @@ annotation class DependencyGraphDsl
 @DependencyGraphDsl
 interface DependencyGraphBuilderScope {
 	fun item(id: Material, block: NodeItemBuilder.() -> Unit)
+	fun item(id: Material, tags: Set<ItemTag>, block: NodeItemBuilder.() -> Unit)
+	fun item(key: NodeKey.Item, block: NodeItemBuilder.() -> Unit)
 	fun mechanic(id: MechanicType, block: NodeMechanicBuilder.() -> Unit)
 }
 
@@ -30,6 +33,8 @@ interface SourcesBuilderScope {
 	fun villagerTrading(item: MaterialFilter = anyOf(Material.EMERALD))
 	fun having(vararg requirement: ProcessRequirement)
 	fun having(vararg materials: Material)
+	fun brewing(vararg materials: Material)
+	fun brewing(vararg requirement: ProcessRequirement)
 }
 
 enum class MechanicType(val key: NodeKey) {
@@ -103,6 +108,25 @@ class DependencyGraphBuilder: DependencyGraphBuilderScope {
 		block: NodeItemBuilder.() -> Unit
 	) {
 		val node = NodeItemBuilder(NodeKey.Item(material), material)
+		node.block()
+		nodes.add(node.build())
+	}
+
+	override fun item(
+		material: Material,
+		tags: Set<ItemTag>,
+		block: NodeItemBuilder.() -> Unit
+	) {
+		val node = NodeItemBuilder(NodeKey.Item(material, tags), material)
+		node.block()
+		nodes.add(node.build())
+	}
+
+	override fun item(
+		key: NodeKey.Item,
+		block: NodeItemBuilder.() -> Unit
+	) {
+		val node = NodeItemBuilder(key, key.material)
 		node.block()
 		nodes.add(node.build())
 	}
@@ -215,6 +239,26 @@ class SourcesBuilder(val description: String? = null): SourcesBuilderScope {
 		)
 	}
 
+	override fun brewing(vararg materials: Material) {
+		transformable.add(
+			Transformable(
+				input = materials(*materials).toList() + (1 of Material.GLASS_BOTTLE) + (1 of Material.BLAZE_POWDER),
+				tools = listOf(ProcessRequirement.Type(NodeKey.Item(Material.BREWING_STAND), 1)),
+				yield = ProcessYield.Undefined
+			)
+		)
+	}
+
+	override fun brewing(vararg requirement: ProcessRequirement) {
+		transformable.add(
+			Transformable(
+				input = requirement.toList() + (1 of Material.GLASS_BOTTLE) + (1 of Material.BLAZE_POWDER),
+				tools = listOf(ProcessRequirement.Type(NodeKey.Item(Material.BREWING_STAND), 1)),
+				yield = ProcessYield.Undefined
+			)
+		)
+	}
+
 	fun build(): Source {
 		return Source(transformable, spawnsInBiomes)
 	}
@@ -230,12 +274,16 @@ sealed interface ProcessRequirement {
 	data class Mechanic(val mechanic: MechanicType): ProcessRequirement
 }
 
-infix fun Int.of(material: Material): ProcessRequirement {
-	return ProcessRequirement.Type(NodeKey.Item(material), this)
-}
-
 infix fun Int.of(group: MaterialFilter): ProcessRequirement {
 	return ProcessRequirement.Any(group, this)
+}
+
+infix fun Int.of(node: NodeKey.Item): ProcessRequirement {
+	return ProcessRequirement.Type(node, this)
+}
+
+infix fun Int.of(material: Material): ProcessRequirement {
+	return 1 of NodeKey.Item(material)
 }
 
 class MaterialFilter(val anyOf: Set<NodeKey> = setOf())

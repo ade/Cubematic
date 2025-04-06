@@ -1,7 +1,9 @@
 package se.ade.mc.cubematic.progression.analysis
 
 import org.bukkit.Material
+import org.bukkit.inventory.BrewerInventory
 import org.bukkit.inventory.FurnaceRecipe
+import org.bukkit.inventory.MerchantRecipe
 import org.bukkit.inventory.RecipeChoice
 import org.bukkit.inventory.ShapedRecipe
 import org.bukkit.inventory.ShapelessRecipe
@@ -9,7 +11,7 @@ import org.bukkit.plugin.java.JavaPlugin
 
 fun DependencyGraphBuilderScope.importAll(plugin: JavaPlugin) {
 	val recipes = plugin.server.recipeIterator()
-
+	
 	val all = recipes.asSequence().toList()
 
 	all.forEach { recipe ->
@@ -86,6 +88,11 @@ fun DependencyGraphBuilderScope.importAll(plugin: JavaPlugin) {
 					is RecipeChoice.ExactChoice -> {
 						// UNSUPPORTED
 					}
+				}
+			}
+			is MerchantRecipe -> {
+				plugin.logger.info {
+					"Merchant recipe: ${recipe.result.type} -> ${recipe.ingredients.joinToString(", ") { it.type.toString() }}"
 				}
 			}
 			else -> {
