@@ -44,6 +44,18 @@ fun testGraphWithPlugin(plugin: JavaPlugin) {
 		NodeKey.Item(Material.WATER_BUCKET)
 	))
 
-	analyzer.analyze().forEach { plugin.logger.info { "Unlocked $it" } }
-	analyzer.printPathTo(NodeKey.Item(Material.TNT))
+	val unlocked = analyzer.analyze().sortedBy {
+		(it as? NodeKey.Item)?.material?.name ?: it.id
+	}
+
+	unlocked.forEach { plugin.logger.info { "Unlocked $it" } }
+
+	val notUnlockedMats = Material.entries - unlocked.mapNotNull {
+		(it as? NodeKey.Item)?.material
+	}
+
+	//notUnlockedMats.forEach { plugin.logger.info { "Not unlocked $it" } }
+	plugin.logger.info { "Not unlocked: ${notUnlockedMats.size} items" }
+
+	analyzer.printPathTo(NodeKey.Item(Material.WHITE_BED))
 }

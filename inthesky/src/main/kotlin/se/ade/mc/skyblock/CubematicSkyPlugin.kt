@@ -16,7 +16,7 @@ class CubematicSkyPlugin: JavaPlugin(), Listener {
         server.pluginManager.registerEvents(this, this)
         netherFacet.onEnable()
 
-        //testGraphWithPlugin(this)
+        testGraphWithPlugin(this)
     }
 
     override fun onDisable() {

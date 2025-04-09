@@ -7,6 +7,7 @@ import se.ade.mc.cubematic.progression.analysis.key.ItemTag
 fun DependencyGraphBuilderScope.standardRules() {
 	logGrowing()
 	growingRules()
+	spawningEntities()
 	wanderingTraderRules()
 
 	mechanic(MechanicType.VILLAGER_TRADING) {

@@ -2,6 +2,9 @@ package se.ade.mc.cubematic.progression.analysis
 
 import org.bukkit.Material
 import org.bukkit.block.Biome
+import org.bukkit.entity.EntityType
+import org.bukkit.inventory.ShapedRecipe
+import org.bukkit.plugin.java.JavaPlugin
 import se.ade.mc.cubematic.progression.analysis.key.ItemTag
 import se.ade.mc.cubematic.progression.analysis.key.NodeKey
 
@@ -20,6 +23,12 @@ interface DependencyGraphBuilderScope {
 interface NodeBuilderScope {
 	val id: NodeKey
 	fun from(description: String? = null, block: SourcesBuilder.() -> Unit)
+
+	fun fromOverworldEntity(entity: EntityType) {
+		from("Spawning overworld entity: $entity") {
+			spawningEntity()
+		}
+	}
 }
 
 @DependencyGraphDsl
@@ -35,6 +44,7 @@ interface SourcesBuilderScope {
 	fun having(vararg materials: Material)
 	fun brewing(vararg materials: Material)
 	fun brewing(vararg requirement: ProcessRequirement)
+	fun spawningEntity()
 }
 
 enum class MechanicType(val key: NodeKey) {
@@ -259,6 +269,16 @@ class SourcesBuilder(val description: String? = null): SourcesBuilderScope {
 		)
 	}
 
+	override fun spawningEntity() {
+		transformable.add(
+			Transformable(
+				input = emptyList(),
+				tools = emptyList(),
+				yield = ProcessYield.Undefined
+			)
+		)
+	}
+
 	fun wanderingTrader(requirement: ProcessRequirement) {
 		transformable.add(
 			Transformable(
@@ -296,7 +316,7 @@ infix fun Int.of(material: Material): ProcessRequirement {
 	return 1 of NodeKey.Item(material)
 }
 
-class MaterialFilter(val anyOf: Set<NodeKey> = setOf())
+data class MaterialFilter(val anyOf: Set<NodeKey> = setOf())
 
 fun furnace() = MaterialFilter(anyOf = setOf(NodeKey.Item(Material.FURNACE)))
 
