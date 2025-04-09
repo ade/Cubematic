@@ -75,8 +75,10 @@ fun testGraphWithPlugin(plugin: JavaPlugin) {
 		timed.value
 	}
 	items.sortedBy {
-		(it as? NodeKey.Item)?.material?.name ?: it.id
+		(it.nodeKey as? NodeKey.Item)?.material?.name ?: it.nodeKey.id
+	}.also {
+		plugin.logger.info { "Unlocked ${it.size} nodes of ${graph.nodes.size}" }
 	}.forEach {
-		plugin.logger.info { "Unlocked2: $it" }
+		it.trace().split("\n").forEach { println(it) }
 	}
 }
