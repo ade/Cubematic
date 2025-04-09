@@ -1,8 +1,11 @@
 package se.ade.mc.cubematic.progression.analysis
 
+import kotlinx.coroutines.GlobalScope
+import kotlinx.coroutines.runBlocking
 import org.bukkit.Material
 import org.bukkit.plugin.java.JavaPlugin
 import se.ade.mc.cubematic.progression.analysis.key.NodeKey
+import kotlin.time.measureTimedValue
 
 fun main() {
 	val initialItems = setOf(
@@ -36,26 +39,44 @@ fun testGraphWithPlugin(plugin: JavaPlugin) {
 		importAll(plugin)
 	}
 
-	val analyzer = DependencyAnalyzer(graph, setOf(
+	val initialItems = setOf(
 		NodeKey.Item(Material.OAK_LOG),
 		NodeKey.Item(Material.OAK_LEAVES),
 		NodeKey.Item(Material.DIRT),
 		NodeKey.Item(Material.LAVA_BUCKET),
 		NodeKey.Item(Material.WATER_BUCKET)
-	))
+	)
+
+	val analyzer = DependencyAnalyzer(graph, initialItems)
 
 	val unlocked = analyzer.analyze().sortedBy {
 		(it as? NodeKey.Item)?.material?.name ?: it.id
 	}
 
-	unlocked.forEach { plugin.logger.info { "Unlocked $it" } }
+	//unlocked.forEach { plugin.logger.info { "Unlocked $it" } }
 
 	val notUnlockedMats = Material.entries - unlocked.mapNotNull {
 		(it as? NodeKey.Item)?.material
 	}
 
 	//notUnlockedMats.forEach { plugin.logger.info { "Not unlocked $it" } }
-	plugin.logger.info { "Not unlocked: ${notUnlockedMats.size} items" }
+	//plugin.logger.info { "Not unlocked: ${notUnlockedMats.size} items" }
 
 	analyzer.printPathTo(NodeKey.Item(Material.WHITE_BED))
+
+
+	val items = runBlocking {
+		val timed = measureTimedValue {
+			deriveObtainableItems(graph, initialItems)
+		}
+
+		println("Analyzed graph in ${timed.duration.inWholeMilliseconds}ms")
+
+		timed.value
+	}
+	items.sortedBy {
+		(it as? NodeKey.Item)?.material?.name ?: it.id
+	}.forEach {
+		plugin.logger.info { "Unlocked2: $it" }
+	}
 }

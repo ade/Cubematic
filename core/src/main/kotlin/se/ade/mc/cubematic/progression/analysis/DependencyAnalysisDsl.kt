@@ -3,8 +3,6 @@ package se.ade.mc.cubematic.progression.analysis
 import org.bukkit.Material
 import org.bukkit.block.Biome
 import org.bukkit.entity.EntityType
-import org.bukkit.inventory.ShapedRecipe
-import org.bukkit.plugin.java.JavaPlugin
 import se.ade.mc.cubematic.progression.analysis.key.ItemTag
 import se.ade.mc.cubematic.progression.analysis.key.NodeKey
 
@@ -111,15 +109,15 @@ class NodeMechanicBuilder(override val id: NodeKey): NodeBuilderScope {
 }
 
 class DependencyGraphBuilder: DependencyGraphBuilderScope {
-	private val nodes = mutableListOf<Node>()
+	private val nodes = mutableMapOf<NodeKey, Node>()
 
 	override fun item(
 		material: Material,
 		block: NodeItemBuilder.() -> Unit
 	) {
-		val node = NodeItemBuilder(NodeKey.Item(material), material)
-		node.block()
-		nodes.add(node.build())
+		val builder = NodeItemBuilder(NodeKey.Item(material), material)
+		builder.block()
+		merge(builder.build())
 	}
 
 	override fun item(
@@ -129,7 +127,7 @@ class DependencyGraphBuilder: DependencyGraphBuilderScope {
 	) {
 		val node = NodeItemBuilder(NodeKey.Item(material, tags), material)
 		node.block()
-		nodes.add(node.build())
+		merge(node.build())
 	}
 
 	override fun item(
@@ -138,18 +136,33 @@ class DependencyGraphBuilder: DependencyGraphBuilderScope {
 	) {
 		val node = NodeItemBuilder(key, key.material)
 		node.block()
-		nodes.add(node.build())
+		merge(node.build())
 	}
 
 	override fun mechanic(
 		mechanic: MechanicType,
 		block: NodeMechanicBuilder.() -> Unit
 	) {
-		nodes.add(NodeMechanicBuilder(mechanic.key).also(block).build())
+		merge(NodeMechanicBuilder(mechanic.key).also(block).build())
+	}
+
+	private fun merge(node: Node) {
+		val existing = nodes[node.id]
+		when (existing) {
+			is Node.Item -> {
+				// Merge sources
+				nodes[node.id] = Node.Item(node.id, existing.material, existing.sources + node.sources)
+			}
+			is Node.Mechanic -> {
+				// Merge sources
+				nodes[node.id] = Node.Mechanic(node.id, existing.sources + node.sources)
+			}
+			null -> nodes[node.id] = node
+		}
 	}
 
 	fun build(): DependencyGraph {
-		return DependencyGraph(nodes)
+		return DependencyGraph(nodes.values.toList())
 	}
 }
 

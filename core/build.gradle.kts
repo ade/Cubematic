@@ -13,6 +13,7 @@ repositories {
 dependencies {
     implementation(libs.paper)
     implementation(libs.kaml)
+    implementation(libs.kotlinx.coroutines.core)
 }
 
 kotlin {
