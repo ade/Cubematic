@@ -20,14 +20,14 @@ suspend fun deriveObtainableItems(
 
 	do {
 		val jobs = queue.map { it ->
-			scope.async { deriveOrNull(graph, it, unlocked.keys.toSet()) }
+			scope.async { deriveOrNull(graph, it, unlocked.keys) }
 		}
-		val derivations = jobs.mapNotNull { it.await() }
-		derivations.forEach { derived ->
+		val scrape = jobs.mapNotNull { it.await() }
+		scrape.forEach { derived ->
 			unlocked[derived.nodeKey] = derived
 			queue.remove(derived.nodeKey)
 		}
-	} while (derivations.isNotEmpty())
+	} while (scrape.isNotEmpty())
 
 	return unlocked.values.toSet()
 }
@@ -48,8 +48,8 @@ fun deriveOrNull(
 
 	val nextVisited = visited + item.id
 
-	val validSourceNodes = item.sources.firstNotNullOfOrNull { source ->
-		source.transforms.firstNotNullOfOrNull { transform ->
+	val validSourceNodes = item.sources.flatMap { source ->
+		source.transforms.mapNotNull { transform ->
 			val required = transform.input + transform.tools
 
 			// For each requirement, get a dependency chain of what supplies it
@@ -87,7 +87,7 @@ fun deriveOrNull(
 		}
 	}
 
-	return if(validSourceNodes != null) {
+	return if(validSourceNodes.isNotEmpty()) {
 		Derived(derivingKey, validSourceNodes)
 	} else {
 		// No valid source found, so this item is not derivable in this pass
@@ -97,14 +97,8 @@ fun deriveOrNull(
 
 data class Derived(
 	val nodeKey: NodeKey,
-	val from: List<Derived> = emptyList(),
+	val from: List<List<Derived>> = emptyList(),
 ) {
-	fun print(depth: Int = 0) {
-		val indent = " ".repeat(depth * 2)
-		println("$indent$nodeKey")
-		from.forEach { it.print(depth + 1) }
-	}
-
 	fun trace() = StringBuilder().also {
 		trace(it)
 	}.toString()
@@ -112,6 +106,13 @@ data class Derived(
 	private fun trace(sb: StringBuilder, depth: Int = 0) {
 		val indent = " ".repeat(depth * 2)
 		sb.append("$indent$nodeKey\n")
-		from.forEach { it.trace(sb, depth + 1) }
+		from.forEachIndexed { index, alternative ->
+			if(from.size > 1)
+				sb.append("$indent  ---[${index+1}/${from.size}: $nodeKey]---\n")
+
+			alternative.forEach { it ->
+				it.trace(sb, depth + 1)
+			}
+		}
 	}
 }
