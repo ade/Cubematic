@@ -104,8 +104,8 @@ private fun DependencyGraphBuilderScope.importShapedRecipe(recipe: ShapedRecipe,
 					requirement is ProcessRequirement.Any &&
 					it.filter == requirement.filter
 					) ||
-					(it is ProcessRequirement.Type &&
-							requirement is ProcessRequirement.Type
+					(it is ProcessRequirement.Single.Type &&
+							requirement is ProcessRequirement.Single.Type
 							&& requirement.key == it.key)
 		}
 
@@ -114,9 +114,9 @@ private fun DependencyGraphBuilderScope.importShapedRecipe(recipe: ShapedRecipe,
 				// Merge quantities
 				ProcessRequirement.Any(existing.filter, existing.quantity + requirement.quantity)
 			}
-			existing is ProcessRequirement.Type && requirement is ProcessRequirement.Type -> {
+			existing is ProcessRequirement.Single.Type && requirement is ProcessRequirement.Single.Type -> {
 				// Merge quantities
-				ProcessRequirement.Type(existing.key, existing.quantity + requirement.quantity)
+				ProcessRequirement.Single.Type(existing.key, existing.quantity + requirement.quantity)
 			}
 			else -> null
 		}

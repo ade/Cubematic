@@ -14,6 +14,7 @@ interface DependencyGraphBuilderScope {
 	fun item(id: Material, block: NodeItemBuilder.() -> Unit)
 	fun item(id: Material, tags: Set<ItemTag>, block: NodeItemBuilder.() -> Unit)
 	fun item(key: NodeKey.Item, block: NodeItemBuilder.() -> Unit)
+	fun entity(type: EntityType, block: NodeEntityBuilder.() -> Unit)
 	fun mechanic(id: MechanicType, block: NodeMechanicBuilder.() -> Unit)
 }
 
@@ -22,9 +23,9 @@ interface NodeBuilderScope {
 	val id: NodeKey
 	fun from(description: String? = null, block: SourcesBuilder.() -> Unit)
 
-	fun fromOverworldEntity(entity: EntityType) {
-		from("Spawning overworld entity: $entity") {
-			spawningEntity()
+	fun fromEntity(entity: EntityType) {
+		from {
+			entity(entity)
 		}
 	}
 }
@@ -42,10 +43,14 @@ interface SourcesBuilderScope {
 	fun having(vararg materials: Material)
 	fun brewing(vararg materials: Material)
 	fun brewing(vararg requirement: ProcessRequirement)
-	fun spawningEntity()
+	fun entity(entity: EntityType)
+
+	/** Requirement expressing "being in overworld" */
+	fun overworld()
 }
 
 enum class MechanicType(val key: NodeKey) {
+	OVERWORLD(key = NodeKey.Custom("overworld", "Overworld")),
 	VILLAGER_TRADING(key = NodeKey.Custom("villager_trading", "Villager Trading")),
 }
 
@@ -60,6 +65,12 @@ sealed class Node {
 	data class Item(
 		override val id: NodeKey,
 		val material: Material,
+		override val sources: List<Source>
+	): Node()
+
+	data class Entity(
+		override val id: NodeKey,
+		val entityType: EntityType,
 		override val sources: List<Source>
 	): Node()
 
@@ -91,6 +102,20 @@ class NodeItemBuilder(override val id: NodeKey, val material: Material): NodeBui
 
 	fun build(): Node {
 		return Node.Item(id, material, sources)
+	}
+}
+
+class NodeEntityBuilder(val key: NodeKey, val entityType: EntityType) {
+	val sources = mutableListOf<Source>()
+
+	fun from(description: String? = null, block: SourcesBuilder.() -> Unit) {
+		val source = SourcesBuilder(description)
+		source.block()
+		sources.add(source.build())
+	}
+
+	fun build(): Node {
+		return Node.Entity(key, entityType, sources)
 	}
 }
 
@@ -139,6 +164,15 @@ class DependencyGraphBuilder: DependencyGraphBuilderScope {
 		merge(node.build())
 	}
 
+	override fun entity(
+		type: EntityType,
+		block: NodeEntityBuilder.() -> Unit
+	) {
+		val node = NodeEntityBuilder(NodeKey.Entity(type), type)
+		node.block()
+		merge(node.build())
+	}
+
 	override fun mechanic(
 		mechanic: MechanicType,
 		block: NodeMechanicBuilder.() -> Unit
@@ -150,12 +184,13 @@ class DependencyGraphBuilder: DependencyGraphBuilderScope {
 		val existing = nodes[node.id]
 		when (existing) {
 			is Node.Item -> {
-				// Merge sources
 				nodes[node.id] = Node.Item(node.id, existing.material, existing.sources + node.sources)
 			}
 			is Node.Mechanic -> {
-				// Merge sources
 				nodes[node.id] = Node.Mechanic(node.id, existing.sources + node.sources)
+			}
+			is Node.Entity -> {
+				nodes[node.id] = Node.Entity(node.id, existing.entityType, existing.sources + node.sources)
 			}
 			null -> nodes[node.id] = node
 		}
@@ -178,7 +213,7 @@ class SourcesBuilder(val description: String? = null): SourcesBuilderScope {
 		transformable.add(
 			Transformable(
 				input = requirement.toList(),
-				tools = listOf(ProcessRequirement.Type(
+				tools = listOf(ProcessRequirement.Single.Type(
 					key = NodeKey.Item(Material.CRAFTING_TABLE),
 					quantity = 1
 				)),
@@ -224,7 +259,7 @@ class SourcesBuilder(val description: String? = null): SourcesBuilderScope {
 	override fun grow(plant: Material, on: MaterialFilter) {
 		transformable.add(
 			Transformable(
-				input = listOf(ProcessRequirement.Type(NodeKey.Item(plant), 1)),
+				input = listOf(ProcessRequirement.Single.Type(NodeKey.Item(plant), 1)),
 				tools = listOf(ProcessRequirement.Any(on, 1)),
 				yield = ProcessYield.Undefined
 			)
@@ -234,7 +269,7 @@ class SourcesBuilder(val description: String? = null): SourcesBuilderScope {
 	override fun smelting(item: Material, with: MaterialFilter, yield: ProcessYield) {
 		transformable.add(
 			Transformable(
-				input = listOf(ProcessRequirement.Type(NodeKey.Item(item), 1)),
+				input = listOf(ProcessRequirement.Single.Type(NodeKey.Item(item), 1)),
 				tools = listOf(ProcessRequirement.Any(with, 1)),
 				yield = yield
 			)
@@ -255,7 +290,7 @@ class SourcesBuilder(val description: String? = null): SourcesBuilderScope {
 		transformable.add(
 			Transformable(
 				input = listOf(ProcessRequirement.Any(item, 1),
-					ProcessRequirement.Mechanic(MechanicType.VILLAGER_TRADING)),
+					ProcessRequirement.Single.Mechanic(MechanicType.VILLAGER_TRADING.key, MechanicType.VILLAGER_TRADING)),
 				tools = emptyList(),
 				yield = ProcessYield.Fixed(1)
 			)
@@ -266,7 +301,7 @@ class SourcesBuilder(val description: String? = null): SourcesBuilderScope {
 		transformable.add(
 			Transformable(
 				input = materials(*materials).toList() + (1 of Material.GLASS_BOTTLE) + (1 of Material.BLAZE_POWDER),
-				tools = listOf(ProcessRequirement.Type(NodeKey.Item(Material.BREWING_STAND), 1)),
+				tools = listOf(ProcessRequirement.Single.Type(NodeKey.Item(Material.BREWING_STAND), 1)),
 				yield = ProcessYield.Undefined
 			)
 		)
@@ -276,16 +311,26 @@ class SourcesBuilder(val description: String? = null): SourcesBuilderScope {
 		transformable.add(
 			Transformable(
 				input = requirement.toList() + (1 of Material.GLASS_BOTTLE) + (1 of Material.BLAZE_POWDER),
-				tools = listOf(ProcessRequirement.Type(NodeKey.Item(Material.BREWING_STAND), 1)),
+				tools = listOf(ProcessRequirement.Single.Type(NodeKey.Item(Material.BREWING_STAND), 1)),
 				yield = ProcessYield.Undefined
 			)
 		)
 	}
 
-	override fun spawningEntity() {
+	override fun entity(entity: EntityType) {
 		transformable.add(
 			Transformable(
-				input = emptyList(),
+				input = listOf(ProcessRequirement.Single.Entity(NodeKey.Entity(entity), entity)),
+				tools = emptyList(),
+				yield = ProcessYield.Undefined
+			)
+		)
+	}
+
+	override fun overworld() {
+		transformable.add(
+			Transformable(
+				input = listOf(ProcessRequirement.Single.Mechanic(MechanicType.OVERWORLD.key, MechanicType.OVERWORLD)),
 				tools = emptyList(),
 				yield = ProcessYield.Undefined
 			)
@@ -307,14 +352,20 @@ class SourcesBuilder(val description: String? = null): SourcesBuilderScope {
 	}
 }
 
-fun materials(vararg materials: Material): Array<ProcessRequirement.Type> {
-	return materials.map { ProcessRequirement.Type(NodeKey.Item(it), 1) }.toTypedArray()
+fun materials(vararg materials: Material): Array<ProcessRequirement.Single.Type> {
+	return materials.map { ProcessRequirement.Single.Type(NodeKey.Item(it), 1) }.toTypedArray()
 }
 
 sealed interface ProcessRequirement {
 	data class Any(val filter: MaterialFilter, val quantity: Int): ProcessRequirement
-	data class Type(val key: NodeKey, val quantity: Int): ProcessRequirement
-	data class Mechanic(val mechanic: MechanicType): ProcessRequirement
+
+	sealed interface Single : ProcessRequirement {
+		val key: NodeKey
+
+		data class Type(override val key: NodeKey, val quantity: Int): Single
+		data class Entity(override val key: NodeKey, val entityType: EntityType): Single
+		data class Mechanic(override val key: NodeKey, val mechanic: MechanicType): Single
+	}
 }
 
 infix fun Int.of(group: MaterialFilter): ProcessRequirement {
@@ -322,7 +373,7 @@ infix fun Int.of(group: MaterialFilter): ProcessRequirement {
 }
 
 infix fun Int.of(node: NodeKey.Item): ProcessRequirement {
-	return ProcessRequirement.Type(node, this)
+	return ProcessRequirement.Single.Type(node, this)
 }
 
 infix fun Int.of(material: Material): ProcessRequirement {

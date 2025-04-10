@@ -55,7 +55,7 @@ fun deriveOrNull(
 			// For each requirement, get a dependency chain of what supplies it
 			val dependencyChains = required.map { req ->
 				when(req) {
-					is ProcessRequirement.Type -> {
+					is ProcessRequirement.Single -> {
 						if(req.key in unlocked) {
 							Derived(req.key)
 						} else {
@@ -70,13 +70,6 @@ fun deriveOrNull(
 							req.filter.anyOf.firstNotNullOfOrNull {
 								deriveOrNull(graph, it, unlocked, nextVisited)
 							}
-					}
-					is ProcessRequirement.Mechanic -> {
-						// Only way to satisfy this is to have the mechanic already.
-						if(req.mechanic.key in unlocked)
-							Derived(req.mechanic.key)
-						else
-							null
 					}
 				}
 			}

@@ -4,37 +4,120 @@ import org.bukkit.Material
 import org.bukkit.entity.EntityType
 
 fun DependencyGraphBuilderScope.spawningEntities() {
+	spawnable()
+	loot()
+}
+
+private fun DependencyGraphBuilderScope.spawnable() {
+	entity(EntityType.COW) {
+		from {
+			overworld()
+		}
+	}
+	entity(EntityType.SHEEP) {
+		from {
+			overworld()
+		}
+	}
+	entity(EntityType.PIG) {
+		from {
+			overworld()
+		}
+	}
+	entity(EntityType.CHICKEN) {
+		from {
+			overworld()
+		}
+	}
+	entity(EntityType.RABBIT) {
+		from {
+			overworld()
+		}
+	}
+	entity(EntityType.WOLF) {
+		from {
+			overworld()
+		}
+	}
+	entity(EntityType.SQUID) {
+		from {
+			overworld()
+		}
+	}
+	entity(EntityType.SALMON) {
+		from {
+			overworld()
+		}
+	}
+	entity(EntityType.TROPICAL_FISH) {
+		from {
+			overworld()
+		}
+	}
+	entity(EntityType.DOLPHIN) {
+		from {
+			overworld()
+		}
+	}
+	entity(EntityType.PARROT) {
+		from {
+			overworld()
+		}
+	}
+	entity(EntityType.BEE) {
+		from {
+			overworld()
+		}
+	}
+	entity(EntityType.HORSE) {
+		from {
+			overworld()
+		}
+	}
+	entity(EntityType.DONKEY) {
+		from {
+			overworld()
+		}
+	}
+	entity(EntityType.MULE) {
+		from {
+			overworld()
+		}
+	}
+}
+
+private fun DependencyGraphBuilderScope.loot() {
 	item(Material.WHITE_WOOL) {
-		fromOverworldEntity(EntityType.SHEEP)
+		fromEntity(EntityType.SHEEP)
 	}
 	item(Material.LEATHER) {
-		fromOverworldEntity(EntityType.COW)
+		fromEntity(EntityType.COW)
 	}
 	item(Material.MUTTON) {
-		fromOverworldEntity(EntityType.SHEEP)
+		fromEntity(EntityType.SHEEP)
 	}
 	item(Material.RABBIT_FOOT) {
-		fromOverworldEntity(EntityType.RABBIT)
+		fromEntity(EntityType.RABBIT)
 	}
 	item(Material.RABBIT_HIDE) {
-		fromOverworldEntity(EntityType.RABBIT)
+		fromEntity(EntityType.RABBIT)
 	}
 	item(Material.RABBIT) {
-		fromOverworldEntity(EntityType.RABBIT)
+		fromEntity(EntityType.RABBIT)
 	}
 	item(Material.PORKCHOP) {
-		fromOverworldEntity(EntityType.PIG)
+		fromEntity(EntityType.PIG)
 	}
 	item(Material.BEEF) {
-		fromOverworldEntity(EntityType.COW)
+		fromEntity(EntityType.COW)
 	}
 	item(Material.CHICKEN) {
-		fromOverworldEntity(EntityType.CHICKEN)
+		fromEntity(EntityType.CHICKEN)
 	}
 	item(Material.FEATHER) {
-		fromOverworldEntity(EntityType.CHICKEN)
+		fromEntity(EntityType.CHICKEN)
 	}
 	item(Material.EGG) {
-		fromOverworldEntity(EntityType.CHICKEN)
+		fromEntity(EntityType.CHICKEN)
 	}
 }

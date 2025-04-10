@@ -1,11 +1,12 @@
 package se.ade.mc.cubematic.progression.analysis.key
 
 import org.bukkit.Material
+import org.bukkit.entity.EntityType
 import org.bukkit.potion.PotionType
 
 sealed interface NodeKey {
-	abstract val id: String
-	abstract val description: String
+	val id: String
+	val description: String
 
 	data class Item(val material: Material, val tags: Set<ItemTag> = setOf()): NodeKey {
 		override val id: String = material.key.toString()
@@ -17,6 +18,12 @@ sealed interface NodeKey {
 				return "($material, tags=${tags.joinToString(", ")})"
 			}
 		}
+	}
+
+	data class Entity(val entityType: EntityType): NodeKey {
+		override val id: String = entityType.key.toString()
+		override val description: String = "Entity($entityType)"
+		override fun toString() = "[$description]"
 	}
 
 	data class Custom(val key: String, override val description: String): NodeKey {

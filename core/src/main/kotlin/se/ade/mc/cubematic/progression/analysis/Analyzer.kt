@@ -53,7 +53,7 @@ class DependencyAnalyzer(
 
 	private fun canSatisfyRequirement(req: ProcessRequirement, currentPath: Set<NodeKey> = emptySet()): Boolean {
 		return when (req) {
-			is ProcessRequirement.Type -> {
+			is ProcessRequirement.Single -> {
 				initialItems.contains(req.key) ||
 						unlocked.contains(req.key) ||
 						canDerive(req.key, currentPath + req.key)
@@ -68,7 +68,7 @@ class DependencyAnalyzer(
 							!currentPath.contains(nodeKey) && canDerive(nodeKey, currentPath + nodeKey)
 						}
 			}
-			is ProcessRequirement.Mechanic -> {
+			is ProcessRequirement.Single.Mechanic -> {
 				initialItems.contains(req.mechanic.key) ||
 						unlocked.contains(req.mechanic.key) ||
 						canDerive(req.mechanic.key, currentPath + req.mechanic.key)
@@ -98,7 +98,7 @@ class DependencyAnalyzer(
 					val satisfiedInputs = mutableListOf<NodeKey>()
 					val allInputsMet = transform.input.all { req ->
 						val met = canSatisfyRequirement(req, currentPath)
-						if (met && req is ProcessRequirement.Type) {
+						if (met && req is ProcessRequirement.Single.Type) {
 							satisfiedInputs.add(req.key)
 						}
 						met
@@ -108,7 +108,7 @@ class DependencyAnalyzer(
 					val satisfiedTools = mutableListOf<NodeKey>()
 					val allToolsMet = transform.tools.all { req ->
 						val met = canSatisfyRequirement(req, currentPath)
-						if (met && req is ProcessRequirement.Type) {
+						if (met && req is ProcessRequirement.Single.Type) {
 							satisfiedTools.add(req.key)
 						}
 						met

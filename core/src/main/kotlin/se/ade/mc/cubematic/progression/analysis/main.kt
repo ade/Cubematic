@@ -40,6 +40,7 @@ fun testGraphWithPlugin(plugin: JavaPlugin) {
 	}
 
 	val initialItems = setOf(
+		MechanicType.OVERWORLD.key,
 		NodeKey.Item(Material.OAK_LOG),
 		NodeKey.Item(Material.OAK_LEAVES),
 		NodeKey.Item(Material.DIRT),
@@ -79,6 +80,7 @@ fun testGraphWithPlugin(plugin: JavaPlugin) {
 	}.also {
 		plugin.logger.info { "Unlocked ${it.size} nodes of ${graph.nodes.size}" }
 	}.forEach {
+		//println(it.nodeKey.toString())
 		it.trace().split("\n").forEach { println(it) }
 	}
 }
