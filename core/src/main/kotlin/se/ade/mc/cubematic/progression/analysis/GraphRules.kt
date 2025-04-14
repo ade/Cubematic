@@ -9,6 +9,7 @@ fun DependencyGraphBuilderScope.standardRules() {
 	growingRules()
 	spawningEntities()
 	wanderingTraderRules()
+	villagerTradingRules()
 
 	mechanic(MechanicType.VILLAGER_TRADING) {
 		from {
