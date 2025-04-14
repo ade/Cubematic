@@ -41,6 +41,7 @@ fun testGraphWithPlugin(plugin: JavaPlugin) {
 
 	val initialItems = setOf(
 		MechanicType.OVERWORLD.key,
+		MechanicType.VILLAGER_TRADING.key,
 		NodeKey.Item(Material.OAK_LOG),
 		NodeKey.Item(Material.OAK_LEAVES),
 		NodeKey.Item(Material.DIRT),

@@ -47,10 +47,14 @@ interface SourcesBuilderScope {
 
 	/** Requirement expressing "being in overworld" */
 	fun overworld()
+
+	/** Requirement expressing "gained access to nether" */
+	fun nether()
 }
 
 enum class MechanicType(val key: NodeKey) {
 	OVERWORLD(key = NodeKey.Custom("overworld", "Overworld")),
+	NETHER(key = NodeKey.Custom("nether", "Nether")),
 	VILLAGER_TRADING(key = NodeKey.Custom("villager_trading", "Villager Trading")),
 }
 
@@ -331,6 +335,16 @@ class SourcesBuilder(val description: String? = null): SourcesBuilderScope {
 		transformable.add(
 			Transformable(
 				input = listOf(ProcessRequirement.Single.Mechanic(MechanicType.OVERWORLD.key, MechanicType.OVERWORLD)),
+				tools = emptyList(),
+				yield = ProcessYield.Undefined
+			)
+		)
+	}
+
+	override fun nether() {
+		transformable.add(
+			Transformable(
+				input = listOf(ProcessRequirement.Single.Mechanic(MechanicType.NETHER.key, MechanicType.NETHER)),
 				tools = emptyList(),
 				yield = ProcessYield.Undefined
 			)

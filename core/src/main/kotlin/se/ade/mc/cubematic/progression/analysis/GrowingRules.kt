@@ -1,8 +1,42 @@
 package se.ade.mc.cubematic.progression.analysis
 
 import org.bukkit.Material
+import org.bukkit.entity.EntityType
 
 fun DependencyGraphBuilderScope.growingRules() {
+	farmingCrops()
+	logGrowing()
+
+	item(Material.APPLE) {
+		from {
+			grow(plant = Material.OAK_SAPLING, on = saplingSoils())
+		}
+	}
+	item(Material.BEEHIVE) {
+		from {
+			grow(plant = Material.OAK_SAPLING, on = saplingSoils())
+		}
+	}
+	entity(EntityType.BEE) {
+		from {
+			grow(plant = Material.OAK_SAPLING, on = saplingSoils())
+		}
+	}
+	item(Material.HONEYCOMB) {
+		from {
+			entity(EntityType.BEE)
+			having(Material.BEEHIVE)
+		}
+	}
+	item(Material.HONEY_BOTTLE) {
+		from {
+			entity(EntityType.BEE)
+			having(Material.BEEHIVE, Material.GLASS_BOTTLE)
+		}
+	}
+}
+
+private fun DependencyGraphBuilderScope.farmingCrops() {
 	item(Material.FARMLAND) {
 		from {
 			having(Material.DIRT, Material.WATER)
@@ -61,5 +95,41 @@ fun DependencyGraphBuilderScope.growingRules() {
 		from {
 			grow(Material.KELP, on = anyOf(Material.DIRT))
 		}
+	}
+}
+
+fun DependencyGraphBuilderScope.logGrowing() {
+	item(Material.OAK_LOG) {
+		from { grow(plant = Material.OAK_SAPLING, on = saplingSoils()) }
+	}
+	item(Material.BIRCH_LOG) {
+		from { grow(plant = Material.BIRCH_SAPLING, on = saplingSoils()) }
+	}
+	item(Material.SPRUCE_LOG) {
+		from { grow(plant = Material.SPRUCE_SAPLING, on = saplingSoils()) }
+	}
+	item(Material.JUNGLE_LOG) {
+		from { grow(plant = Material.JUNGLE_SAPLING, on = saplingSoils()) }
+	}
+	item(Material.ACACIA_LOG) {
+		from { grow(plant = Material.ACACIA_SAPLING, on = saplingSoils()) }
+	}
+	item(Material.DARK_OAK_LOG) {
+		from { grow(plant = Material.DARK_OAK_SAPLING, on = saplingSoils()) }
+	}
+	item(Material.PALE_OAK_LOG) {
+		from { grow(plant = Material.PALE_OAK_SAPLING, on = saplingSoils()) }
+	}
+	item(Material.MANGROVE_LOG) {
+		from { grow(plant = Material.MANGROVE_PROPAGULE, on = saplingSoils()) }
+	}
+	item(Material.CHERRY_LOG) {
+		from { grow(plant = Material.CHERRY_SAPLING, on = saplingSoils()) }
+	}
+	item(Material.WARPED_STEM) {
+		from { grow(plant = Material.WARPED_FUNGUS, on = saplingSoils() + anyOf(Material.WARPED_NYLIUM, Material.CRIMSON_NYLIUM, Material.SOUL_SOIL)) }
+	}
+	item(Material.CRIMSON_STEM) {
+		from { grow(plant = Material.CRIMSON_FUNGUS, on = saplingSoils() + anyOf(Material.WARPED_NYLIUM, Material.CRIMSON_NYLIUM, Material.SOUL_SOIL)) }
 	}
 }
