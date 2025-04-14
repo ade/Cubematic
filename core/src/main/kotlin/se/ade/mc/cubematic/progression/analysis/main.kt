@@ -48,24 +48,6 @@ fun testGraphWithPlugin(plugin: JavaPlugin) {
 		NodeKey.Item(Material.WATER_BUCKET)
 	)
 
-	val analyzer = DependencyAnalyzer(graph, initialItems)
-
-	val unlocked = analyzer.analyze().sortedBy {
-		(it as? NodeKey.Item)?.material?.name ?: it.id
-	}
-
-	//unlocked.forEach { plugin.logger.info { "Unlocked $it" } }
-
-	val notUnlockedMats = Material.entries - unlocked.mapNotNull {
-		(it as? NodeKey.Item)?.material
-	}
-
-	//notUnlockedMats.forEach { plugin.logger.info { "Not unlocked $it" } }
-	//plugin.logger.info { "Not unlocked: ${notUnlockedMats.size} items" }
-
-	analyzer.printPathTo(NodeKey.Item(Material.WHITE_BED))
-
-
 	val items = runBlocking {
 		val timed = measureTimedValue {
 			deriveObtainableItems(graph, initialItems)
@@ -74,13 +56,20 @@ fun testGraphWithPlugin(plugin: JavaPlugin) {
 		println("Analyzed graph in ${timed.duration.inWholeMilliseconds}ms")
 
 		timed.value
-	}
-	items.sortedBy {
+	}.sortedBy {
 		(it.nodeKey as? NodeKey.Item)?.material?.name ?: it.nodeKey.id
-	}.also {
-		plugin.logger.info { "Unlocked ${it.size} nodes of ${graph.nodes.size}" }
-	}.forEach {
-		//println(it.nodeKey.toString())
-		it.trace().split("\n").forEach { println(it) }
 	}
+
+	val notUnlockedMats = (Material.entries - items.mapNotNull {
+		(it.nodeKey as? NodeKey.Item)?.material
+	}).sortedBy {
+		it.name
+	}
+
+	items.forEach {
+		plugin.logger.info { "Unlocked: ${it.nodeKey}" }
+		//it.trace().split("\n").forEach { println(it) }
+	}
+	notUnlockedMats.forEach { plugin.logger.info { "Not unlocked $it" } }
+	plugin.logger.info { "${items.size} unlocked, ${notUnlockedMats.size} remain, total of ${Material.entries.size}" }
 }
