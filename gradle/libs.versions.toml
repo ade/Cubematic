@@ -1,9 +1,9 @@
 [versions]
 kotlin = "2.1.10"
-paper = "1.21.4-R0.1-SNAPSHOT"
+paper = "1.21.5-R0.1-SNAPSHOT"
 exposed = "0.60.0"
 sqlite = "3.44.1.0"
-minecraft = "1.21.4"
+minecraft = "1.21.5"
 
 [plugins]
 shadow = { id = "com.github.johnrengelman.shadow", version = "8.1.1" }
@@ -20,6 +20,7 @@ sqlite = { group = "org.xerial", name = "sqlite-jdbc", version.ref = "sqlite" }
 multiverse2 = { group = "com.onarandombox.multiversecore", name = "multiverse-core", version = "4.3.14" }
 kotlinx-coroutines-core = { group = "org.jetbrains.kotlinx", name = "kotlinx-coroutines-core", version = "1.9.0" }
 kaml = { group = "com.charleskorn.kaml", name = "kaml", version = "0.54.0" }
+kotlinx-serialization-json = { group = "org.jetbrains.kotlinx", name = "kotlinx-serialization-json", version = "1.8.1" }
 
 [bundles]
 exposed = [ "exposed-core", "exposed-dao", "exposed-jdbc" ]

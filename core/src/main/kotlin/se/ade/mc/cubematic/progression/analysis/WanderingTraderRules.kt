@@ -93,12 +93,10 @@ fun DependencyGraphBuilderScope.wanderingTraderRules() {
 		Material.HORN_CORAL_BLOCK,
 		Material.TUBE_CORAL_BLOCK,
 		Material.SLIME_BALL,
-		Material.NAUTILUS_SHELL
-
-		//TODO 1.21.5
-		//TODO Material.FIREFLY_BUSH
-		//TODO TALL DRY GRASS
-		//TODO WILDFLOWERS
+		Material.NAUTILUS_SHELL,
+		Material.FIREFLY_BUSH,
+		Material.TALL_DRY_GRASS,
+		Material.WILDFLOWERS
 	)
 
 	purchasable.forEach {
