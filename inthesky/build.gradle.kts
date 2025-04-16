@@ -1,5 +1,6 @@
 import java.util.Properties
 import net.minecrell.pluginyml.bukkit.BukkitPluginDescription
+import org.gradle.kotlin.dsl.invoke
 
 plugins {
     kotlin("jvm") version "2.1.10"
@@ -33,6 +34,7 @@ tasks.shadowJar {
     manifest {
         attributes["paperweight-mappings-namespace"] = "mojang"
     }
+    archiveBaseName.set("cubematic-inthesky")
 }
 
 tasks.register<Copy>("deploy") {

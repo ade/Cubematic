@@ -24,6 +24,16 @@ Skyblock like plugin for Paper-based Minecraft servers.
 - Progression / Unlocking of more content
   - TBD
 
+### Enabling
+Edit bukkit.yml, set the generator for the world to CubematicSkyPlugin for both overworld and nether.
+```yaml
+worlds:
+  world:
+    generator: Cubematic-InTheSky
+  world_nether:
+    generator: Cubematic-InTheSky:nether
+```
+
 ## Portals
 This plugin creates a custom portal system in Minecraft with the following features:
 

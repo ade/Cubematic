@@ -50,7 +50,7 @@ tasks {
         manifest {
             attributes["paperweight-mappings-namespace"] = "mojang"
         }
-        archiveBaseName.set("cubematic")
+        archiveBaseName.set("cubematic-automation")
     }
 
     runServer {
