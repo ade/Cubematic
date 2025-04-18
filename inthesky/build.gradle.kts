@@ -19,6 +19,7 @@ dependencies {
     compileOnly(libs.paper)
     implementation(project(":core"))
     implementation(libs.kaml)
+    implementation(libs.kotlinx.coroutines.core)
 
     testImplementation(kotlin("test"))
 }

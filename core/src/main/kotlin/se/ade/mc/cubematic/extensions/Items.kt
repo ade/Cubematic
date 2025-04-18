@@ -1,6 +1,7 @@
 package se.ade.mc.cubematic.extensions
 
 import org.bukkit.Material
+import org.bukkit.inventory.ItemStack
 
 enum class PickTier(val level: Int, vararg materials: Material) {
 	WOODEN(0, Material.WOODEN_PICKAXE, Material.GOLDEN_PICKAXE),
@@ -14,4 +15,16 @@ enum class PickTier(val level: Int, vararg materials: Material) {
 infix fun Material.isPickOfAtleast(level: PickTier): Boolean {
 	return PickTier.entries.filter { it.level >= level.level }
 		.any { it.materials.contains(this) }
+}
+
+fun ItemStack.spend(amount: Int = 1): ItemStack {
+	return if (this.amount <= amount) {
+		ItemStack.empty()
+	} else {
+		this.clone().also { it.amount -= amount }
+	}
+}
+
+infix operator fun ItemStack.minus(amount: Int): ItemStack {
+	return this.spend(amount)
 }
