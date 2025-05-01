@@ -21,6 +21,12 @@ Skyblock like plugin for Paper-based Minecraft servers.
 - Nether generation
   - Void nether
   - Microbiomes
+- New game rules
+  - Grass block obtainable: Turn dirt into grass by right-clicking it with short grass
+  - Charcoal without furnace
+    - Set a log block on fire and wait for it to burn up. It will drop a charcoal item.
+    - Campfire allows burning logs to get charcoal.
+    
 - Progression / Unlocking of more content
   - TBD
 

@@ -2,6 +2,7 @@ package se.ade.mc.cubematic.progression.analysis
 
 import org.bukkit.Material
 import org.bukkit.potion.PotionType
+import se.ade.mc.cubematic.definitions.overworldLogTypes
 
 fun DependencyGraphBuilderScope.wanderingTraderRules() {
 	val description = "Wandering Trader"

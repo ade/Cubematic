@@ -11,3 +11,6 @@ fun Block.adjacentHorizontal(): List<Block> {
 		getRelative(BlockFace.WEST)
 	)
 }
+
+fun Block.isRightTemperatureForRain() =
+	temperature in 0.15..0.95
