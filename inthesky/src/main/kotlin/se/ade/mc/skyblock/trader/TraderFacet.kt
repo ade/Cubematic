@@ -8,6 +8,7 @@ import org.bukkit.entity.WanderingTrader
 import org.bukkit.event.EventHandler
 import org.bukkit.event.Listener
 import org.bukkit.event.entity.CreatureSpawnEvent
+import org.bukkit.event.world.TimeSkipEvent
 import org.bukkit.inventory.EntityEquipment
 import org.bukkit.inventory.ItemStack
 import org.bukkit.inventory.MerchantRecipe
@@ -32,6 +33,11 @@ class TraderFacet(val plugin: CubematicSkyPlugin): Aspect(plugin) {
 	}
 
 	private val listener = object : Listener {
+		@EventHandler
+		fun on(e: TimeSkipEvent) {
+			spawnTraderRule(e, plugin)
+		}
+
 		@EventHandler
 		fun onSpawn(event: CreatureSpawnEvent) {
 			if(event.entity.type == EntityType.WANDERING_TRADER && event.spawnReason == CreatureSpawnEvent.SpawnReason.SPAWNER_EGG) {

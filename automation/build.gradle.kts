@@ -58,10 +58,10 @@ tasks {
         // This is the only required configuration besides applying the plugin.
         // Your plugin's jar (or shadowJar if present) will be used automatically.
         minecraftVersion(libs.versions.minecraft.get().toString())
-        dependsOn(":dreams:shadowJar")
+        //dependsOn(":dreams:shadowJar")
         dependsOn(":inthesky:shadowJar")
         dependsOn(":portals:shadowJar")
-        pluginJars(project(":dreams").tasks.named("shadowJar").get().outputs.files.first())
+        //pluginJars(project(":dreams").tasks.named("shadowJar").get().outputs.files.first())
         pluginJars(project(":inthesky").tasks.named("shadowJar").get().outputs.files.first())
         pluginJars(project(":portals").tasks.named("shadowJar").get().outputs.files.first())
 

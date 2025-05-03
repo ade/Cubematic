@@ -26,6 +26,15 @@ Skyblock like plugin for Paper-based Minecraft servers.
   - Charcoal without furnace
     - Set a log block on fire and wait for it to burn up. It will drop a charcoal item.
     - Campfire allows burning logs to get charcoal.
+  - Wandering trader spawns much more often
+    - Sleeping in a bed grants a chance to spawn a wandering trader.
+    - The trader has a spawn chance based on the player with the highest level in the world.
+    - Each level gives a 1% chance to spawn the trader, all the way up to a max of 100% at level 100+.
+    - The trader will spawn next to the player with the highest level, within a 16 block radius
+    - The trader will only spawn if there isn't already one in the world.
+    - Trader will despawn after 2 days (as a naturally spawned one)
+    - This trader does not spawn with llamas
+    - Vanilla trader spawning has not been modified, but might not happen if a trader is already in the world.
     
 - Progression / Unlocking of more content
   - TBD
