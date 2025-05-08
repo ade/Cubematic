@@ -47,6 +47,7 @@ There are some main routes for the Nether, and they are:
 - Nether gold ore
 - Nether quartz ore
 - Crimson/warped nylium, which leads to fungi, planks, etc
+  - What if sculk catalysts are used to grow them?
 
 # Already obtainable and need no action (-> reminder how it works)
 - Magma blocks -> Craft with magma cream from magma cubes

@@ -1,5 +1,6 @@
 package se.ade.mc.skyblock.trader
 
+import io.papermc.paper.event.player.PlayerTradeEvent
 import org.bukkit.Location
 import org.bukkit.Material
 import org.bukkit.NamespacedKey
@@ -26,12 +27,6 @@ class TraderFacet(val plugin: CubematicSkyPlugin): Aspect(plugin) {
 
 	}
 
-	private fun spawnSpecialTrader(location: Location) {
-		location.world.spawnEntity(location, EntityType.WANDERING_TRADER, CreatureSpawnEvent.SpawnReason.CUSTOM) {
-
-		}
-	}
-
 	private val listener = object : Listener {
 		@EventHandler
 		fun on(e: TimeSkipEvent) {
@@ -39,7 +34,23 @@ class TraderFacet(val plugin: CubematicSkyPlugin): Aspect(plugin) {
 		}
 
 		@EventHandler
+		fun on(e: PlayerTradeEvent) {
+			if(e.villager.type != EntityType.WANDERING_TRADER)
+				return
+
+			if(e.trade.result.type == Material.ECHO_SHARD) {
+				plugin.config = plugin.config.copy(
+					trader = plugin.config.trader.copy(
+						shardIngredientKeys = emptyList()
+					)
+				)
+			}
+		}
+
+		@EventHandler
 		fun onSpawn(event: CreatureSpawnEvent) {
+			traderLavaBucketRule(event, plugin)
+
 			if(event.entity.type == EntityType.WANDERING_TRADER && event.spawnReason == CreatureSpawnEvent.SpawnReason.SPAWNER_EGG) {
 				val trader = (event.entity as WanderingTrader)
 

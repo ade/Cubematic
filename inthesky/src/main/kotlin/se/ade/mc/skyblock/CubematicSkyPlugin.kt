@@ -10,7 +10,7 @@ import se.ade.mc.skyblock.nether.NetherFacet
 import se.ade.mc.skyblock.trader.TraderFacet
 
 class CubematicSkyPlugin: JavaPlugin(), Listener {
-    val config by configProvider { SkyConfig() }
+    var config by configProvider { SkyConfig() }
     val netherFacet = NetherFacet(this)
     val traderFacet = TraderFacet(this)
     val interactionFacet = InteractionFacet(this)

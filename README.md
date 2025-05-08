@@ -35,9 +35,12 @@ Skyblock like plugin for Paper-based Minecraft servers.
     - Trader will despawn after 2 days (as a naturally spawned one)
     - This trader does not spawn with llamas
     - Vanilla trader spawning has not been modified, but might not happen if a trader is already in the world.
-    
 - Progression / Unlocking of more content
-  - TBD
+  - Wandering Trader sells lava buckets for 10 echo shards
+  - Wandering Trader sells echo shards for random items.
+    - These items are hard to obtain and require some effort to get.
+    - The same trades are offered on every wandering trader until one is completed.
+    - There are two of these trades available at a time, each usable once.
 
 ### Enabling
 Edit bukkit.yml, set the generator for the world to CubematicSkyPlugin for both overworld and nether.
