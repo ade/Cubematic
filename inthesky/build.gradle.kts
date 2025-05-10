@@ -61,4 +61,18 @@ bukkit {
     version = project.version.toString()
 
     apiVersion = "1.21"
+
+    permissions {
+        register("cubematic.inthesky.commands") {
+            description = "Allows cubematic inthesky commands"
+            default = BukkitPluginDescription.Permission.Default.OP
+        }
+    }
+
+    commands {
+        register("cubematic") {
+            description = "Cubematic inthesky"
+            permission = "skyblock.command"
+        }
+    }
 }

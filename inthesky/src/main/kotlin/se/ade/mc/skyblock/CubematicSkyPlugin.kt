@@ -1,9 +1,14 @@
 package se.ade.mc.skyblock
 
+import org.bukkit.Material
+import org.bukkit.enchantments.Enchantment
 import org.bukkit.event.Listener
 import org.bukkit.generator.ChunkGenerator
+import org.bukkit.inventory.ItemStack
 import org.bukkit.plugin.java.JavaPlugin
 import se.ade.mc.cubematic.config.configProvider
+import se.ade.mc.cubematic.extensions.commands
+import se.ade.mc.skyblock.experiments.mapExperiment
 import se.ade.mc.skyblock.interaction.InteractionFacet
 import se.ade.mc.skyblock.generator.GeneratorSelector
 import se.ade.mc.skyblock.nether.NetherFacet
@@ -21,6 +26,8 @@ class CubematicSkyPlugin: JavaPlugin(), Listener {
         traderFacet.enable()
         interactionFacet.enable()
         //testGraphWithPlugin(this)
+
+        addCommands(this)
     }
 
     override fun onDisable() {
@@ -31,6 +38,24 @@ class CubematicSkyPlugin: JavaPlugin(), Listener {
 
     override fun getDefaultWorldGenerator(worldName: String, id: String?): ChunkGenerator {
         return GeneratorSelector.selectGenerator(this, worldName, id)
+    }
+
+    private fun addCommands(plugin: CubematicSkyPlugin) {
+        commands {
+            command("cubematic") {
+                subcommand("sky") {
+                    subcommand("debug") {
+                        subcommand("map") {
+                            subcommand("monument") {
+                                playerExecutes { context, player ->
+                                    mapExperiment(player, plugin)
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        }
     }
 }
 
