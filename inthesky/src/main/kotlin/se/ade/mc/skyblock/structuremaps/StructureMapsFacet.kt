@@ -13,9 +13,6 @@ class StructureMapsFacet(private val plugin: CubematicSkyPlugin): Aspect(plugin)
 			val id = e.map.id
 
 			plugin.config.structureMapData[id]?.let { data ->
-				e.map.renderers.toList().forEach {
-					e.map.removeRenderer(it)
-				}
 				when(data) {
 					is StructureOutlineData.Box -> e.map.addRenderer(MapViewBoxOutlineRenderer(data))
 				}

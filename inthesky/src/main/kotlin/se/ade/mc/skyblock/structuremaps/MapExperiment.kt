@@ -59,9 +59,11 @@ fun mapExperiment(
 	// Create and configure the map
 	val mapView = Bukkit.createMap(world)
 
-	// Need to remove the default renderer to avoid the default map rendering
-	val renderers = mapView.renderers.toList()
-	renderers.forEach { mapView.removeRenderer(it) }
+	// NOTE that we don't delete the default renderers on purpose here
+	// because if we do then the locator arrow doesn't show up.
+	// Instead, we just set the map as locked right away
+	// This allows both the locator and our custom renderer to work.
+	// (custom renderer IS invoked even though map is locked)
 
 	mapView.centerX = centerX
 	mapView.centerZ = centerZ
