@@ -33,17 +33,24 @@ class MapViewBoxOutlineRenderer(
 		// Draw all four edges
 		drawBoxEdges(canvas, Colors.foreground)
 
-		// Have not found a replacement for this yet
-		@Suppress("DEPRECATION", "removal")
-		val foregroundColorIndex = MapPalette.matchColor(Colors.foreground)
-
-		canvas.drawText(0, 0, MinecraftFont.Font, "§$foregroundColorIndex;${drawData.title}")
+		renderText(canvas, drawData.title, 1, 0)
+		renderText(canvas, "x: ${drawData.minX}...${drawData.maxX}", 1, 9)
+		renderText(canvas, "y: ${drawData.minY}...${drawData.maxY}", 1, 18)
+		renderText(canvas, "z: ${drawData.minZ}...${drawData.maxZ}", 1, 27)
 
 		map.isTrackingPosition = true
 		map.isUnlimitedTracking = true
 		map.isLocked = true
 
 		hasRendered = true
+	}
+
+	private fun renderText(canvas: MapCanvas, text: String, x: Int, y: Int) {
+		// Have not found a replacement for this yet
+		@Suppress("DEPRECATION", "removal")
+		val foregroundColorIndex = MapPalette.matchColor(Colors.foreground)
+
+		canvas.drawText(x, y, MinecraftFont.Font, "§$foregroundColorIndex;$text")
 	}
 
 	private fun drawBoxEdges(canvas: MapCanvas, color: Color) {

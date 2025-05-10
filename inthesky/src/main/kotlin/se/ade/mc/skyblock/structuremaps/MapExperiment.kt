@@ -85,6 +85,8 @@ fun mapExperiment(
 		centerZ = centerZ,
 		minX = bbox.minX.toInt(),
 		maxX = bbox.maxX.toInt(),
+		minY = bbox.minY.toInt(),
+		maxY = bbox.maxY.toInt(),
 		minZ = bbox.minZ.toInt(),
 		maxZ = bbox.maxZ.toInt()
 	)

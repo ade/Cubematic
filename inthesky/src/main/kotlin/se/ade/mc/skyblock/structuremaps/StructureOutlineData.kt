@@ -27,6 +27,8 @@ sealed interface StructureOutlineData {
 		override val centerZ: Int,
 		val minX: Int,
 		val maxX: Int,
+		val minY: Int,
+		val maxY: Int,
 		val minZ: Int,
 		val maxZ: Int,
 	): StructureOutlineData
