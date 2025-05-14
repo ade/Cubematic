@@ -77,12 +77,13 @@ class NetherGenerator(private val plugin: CubematicSkyPlugin) : ChunkGenerator()
 
 	override fun getDefaultBiomeProvider(worldInfo: WorldInfo): BiomeProvider? {
 		// TODO Configuration opportunity (use custom or not)
-		return NetherBiomeProvider(0, 0, supportedNetherBiomes)
+		// return NetherBiomeProvider(0, 0, supportedNetherBiomes)
+		return null
 	}
 
 	override fun shouldGenerateStructures(): Boolean {
 		// This will generate the metadata fortress "structure" without the blocks
-		return false
+		return true
 	}
 
 	override fun shouldGenerateDecorations(): Boolean {

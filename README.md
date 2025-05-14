@@ -17,10 +17,12 @@ Skyblock like plugin for Paper-based Minecraft servers.
 - Overworld generation
   - Classic starter island
   - Void world
-  - Microbiomes (small biomes around the player in a grid)
+  - (inactive) Microbiomes (small biomes around the player in a grid)
+  - Structure boxes generation from vanilla generator (technical only - no blocks!)
 - Nether generation
   - Void nether
-  - Microbiomes
+  - (inactive) Microbiomes
+  - Structure boxes generation from vanilla generator (technical only - no blocks!)
 - New game rules
   - Grass block obtainable: Turn dirt into grass by right-clicking it with short grass
   - Charcoal without furnace
@@ -41,6 +43,10 @@ Skyblock like plugin for Paper-based Minecraft servers.
     - These items are hard to obtain and require some effort to get.
     - The same trades are offered on every wandering trader until one is completed.
     - There are two of these trades available at a time, each usable once.
+  - Wandering Trader sells schematics to get location and see bounds of structures (for farms).
+    - Monument
+    - Swamp Hut
+    - Pillager Outpost
 
 ### Enabling
 Edit bukkit.yml, set the generator for the world to CubematicSkyPlugin for both overworld and nether.

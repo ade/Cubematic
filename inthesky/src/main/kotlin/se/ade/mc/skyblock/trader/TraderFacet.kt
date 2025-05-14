@@ -50,6 +50,7 @@ class TraderFacet(val plugin: CubematicSkyPlugin): Aspect(plugin) {
 		@EventHandler
 		fun onSpawn(event: CreatureSpawnEvent) {
 			traderLavaBucketRule(event, plugin)
+			traderMapsRule(event, plugin)
 
 			if(event.entity.type == EntityType.WANDERING_TRADER && event.spawnReason == CreatureSpawnEvent.SpawnReason.SPAWNER_EGG) {
 				val trader = (event.entity as WanderingTrader)
@@ -61,7 +62,7 @@ class TraderFacet(val plugin: CubematicSkyPlugin): Aspect(plugin) {
 
 				trader.persistentDataContainer.set(moddedKey, PersistentDataType.BOOLEAN, true)
 
-				trader.recipes = trader.recipes + listOf<MerchantRecipe>(
+				trader.recipes = trader.recipes + listOf(
 					MerchantRecipe(ItemStack(Material.GRASS_BLOCK), 1).also {
 						it.ingredients = listOf(
 							ItemStack(Material.DIRT, 2),

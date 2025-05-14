@@ -1,32 +1,40 @@
 package se.ade.mc.skyblock.structuremaps
 
+import net.kyori.adventure.text.Component
+import net.kyori.adventure.text.Component.text
+import net.kyori.adventure.text.format.NamedTextColor
+import net.kyori.adventure.text.format.TextColor
 import org.bukkit.Bukkit
+import org.bukkit.Location
 import org.bukkit.Material
-import org.bukkit.entity.Player
-import org.bukkit.generator.structure.StructureType
+import org.bukkit.Registry
+import org.bukkit.generator.structure.Structure
 import org.bukkit.inventory.ItemStack
 import org.bukkit.inventory.meta.MapMeta
 import org.bukkit.map.MapView
 import org.bukkit.util.BoundingBox
 import org.bukkit.util.StructureSearchResult
 import se.ade.mc.skyblock.CubematicSkyPlugin
+import java.awt.Color
 import kotlin.math.max
 
 
-fun mapExperiment(
-	player: Player,
+fun createStructureMap(
+	loc: Location,
 	plugin: CubematicSkyPlugin,
-	structureType: StructureType = StructureType.OCEAN_MONUMENT
-) {
-	val world = player.world
-	val loc = player.location
-	val structureKey = structureType.key
+	structure: Structure,
+	title: String
+): ItemStack? {
+	val world = loc.world
 	val log = plugin.config.debug
 
 	// Locate the nearest structure
 	val findOnlyUnexplored = false
-	val result: StructureSearchResult = world.locateNearestStructure(loc, structureType, 10000, findOnlyUnexplored)
-		?: return
+	val result: StructureSearchResult = world.locateNearestStructure(loc, structure, 10000, findOnlyUnexplored)
+		?: run {
+			if (log) plugin.logger.warning { "Structure '$title' not found in world: ${world.name} searching from $loc" }
+			return null
+		}
 
 	if(log) plugin.logger.info { "Locate structure: $result" }
 
@@ -34,10 +42,12 @@ fun mapExperiment(
 	val resultChunkZ = result.location.chunk.z
 
 	val struct = world.getStructures(resultChunkX, resultChunkZ)
-		.firstOrNull { it.structure.structureType == structureType }
+		.firstOrNull {
+			it.structure == structure
+		}
 		?: run {
-			if (log) plugin.logger.warning { "Structure $structureKey not found at: ${result.location}" }
-			return
+			if (log) plugin.logger.warning { "Structure '$title' not found at: ${result.location}" }
+			return null
 		}
 
 	val bbox: BoundingBox = struct.boundingBox
@@ -79,7 +89,7 @@ fun mapExperiment(
 
 	val info = StructureOutlineData.Box(
 		id = mapView.id,
-		title = structureKey.key,
+		title = title,
 		scale = scale,
 		centerX = centerX,
 		centerZ = centerZ,
@@ -106,6 +116,14 @@ fun mapExperiment(
 			it[mapView.id] = info
 		}
 	)
-	player.inventory.addItem(mapItem)
+
+	mapItem.itemMeta = mapItem.itemMeta.also {
+		it.displayName(Component.text("Schematic", NamedTextColor.GOLD))
+		it.lore(listOf(
+			Component.text(title, TextColor.color(Color(0x13f832).rgb))
+		))
+	}
+
+	return mapItem
 }
 

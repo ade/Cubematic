@@ -2,10 +2,11 @@ package se.ade.mc.skyblock
 
 import org.bukkit.event.Listener
 import org.bukkit.generator.ChunkGenerator
+import org.bukkit.generator.structure.Structure
 import org.bukkit.plugin.java.JavaPlugin
 import se.ade.mc.cubematic.config.configProvider
 import se.ade.mc.cubematic.extensions.commands
-import se.ade.mc.skyblock.structuremaps.mapExperiment
+import se.ade.mc.skyblock.structuremaps.createStructureMap
 import se.ade.mc.skyblock.interaction.InteractionFacet
 import se.ade.mc.skyblock.generator.GeneratorSelector
 import se.ade.mc.skyblock.nether.NetherFacet
@@ -21,7 +22,7 @@ class CubematicSkyPlugin: JavaPlugin(), Listener {
 
     override fun onEnable() {
         server.pluginManager.registerEvents(this, this)
-        netherFacet.onEnable()
+        //netherFacet.onEnable()
         traderFacet.enable()
         interactionFacet.enable()
         structureMapsFacet.enable()
@@ -49,8 +50,24 @@ class CubematicSkyPlugin: JavaPlugin(), Listener {
                         subcommand("map") {
                             subcommand("monument") {
                                 playerExecutes { context, player ->
-                                    mapExperiment(player, plugin)
+                                    createStructureMap(player.location, plugin, structure = Structure.MONUMENT, title = "Monument")
                                 }
+                            }
+                            subcommand("fortress") {
+                                playerExecutes { context, player ->
+                                    createStructureMap(player.location, plugin, structure = Structure.FORTRESS, title = "Fortress")
+                                }
+                            }
+                            subcommand("hut") {
+                                playerExecutes { context, player ->
+                                    createStructureMap(player.location, plugin, structure = Structure.SWAMP_HUT, title = "Swamp Hut")
+                                }
+                            }
+                        }
+                        subcommand("explorer-map") {
+                            playerExecutes { context, player ->
+                                val result = player.world.locateNearestStructure(player.location, Structure.PILLAGER_OUTPOST, 1000, false)
+                                player.sendMessage(result.toString())
                             }
                         }
                     }
