@@ -29,7 +29,7 @@ fun traderMapsRule(event: CreatureSpawnEvent, plugin: CubematicSkyPlugin) {
 		loc = event.location,
 		plugin = plugin,
 		structure = type,
-		title = title
+		title = "$title Schematic"
 	) ?: run {
 		plugin.logger.warning { "Failed to create map for $title" }
 		return

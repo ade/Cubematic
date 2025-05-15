@@ -118,10 +118,12 @@ fun createStructureMap(
 	)
 
 	mapItem.itemMeta = mapItem.itemMeta.also {
-		it.displayName(Component.text("Schematic", NamedTextColor.GOLD))
+		it.customName(Component.text("$title Schematic", NamedTextColor.GOLD))
+		/*
 		it.lore(listOf(
-			Component.text(title, TextColor.color(Color(0x13f832).rgb))
+			Component.text("Bounding box map with coordinates", TextColor.color(Color(0x13f832).rgb))
 		))
+		 */
 	}
 
 	return mapItem

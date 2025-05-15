@@ -22,7 +22,7 @@ class CubematicSkyPlugin: JavaPlugin(), Listener {
 
     override fun onEnable() {
         server.pluginManager.registerEvents(this, this)
-        //netherFacet.onEnable()
+        netherFacet.onEnable()
         traderFacet.enable()
         interactionFacet.enable()
         structureMapsFacet.enable()
