@@ -8,7 +8,12 @@ import org.bukkit.map.MapView
 import org.bukkit.map.MinecraftFont
 import java.awt.Color
 import java.awt.Font
+import java.awt.Image
+import java.awt.RenderingHints
+import java.awt.Stroke
+import java.awt.geom.AffineTransform
 import java.awt.image.BufferedImage
+import kotlin.collections.forEach
 
 class MapViewBoxOutlineRenderer(
 	private val drawData: StructureOutlineData.Box,
@@ -31,77 +36,26 @@ class MapViewBoxOutlineRenderer(
 			foregroundText = canvas.getPixelColor(3, 0)!!,
 		)
 
-		// Fill the map with a color
-		for (x in 0..127) {
-			for (y in 0..127) {
-				canvas.setPixelColor(x, y, colors.background)
-			}
-		}
+		val minXpx = worldToPixel(drawData.minX, drawData.centerX)
+		val maxXpx = worldToPixel(drawData.maxX, drawData.centerX)
+		val minZpx = worldToPixel(drawData.minZ, drawData.centerZ)
+		val maxZpx = worldToPixel(drawData.maxZ, drawData.centerZ)
 
-		renderText(canvas, drawData.title, 1, 0)
-		renderText(canvas, "${drawData.minX} < x < ${drawData.maxX}", 1, 9)
-		renderText(canvas, "${drawData.minY} < y < ${drawData.maxY}", 1, 18)
-		renderText(canvas, "${drawData.minZ} < z < ${drawData.maxZ}", 1, 27)
+		val mapImageBuilder = MapImageBuilder(colors)
+		mapImageBuilder.fill(colors.background)
+		mapImageBuilder.title(drawData.title)
+		mapImageBuilder.axisLabelX("${drawData.minX} < x < ${drawData.maxX}")
+		mapImageBuilder.axisLabelY("${drawData.minY} < y < ${drawData.maxY}")
+		mapImageBuilder.axisLabelZ( "${drawData.minZ} < z < ${drawData.maxZ}")
+		mapImageBuilder.boundingBox(minXpx, minZpx, maxXpx, maxZpx)
 
-		// Draw all four edges
-		drawBoxEdges(canvas, colors)
+		canvas.drawImage(0, 0, mapImageBuilder.build())
 
 		map.isTrackingPosition = true
 		map.isUnlimitedTracking = true
 		map.isLocked = true
 
 		hasRendered = true
-	}
-
-	private fun renderText(canvas: MapCanvas, text: String, x: Int, y: Int) {
-		// Have not found a replacement for this yet
-		@Suppress("DEPRECATION", "removal")
-		val foregroundColorIndex = MapPalette.matchColor(Colors.default.foregroundText)
-		canvas.drawText(x, y, MinecraftFont.Font, "§$foregroundColorIndex;$text")
-	}
-
-	private fun drawBoxEdges(canvas: MapCanvas, colors: Colors) {
-		// Convert all coordinates to pixels first
-		val minXpx = worldToPixel(drawData.minX, drawData.centerX)
-		val maxXpx = worldToPixel(drawData.maxX, drawData.centerX)
-		val minZpx = worldToPixel(drawData.minZ, drawData.centerZ)
-		val maxZpx = worldToPixel(drawData.maxZ, drawData.centerZ)
-
-		var dash = 2
-		// Horizontal lines (Z edges)
-		(minXpx..maxXpx).forEach { x ->
-			if(dash > 0 || x == maxXpx) {
-				paintLinePixel(x.coerceInCanvas(), minZpx.coerceInCanvas(), canvas, colors)
-				paintLinePixel(x.coerceInCanvas(), maxZpx.coerceInCanvas(), canvas, colors)
-				dash--
-			} else {
-				dash = 2
-			}
-		}
-
-		dash = 2
-		// Vertical lines (X edges)
-		(minZpx..maxZpx).forEach { z ->
-			if(dash > 0 || z == maxZpx) {
-				paintLinePixel(minXpx.coerceInCanvas(), z.coerceInCanvas(), canvas, colors)
-				paintLinePixel(maxXpx.coerceInCanvas(), z.coerceInCanvas(), canvas, colors)
-				dash--
-			} else {
-				dash = 2
-			}
-		}
-	}
-
-	private fun paintLinePixel(x: Int, y: Int, canvas: MapCanvas, colors: Colors) {
-		val current = canvas.getPixelColor(x, y)
-		when (current) {
-			null, colors.background -> {
-				canvas.setPixelColor(x, y, colors.foregroundLine)
-			}
-			colors.foregroundText -> {
-				canvas.setPixelColor(x, y, colors.foregroundMixed)
-			}
-		}
 	}
 
 	private fun worldToPixel(worldCoord: Int, center: Int): Int {
@@ -127,3 +81,118 @@ private data class Colors(
 }
 
 private fun Int.coerceInCanvas() = coerceIn(0, 127)
+
+private class MapImageBuilder(private val colors: Colors) {
+	private val fontStream = this::class.java.classLoader.getResourceAsStream("fonts/mapfont.bin")
+		?: throw IllegalStateException("Font file not found")
+
+	private val font = Font.createFont(Font.TRUETYPE_FONT, fontStream)
+		.deriveFont(8f)
+
+	private val image = BufferedImage(128, 128, BufferedImage.TYPE_INT_ARGB)
+	private val graphics = image.createGraphics().also { graphics ->
+		graphics.font = font
+		graphics.setRenderingHint(RenderingHints.KEY_TEXT_ANTIALIASING, RenderingHints.VALUE_TEXT_ANTIALIAS_OFF)
+		graphics.setRenderingHint(RenderingHints.KEY_FRACTIONALMETRICS, RenderingHints.VALUE_FRACTIONALMETRICS_OFF)
+	}
+
+	fun fill(color: Color) {
+		graphics.color = color
+		graphics.fillRect(0, 0, image.width, image.height)
+	}
+
+	fun title(text: String) {
+		val bounds = font.getStringBounds(text, graphics.fontRenderContext)
+		graphics.color = colors.foregroundText
+		graphics.transform = AffineTransform()
+		graphics.drawString(text, (64 - bounds.width/2).toInt(), bounds.height.toInt())
+	}
+
+	fun axisLabelX(text: String) {
+		val bounds = font.getStringBounds(text, graphics.fontRenderContext)
+		graphics.color = colors.foregroundText
+		graphics.transform = AffineTransform()
+		graphics.drawString(text, (64 - bounds.width/2).toInt(), 126)
+	}
+
+	fun axisLabelY(text: String) {
+		val bounds = font.getStringBounds(text, graphics.fontRenderContext)
+		graphics.color = colors.foregroundText
+		graphics.transform = AffineTransform()
+		graphics.translate(
+			(127 - bounds.height + 4).toInt().coerceInCanvas(),
+			(64 - bounds.width/2).toInt()
+		)
+		graphics.rotate(Math.toRadians(90.0))
+		graphics.drawString(text, 0, 0)
+	}
+
+	fun textTopLeft(text: String, left: Int, top: Int) {
+		val bounds = font.getStringBounds(text, graphics.fontRenderContext)
+		graphics.color = colors.foregroundText
+		graphics.transform = AffineTransform()
+		graphics.transform = graphics.transform.apply {
+			translate(left.toDouble(), (top + bounds.height.toInt()).toDouble())
+		}
+		graphics.drawString(text, 0, 0)
+	}
+
+	fun axisLabelZ(text: String) {
+		val bounds = font.getStringBounds(text, graphics.fontRenderContext)
+		graphics.color = colors.foregroundText
+		graphics.transform = AffineTransform()
+		graphics.translate(1.0, 64 - bounds.width/2)
+		graphics.rotate(Math.toRadians(90.0))
+		graphics.drawString(text, 0, 0)
+	}
+
+	fun boundingBox(
+		minXpx: Int,
+		minZpx: Int,
+		maxXpx: Int,
+		maxZpx: Int,
+	) {
+		graphics.color = colors.foregroundLine
+
+		var dash = 2
+		// Horizontal lines (Z edges)
+		(minXpx..maxXpx).forEach { x ->
+			if(dash > 0 || x == maxXpx) {
+				paintLinePixel(x.coerceInCanvas(), minZpx.coerceInCanvas())
+				paintLinePixel(x.coerceInCanvas(), maxZpx.coerceInCanvas())
+				dash--
+			} else {
+				dash = 2
+			}
+		}
+
+		dash = 2
+		// Vertical lines (X edges)
+		(minZpx..maxZpx).forEach { z ->
+			if(dash > 0 || z == maxZpx) {
+				paintLinePixel(minXpx.coerceInCanvas(), z.coerceInCanvas())
+				paintLinePixel(maxXpx.coerceInCanvas(), z.coerceInCanvas())
+				dash--
+			} else {
+				dash = 2
+			}
+		}
+	}
+
+	private fun paintLinePixel(x: Int, y: Int) {
+		val current = image.getRGB(x, y)
+		when (current) {
+			colors.background.rgb -> {
+				image.setRGB(x, y, colors.foregroundLine.rgb)
+			}
+			colors.foregroundText.rgb -> {
+				image.setRGB(x, y, colors.foregroundMixed.rgb)
+			}
+		}
+	}
+
+	fun build(): Image {
+		graphics.dispose()
+		return image
+	}
+}
