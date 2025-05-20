@@ -10,6 +10,7 @@ import se.ade.mc.skyblock.structuremaps.createStructureMap
 import se.ade.mc.skyblock.interaction.InteractionFacet
 import se.ade.mc.skyblock.generator.GeneratorSelector
 import se.ade.mc.skyblock.nether.NetherFacet
+import se.ade.mc.skyblock.nether.createNetherFortressMap
 import se.ade.mc.skyblock.structuremaps.StructureMapsFacet
 import se.ade.mc.skyblock.trader.TraderFacet
 
@@ -55,7 +56,9 @@ class CubematicSkyPlugin: JavaPlugin(), Listener {
                             }
                             subcommand("fortress") {
                                 playerExecutes { context, player ->
-                                    createStructureMap(player.location, plugin, structure = Structure.FORTRESS, title = "Fortress")
+                                    createNetherFortressMap(player.location, plugin)?.let {
+                                        player.give(it)
+                                    }
                                 }
                             }
                             subcommand("hut") {

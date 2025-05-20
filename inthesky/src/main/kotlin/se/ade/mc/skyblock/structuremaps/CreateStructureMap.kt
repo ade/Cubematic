@@ -87,6 +87,23 @@ fun createStructureMap(
 		"Make Map params: centerX=$centerX, centerZ=$centerZ, scale=$scale, widthX=$widthX, widthZ=$widthZ, bbox=$bbox"
 	}
 
+	val parts = struct.pieces.map {
+		Part(
+			minX = it.boundingBox.minX.toInt(),
+			maxX = it.boundingBox.maxX.toInt(),
+			minY = it.boundingBox.minY.toInt(),
+			maxY = it.boundingBox.maxY.toInt(),
+			minZ = it.boundingBox.minZ.toInt(),
+			maxZ = it.boundingBox.maxZ.toInt()
+		)
+	}
+
+	if(log) {
+		parts.forEach {
+			plugin.logger.info { "Part: $it" }
+		}
+	}
+
 	val info = StructureOutlineData.Box(
 		id = mapView.id,
 		title = title,
@@ -98,7 +115,8 @@ fun createStructureMap(
 		minY = bbox.minY.toInt(),
 		maxY = bbox.maxY.toInt(),
 		minZ = bbox.minZ.toInt(),
-		maxZ = bbox.maxZ.toInt()
+		maxZ = bbox.maxZ.toInt(),
+		parts = parts,
 	)
 
 	// Add custom renderer to draw the outline

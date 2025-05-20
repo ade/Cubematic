@@ -2,15 +2,12 @@ package se.ade.mc.skyblock.structuremaps
 
 import org.bukkit.entity.Player
 import org.bukkit.map.MapCanvas
-import org.bukkit.map.MapPalette
 import org.bukkit.map.MapRenderer
 import org.bukkit.map.MapView
-import org.bukkit.map.MinecraftFont
 import java.awt.Color
 import java.awt.Font
 import java.awt.Image
 import java.awt.RenderingHints
-import java.awt.Stroke
 import java.awt.geom.AffineTransform
 import java.awt.image.BufferedImage
 import kotlin.collections.forEach
@@ -36,18 +33,27 @@ class MapViewBoxOutlineRenderer(
 			foregroundText = canvas.getPixelColor(3, 0)!!,
 		)
 
-		val minXpx = worldToPixel(drawData.minX, drawData.centerX)
-		val maxXpx = worldToPixel(drawData.maxX, drawData.centerX)
-		val minZpx = worldToPixel(drawData.minZ, drawData.centerZ)
-		val maxZpx = worldToPixel(drawData.maxZ, drawData.centerZ)
+		val minXpx = worldToMapCoord(drawData.minX, drawData.centerX)
+		val maxXpx = worldToMapCoord(drawData.maxX, drawData.centerX)
+		val minZpx = worldToMapCoord(drawData.minZ, drawData.centerZ)
+		val maxZpx = worldToMapCoord(drawData.maxZ, drawData.centerZ)
 
 		val mapImageBuilder = MapImageBuilder(colors)
 		mapImageBuilder.fill(colors.background)
 		mapImageBuilder.title(drawData.title)
 		mapImageBuilder.axisLabelX("${drawData.minX} < x < ${drawData.maxX}")
 		mapImageBuilder.axisLabelY("${drawData.minY} < y < ${drawData.maxY}")
-		mapImageBuilder.axisLabelZ( "${drawData.minZ} < z < ${drawData.maxZ}")
+		mapImageBuilder.axisLabelZ("${drawData.minZ} < z < ${drawData.maxZ}")
 		mapImageBuilder.boundingBox(minXpx, minZpx, maxXpx, maxZpx)
+
+		drawData.parts.forEach { part ->
+			val partMinXpx = worldToMapCoord(part.minX, drawData.centerX)
+			val partMaxXpx = worldToMapCoord(part.maxX, drawData.centerX)
+			val partMinZpx = worldToMapCoord(part.minZ, drawData.centerZ)
+			val partMaxZpx = worldToMapCoord(part.maxZ, drawData.centerZ)
+
+			mapImageBuilder.boundingBox(partMinXpx, partMinZpx, partMaxXpx, partMaxZpx)
+		}
 
 		canvas.drawImage(0, 0, mapImageBuilder.build())
 
@@ -58,7 +64,7 @@ class MapViewBoxOutlineRenderer(
 		hasRendered = true
 	}
 
-	private fun worldToPixel(worldCoord: Int, center: Int): Int {
+	private fun worldToMapCoord(worldCoord: Int, center: Int): Int {
 		val blockPerPixel = 1 shl drawData.scale
 		return ((worldCoord - center) / blockPerPixel) + 64
 	}

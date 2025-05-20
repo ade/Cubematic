@@ -1,5 +1,6 @@
 package se.ade.mc.skyblock.nether
 
+import org.bukkit.Location
 import org.bukkit.World
 import org.bukkit.event.entity.PiglinBarterEvent
 import org.bukkit.generator.structure.Structure
@@ -19,12 +20,15 @@ fun barterSchematicRule(e: PiglinBarterEvent, plugin: CubematicSkyPlugin) {
 	}
 
 	if(Random.nextDouble(0.0, 100.0) <= BARTER_CHANCE_PERCENT) {
-		val item = createStructureMap(
-			loc = e.entity.location,
-			plugin = plugin,
-			structure = Structure.FORTRESS,
-			title = "Fortress",
-		)
+		val item = createNetherFortressMap(e.entity.location, plugin)
 		e.outcome.add(item)
 	}
 }
+
+fun createNetherFortressMap(location: Location, plugin: CubematicSkyPlugin)
+	= createStructureMap(
+		loc = location,
+		plugin = plugin,
+		structure = Structure.FORTRESS,
+		title = "Fortress",
+	)

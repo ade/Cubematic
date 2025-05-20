@@ -31,5 +31,16 @@ sealed interface StructureOutlineData {
 		val maxY: Int,
 		val minZ: Int,
 		val maxZ: Int,
+		val parts: List<Part> = listOf(),
 	): StructureOutlineData
 }
+
+@Serializable
+data class Part(
+	val minX: Int,
+	val maxX: Int,
+	val minY: Int,
+	val maxY: Int,
+	val minZ: Int,
+	val maxZ: Int,
+)
