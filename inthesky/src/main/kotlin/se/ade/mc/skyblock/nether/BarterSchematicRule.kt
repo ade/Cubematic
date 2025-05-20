@@ -7,12 +7,18 @@ import se.ade.mc.skyblock.CubematicSkyPlugin
 import se.ade.mc.skyblock.structuremaps.createStructureMap
 import kotlin.random.Random
 
+private const val BARTER_CHANCE_PERCENT = 1.0
+
+/**
+ * BarterSchematicRule adds a chance to get a nether fortress map when bartering with piglins.
+ * The item is dropped in addition to the normal drop regardless of the outcome of the barter.
+ */
 fun barterSchematicRule(e: PiglinBarterEvent, plugin: CubematicSkyPlugin) {
 	if (e.entity.world.environment != World.Environment.NETHER) {
 		return
 	}
 
-	if(Random.nextInt(1, 100) == 1) {
+	if(Random.nextDouble(0.0, 100.0) <= BARTER_CHANCE_PERCENT) {
 		val item = createStructureMap(
 			loc = e.entity.location,
 			plugin = plugin,
