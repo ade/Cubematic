@@ -108,8 +108,6 @@ class MapViewBoxOutlineRenderer(
 		val blockPerPixel = 1 shl drawData.scale
 		return ((worldCoord - center) / blockPerPixel) + 64
 	}
-
-	private fun Int.coerceInCanvas() = coerceIn(0, 127)
 }
 
 private data class Colors(
@@ -121,9 +119,11 @@ private data class Colors(
 	companion object {
 		val default = Colors(
 			background = Color(0xD1B1A1),
-			foregroundLine = Color(0x435E1D),
-			foregroundMixed = Color(0x004100),
+			foregroundLine = Color(0xD87F33),
+			foregroundMixed = Color(0x72431B),
 			foregroundText = Color(0x3B3B3B),
 		)
 	}
 }
+
+private fun Int.coerceInCanvas() = coerceIn(0, 127)

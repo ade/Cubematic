@@ -23,7 +23,7 @@ Skyblock like plugin for Paper-based Minecraft servers.
   - Void nether
   - (inactive) Microbiomes
   - Structure boxes generation from vanilla generator (technical only - no blocks!)
-- New game rules
+- General rule changes
   - Grass block obtainable: Turn dirt into grass by right-clicking it with short grass
   - Charcoal without furnace
     - Set a log block on fire and wait for it to burn up. It will drop a charcoal item.
@@ -37,16 +37,19 @@ Skyblock like plugin for Paper-based Minecraft servers.
     - Trader will despawn after 2 days (as a naturally spawned one)
     - This trader does not spawn with llamas
     - Vanilla trader spawning has not been modified, but might not happen if a trader is already in the world.
-- Progression / Unlocking of more content
+- Lava progression
   - Wandering Trader sells lava buckets for 10 echo shards
   - Wandering Trader sells echo shards for random items.
     - These items are hard to obtain and require some effort to get.
     - The same trades are offered on every wandering trader until one is completed.
     - There are two of these trades available at a time, each usable once.
-  - Wandering Trader sells schematics to get location and see bounds of structures (for farms).
-    - Monument
-    - Swamp Hut
-    - Pillager Outpost
+  - Structures for special spawns
+    - Wandering Trader sells schematics to get location and see bounds of structures (for farms).
+      - Monument
+      - Swamp Hut
+      - Pillager Outpost
+    - Nether Fortress
+      - Piglins have a small chance to add a map of a nether fortress when bartering.
 
 ### Enabling
 Edit bukkit.yml, set the generator for the world to CubematicSkyPlugin for both overworld and nether.
