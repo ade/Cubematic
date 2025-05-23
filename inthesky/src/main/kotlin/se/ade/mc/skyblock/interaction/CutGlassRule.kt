@@ -7,12 +7,15 @@ import org.bukkit.inventory.RecipeChoice
 import org.bukkit.inventory.StonecuttingRecipe
 import se.ade.mc.skyblock.CubematicSkyPlugin
 
+/**
+ * Makes glass (more practically) renewable by allowing stonecutter to cut glass blocks and glass bottles into sand.
+ */
 fun cutGlassRule(plugin: CubematicSkyPlugin) {
 	plugin.server.addRecipe(
 		StonecuttingRecipe(
 			/*key = */ NamespacedKey(plugin, "stonecutter_glass_bottle"),
 			/*result = */ ItemStack(Material.SAND),
-			/*source= */ Material.GLASS_BOTTLE,
+			/*source = */ Material.GLASS_BOTTLE,
 		)
 	)
 	plugin.server.addRecipe(
@@ -23,6 +26,8 @@ fun cutGlassRule(plugin: CubematicSkyPlugin) {
 			RecipeChoice.MaterialChoice(
 				listOf(
 					Material.GLASS,
+					Material.TINTED_GLASS,
+
 					Material.BLACK_STAINED_GLASS,
 					Material.BLUE_STAINED_GLASS,
 					Material.BROWN_STAINED_GLASS,

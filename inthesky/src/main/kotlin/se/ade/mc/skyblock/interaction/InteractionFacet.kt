@@ -7,6 +7,7 @@ import org.bukkit.event.entity.EntityDeathEvent
 import org.bukkit.event.player.PlayerInteractEvent
 import se.ade.mc.cubematic.extensions.Aspect
 import se.ade.mc.skyblock.CubematicSkyPlugin
+import se.ade.mc.skyblock.mobs.witchDropsCauldronRule
 
 class InteractionFacet(val plugin: CubematicSkyPlugin): Aspect(plugin) {
 	override fun enable() {
@@ -28,12 +29,6 @@ class InteractionFacet(val plugin: CubematicSkyPlugin): Aspect(plugin) {
 		@EventHandler
 		fun on(e: BlockBurnEvent) {
 			charcoalLogBurnEvent(e)
-		}
-
-		@EventHandler
-		fun on(e: EntityDeathEvent) {
-			witchDropsCauldronRule(e)
-			creeperDropsBlazePowderRule(e)
 		}
 	}
 }

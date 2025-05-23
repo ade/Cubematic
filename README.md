@@ -50,6 +50,8 @@ Skyblock like plugin for Paper-based Minecraft servers.
       - Pillager Outpost
     - Nether Fortress
       - Piglins have a small chance to add a map of a nether fortress when bartering.
+  - Sand renewability improved
+    - Cut glass blocks and glass bottles into sand blocks on the stonecutter.
 
 ### Enabling
 Edit bukkit.yml, set the generator for the world to CubematicSkyPlugin for both overworld and nether.

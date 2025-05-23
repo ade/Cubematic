@@ -1,4 +1,4 @@
-package se.ade.mc.skyblock.interaction
+package se.ade.mc.skyblock.mobs
 
 import org.bukkit.Material
 import org.bukkit.entity.EntityType

@@ -9,6 +9,7 @@ import se.ade.mc.cubematic.extensions.commands
 import se.ade.mc.skyblock.structuremaps.createStructureMap
 import se.ade.mc.skyblock.interaction.InteractionFacet
 import se.ade.mc.skyblock.generator.GeneratorSelector
+import se.ade.mc.skyblock.mobs.MobsFacet
 import se.ade.mc.skyblock.nether.NetherFacet
 import se.ade.mc.skyblock.nether.createNetherFortressMap
 import se.ade.mc.skyblock.structuremaps.StructureMapsFacet
@@ -18,6 +19,7 @@ class CubematicSkyPlugin: JavaPlugin(), Listener {
     var config by configProvider { SkyConfig() }
     val netherFacet = NetherFacet(this)
     val traderFacet = TraderFacet(this)
+    val mobsFacet = MobsFacet(this)
     val interactionFacet = InteractionFacet(this)
     val structureMapsFacet = StructureMapsFacet(this)
 
@@ -25,6 +27,7 @@ class CubematicSkyPlugin: JavaPlugin(), Listener {
         server.pluginManager.registerEvents(this, this)
         netherFacet.onEnable()
         traderFacet.enable()
+        mobsFacet.enable()
         interactionFacet.enable()
         structureMapsFacet.enable()
 
