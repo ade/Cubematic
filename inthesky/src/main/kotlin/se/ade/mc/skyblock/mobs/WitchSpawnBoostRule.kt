@@ -32,14 +32,14 @@ fun witchSpawnBoostRule(e: CreatureSpawnEvent, plugin: CubematicSkyPlugin) {
     if(e.spawnReason == CreatureSpawnEvent.SpawnReason.CUSTOM)
         return
 
-    val struct = world.getStructures(loc.chunk.x, loc.chunk.z).firstOrNull {
+    val struct = world.getStructures(loc.chunk.x, loc.chunk.z, Structure.SWAMP_HUT).firstOrNull {
         // Structure mob spawn box is inclusive! For example, a structure with bbox
         // [minX=1232.0, minY=64.0, minZ=576.0, maxX=1240.0, maxY=70.0, maxZ=582.0]
         // can spawn a witch at [x=1239.5,y=67.0,z=582.5], even though the bounding box
         // technically only cover the area in Z from 576 to <582.
-        // This was proven in a test world with a Swamp Hut in 1.21.5 (papermc)
+        // The above are actual coordinates from a test world with a Swamp Hut in 1.21.5 (papermc)
         // So - the normal BoundingBox.contains() method does not work here, since it is exclusive.
-        it.structure == Structure.SWAMP_HUT && it.boundingBox.containsInclusive(loc)
+        it.boundingBox.containsInclusive(loc)
     } ?: return // If null - Normal witch spawn, not in a Swamp Hut.
 
 
