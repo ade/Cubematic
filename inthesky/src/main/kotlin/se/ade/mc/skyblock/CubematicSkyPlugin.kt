@@ -51,6 +51,37 @@ class CubematicSkyPlugin: JavaPlugin(), Listener {
             command("cubematic") {
                 subcommand("sky") {
                     subcommand("debug") {
+                        subcommand("struct") {
+                            subcommand("test-find-unexplored") {
+                                playerExecutes { context, player ->
+                                    // This tests whether finding an unexplored structure
+                                    // will let us find it with world.getStructures
+                                    // and retrieves its bounding box and structure type.
+                                    // answer: Yes, it does.
+
+                                    val result = player.world.locateNearestStructure(
+                                        player.location, Structure.SWAMP_HUT, 10000, true
+                                    )
+
+                                    if (result == null) {
+                                        player.sendMessage("No structure found in the world.")
+                                        return@playerExecutes
+                                    }
+
+                                    player.sendMessage("Located structure at: ${result.location}")
+
+                                    val gotten = player.world.getStructures(result.location.chunk.x, result.location.chunk.z, Structure.SWAMP_HUT)
+
+                                    if (gotten.isEmpty()) {
+                                        player.sendMessage("No structures found in chunk ${player.location.chunk.x}, ${player.location.chunk.z}")
+                                    } else {
+                                        gotten.forEach { struct ->
+                                            player.sendMessage("Got structure data: ${struct.structure.structureType} at ${struct.boundingBox}")
+                                        }
+                                    }
+                                }
+                            }
+                        }
                         subcommand("map") {
                             subcommand("monument") {
                                 playerExecutes { context, player ->
