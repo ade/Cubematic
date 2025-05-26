@@ -9,6 +9,7 @@ import org.bukkit.event.EventHandler
 import org.bukkit.event.entity.CreatureSpawnEvent
 import kotlin.random.Random
 
+@Deprecated("Not used since we are generating nether with vanilla structures now.")
 fun fortressMobsSpawnOnNetherBricksRule(event: CreatureSpawnEvent) {
 	val entity = event.entity
 	val location = entity.location

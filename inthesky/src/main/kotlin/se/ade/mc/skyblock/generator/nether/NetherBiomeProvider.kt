@@ -6,6 +6,15 @@ import org.bukkit.generator.WorldInfo
 import kotlin.math.abs
 import kotlin.random.Random
 
+// TODO Configuration opportunity
+private val supportedNetherBiomes = listOf(
+	Biome.NETHER_WASTES,
+	Biome.SOUL_SAND_VALLEY,
+	Biome.CRIMSON_FOREST,
+	Biome.WARPED_FOREST,
+	Biome.BASALT_DELTAS
+)
+
 class NetherBiomeProvider(
 	private val worldSpawnX: Int,
 	private val worldSpawnZ: Int,
