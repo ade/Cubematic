@@ -7,7 +7,7 @@ import org.bukkit.generator.structure.Structure
 import org.bukkit.inventory.ItemStack
 import org.bukkit.inventory.MerchantRecipe
 import se.ade.mc.skyblock.CubematicSkyPlugin
-import se.ade.mc.skyblock.structuremaps.createStructureMap
+import se.ade.mc.skyblock.structuremaps.createStructureMapOrNull
 
 fun traderMapsRule(event: CreatureSpawnEvent, plugin: CubematicSkyPlugin) {
 	val trader = event.entity as? WanderingTrader
@@ -25,7 +25,7 @@ fun traderMapsRule(event: CreatureSpawnEvent, plugin: CubematicSkyPlugin) {
 
 	plugin.logger.info { "Attempt to find: $title" }
 
-	val map = createStructureMap(
+	val map = createStructureMapOrNull(
 		loc = event.location,
 		plugin = plugin,
 		structure = type,

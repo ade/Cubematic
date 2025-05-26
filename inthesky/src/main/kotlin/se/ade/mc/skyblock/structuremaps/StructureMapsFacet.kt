@@ -10,13 +10,7 @@ class StructureMapsFacet(private val plugin: CubematicSkyPlugin): Aspect(plugin)
 	val listener = object: Listener {
 		@EventHandler
 		fun on(e: MapInitializeEvent) {
-			val id = e.map.id
-
-			plugin.config.structureMapData[id]?.let { data ->
-				when(data) {
-					is StructureOutlineData.Box -> e.map.addRenderer(MapViewBoxOutlineRenderer(data))
-				}
-			}
+			reloadStructureMapData(e, plugin)
 		}
 	}
 

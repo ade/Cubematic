@@ -5,7 +5,7 @@ import org.bukkit.World
 import org.bukkit.event.entity.PiglinBarterEvent
 import org.bukkit.generator.structure.Structure
 import se.ade.mc.skyblock.CubematicSkyPlugin
-import se.ade.mc.skyblock.structuremaps.createStructureMap
+import se.ade.mc.skyblock.structuremaps.createStructureMapOrNull
 import kotlin.random.Random
 
 private const val BARTER_CHANCE_PERCENT = 1.0
@@ -26,7 +26,7 @@ fun barterSchematicRule(e: PiglinBarterEvent, plugin: CubematicSkyPlugin) {
 }
 
 fun createNetherFortressMap(location: Location, plugin: CubematicSkyPlugin)
-	= createStructureMap(
+	= createStructureMapOrNull(
 		loc = location,
 		plugin = plugin,
 		structure = Structure.FORTRESS,

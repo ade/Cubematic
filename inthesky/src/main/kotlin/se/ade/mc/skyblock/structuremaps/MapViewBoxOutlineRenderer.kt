@@ -1,6 +1,7 @@
 package se.ade.mc.skyblock.structuremaps
 
 import org.bukkit.entity.Player
+import org.bukkit.generator.structure.Structure
 import org.bukkit.map.MapCanvas
 import org.bukkit.map.MapRenderer
 import org.bukkit.map.MapView
@@ -13,7 +14,7 @@ import java.awt.image.BufferedImage
 import kotlin.collections.forEach
 
 class MapViewBoxOutlineRenderer(
-	private val drawData: StructureOutlineData.Box,
+	private val drawData: StructureMapDrawData,
 ) : MapRenderer() {
 	private var hasRendered = false
 
@@ -33,24 +34,33 @@ class MapViewBoxOutlineRenderer(
 			foregroundText = canvas.getPixelColor(3, 0)!!,
 		)
 
-		val minXpx = worldToMapCoord(drawData.minX, drawData.centerX)
-		val maxXpx = worldToMapCoord(drawData.maxX, drawData.centerX)
-		val minZpx = worldToMapCoord(drawData.minZ, drawData.centerZ)
-		val maxZpx = worldToMapCoord(drawData.maxZ, drawData.centerZ)
+		val bounds = drawData.structure.boundingBox
+
+		val minX = bounds.minX.toInt()
+		val maxX = bounds.maxX.toInt()
+		val minY = bounds.minY.toInt()
+		val maxY = bounds.maxY.toInt()
+		val minZ = bounds.minZ.toInt()
+		val maxZ = bounds.maxZ.toInt()
+
+		val minXpx = worldToMapCoord(minX, drawData.centerX)
+		val maxXpx = worldToMapCoord(maxX, drawData.centerX)
+		val minZpx = worldToMapCoord(minZ, drawData.centerZ)
+		val maxZpx = worldToMapCoord(maxZ, drawData.centerZ)
 
 		val mapImageBuilder = MapImageBuilder(colors)
 		mapImageBuilder.fill(colors.background)
-		mapImageBuilder.title(drawData.title)
-		mapImageBuilder.axisLabelX("${drawData.minX} < x < ${drawData.maxX}")
-		mapImageBuilder.axisLabelY("${drawData.minY} < y < ${drawData.maxY}")
-		mapImageBuilder.axisLabelZ("${drawData.minZ} < z < ${drawData.maxZ}")
+		mapImageBuilder.title(getTitle(drawData.structure.structure))
+		mapImageBuilder.axisLabelX("$minX < x < $maxX")
+		mapImageBuilder.axisLabelY("$minY < y < $maxY")
+		mapImageBuilder.axisLabelZ("$minZ < z < $maxZ")
 		mapImageBuilder.boundingBox(minXpx, minZpx, maxXpx, maxZpx)
 
 		val chunkX = drawData.centerX shr 4
 		val chunkZ = drawData.centerZ shr 4
 		val parts = map.world
 			?.getStructures(chunkX, chunkZ)
-			?.firstOrNull { drawData.centerY >= it.boundingBox.minY && drawData.centerY <= it.boundingBox.maxY }
+			?.firstOrNull { it.structure == drawData.structure.structure }
 			?.pieces
 
 		parts?.forEach { part ->
@@ -208,5 +218,15 @@ private class MapImageBuilder(private val colors: Colors) {
 	fun build(): Image {
 		graphics.dispose()
 		return image
+	}
+}
+
+private fun getTitle(structure: Structure): String {
+	return when (structure) {
+		Structure.MONUMENT -> "Ocean Monument"
+		Structure.FORTRESS -> "Nether Fortress"
+		Structure.SWAMP_HUT -> "Swamp Hut"
+		Structure.PILLAGER_OUTPOST -> "Pillager Outpost"
+		else -> "Unknown Structure"
 	}
 }

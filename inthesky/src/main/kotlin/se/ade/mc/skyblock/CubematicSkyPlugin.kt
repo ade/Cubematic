@@ -6,7 +6,8 @@ import org.bukkit.generator.structure.Structure
 import org.bukkit.plugin.java.JavaPlugin
 import se.ade.mc.cubematic.config.configProvider
 import se.ade.mc.cubematic.extensions.commands
-import se.ade.mc.skyblock.structuremaps.createStructureMap
+import se.ade.mc.skyblock.datastore.SkyDb
+import se.ade.mc.skyblock.structuremaps.createStructureMapOrNull
 import se.ade.mc.skyblock.interaction.InteractionFacet
 import se.ade.mc.skyblock.generator.GeneratorSelector
 import se.ade.mc.skyblock.mobs.MobsFacet
@@ -22,6 +23,8 @@ class CubematicSkyPlugin: JavaPlugin(), Listener {
     val mobsFacet = MobsFacet(this)
     val interactionFacet = InteractionFacet(this)
     val structureMapsFacet = StructureMapsFacet(this)
+
+    val database = SkyDb(this)
 
     override fun onEnable() {
         server.pluginManager.registerEvents(this, this)
@@ -85,7 +88,7 @@ class CubematicSkyPlugin: JavaPlugin(), Listener {
                         subcommand("map") {
                             subcommand("monument") {
                                 playerExecutes { context, player ->
-                                    createStructureMap(player.location, plugin, structure = Structure.MONUMENT, title = "Monument")?.let {
+                                    createStructureMapOrNull(player.location, plugin, structure = Structure.MONUMENT, title = "Monument")?.let {
                                         player.give(it)
                                     }
                                 }
@@ -99,14 +102,14 @@ class CubematicSkyPlugin: JavaPlugin(), Listener {
                             }
                             subcommand("hut") {
                                 playerExecutes { context, player ->
-                                    createStructureMap(player.location, plugin, structure = Structure.SWAMP_HUT, title = "Swamp Hut")?.let {
+                                    createStructureMapOrNull(player.location, plugin, structure = Structure.SWAMP_HUT, title = "Swamp Hut")?.let {
                                         player.give(it)
                                     }
                                 }
                             }
                             subcommand("outpost") {
                                 playerExecutes { context, player ->
-                                    createStructureMap(player.location, plugin, structure = Structure.PILLAGER_OUTPOST, title = "Pillager Outpost")?.let {
+                                    createStructureMapOrNull(player.location, plugin, structure = Structure.PILLAGER_OUTPOST, title = "Pillager Outpost")?.let {
                                         player.give(it)
                                     }
                                 }

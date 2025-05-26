@@ -20,6 +20,8 @@ dependencies {
     implementation(project(":core"))
     implementation(libs.kaml)
     implementation(libs.kotlinx.coroutines.core)
+    implementation(libs.sqlite)
+    implementation(libs.bundles.exposed)
 
     testImplementation(kotlin("test"))
 }
