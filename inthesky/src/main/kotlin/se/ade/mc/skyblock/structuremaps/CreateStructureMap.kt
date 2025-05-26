@@ -1,13 +1,10 @@
 package se.ade.mc.skyblock.structuremaps
 
 import net.kyori.adventure.text.Component
-import net.kyori.adventure.text.Component.text
 import net.kyori.adventure.text.format.NamedTextColor
-import net.kyori.adventure.text.format.TextColor
 import org.bukkit.Bukkit
 import org.bukkit.Location
 import org.bukkit.Material
-import org.bukkit.Registry
 import org.bukkit.generator.structure.Structure
 import org.bukkit.inventory.ItemStack
 import org.bukkit.inventory.meta.MapMeta
@@ -15,7 +12,6 @@ import org.bukkit.map.MapView
 import org.bukkit.util.BoundingBox
 import org.bukkit.util.StructureSearchResult
 import se.ade.mc.skyblock.CubematicSkyPlugin
-import java.awt.Color
 import kotlin.math.max
 
 
@@ -52,6 +48,7 @@ fun createStructureMap(
 
 	val bbox: BoundingBox = struct.boundingBox
 	val centerX = bbox.centerX.toInt()
+	val centerY = bbox.centerY.toInt()
 	val centerZ = bbox.centerZ.toInt()
 
 	// Determine the appropriate map scale
@@ -87,28 +84,12 @@ fun createStructureMap(
 		"Make Map params: centerX=$centerX, centerZ=$centerZ, scale=$scale, widthX=$widthX, widthZ=$widthZ, bbox=$bbox"
 	}
 
-	val parts = struct.pieces.map {
-		Part(
-			minX = it.boundingBox.minX.toInt(),
-			maxX = it.boundingBox.maxX.toInt(),
-			minY = it.boundingBox.minY.toInt(),
-			maxY = it.boundingBox.maxY.toInt(),
-			minZ = it.boundingBox.minZ.toInt(),
-			maxZ = it.boundingBox.maxZ.toInt()
-		)
-	}
-
-	if(log) {
-		parts.forEach {
-			plugin.logger.info { "Part: $it" }
-		}
-	}
-
 	val info = StructureOutlineData.Box(
 		id = mapView.id,
 		title = title,
 		scale = scale,
 		centerX = centerX,
+		centerY = centerY,
 		centerZ = centerZ,
 		minX = bbox.minX.toInt(),
 		maxX = bbox.maxX.toInt(),
@@ -116,7 +97,6 @@ fun createStructureMap(
 		maxY = bbox.maxY.toInt(),
 		minZ = bbox.minZ.toInt(),
 		maxZ = bbox.maxZ.toInt(),
-		parts = parts,
 	)
 
 	// Add custom renderer to draw the outline

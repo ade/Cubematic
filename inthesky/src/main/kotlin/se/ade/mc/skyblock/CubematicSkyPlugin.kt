@@ -85,7 +85,9 @@ class CubematicSkyPlugin: JavaPlugin(), Listener {
                         subcommand("map") {
                             subcommand("monument") {
                                 playerExecutes { context, player ->
-                                    createStructureMap(player.location, plugin, structure = Structure.MONUMENT, title = "Monument")
+                                    createStructureMap(player.location, plugin, structure = Structure.MONUMENT, title = "Monument")?.let {
+                                        player.give(it)
+                                    }
                                 }
                             }
                             subcommand("fortress") {
@@ -97,7 +99,16 @@ class CubematicSkyPlugin: JavaPlugin(), Listener {
                             }
                             subcommand("hut") {
                                 playerExecutes { context, player ->
-                                    createStructureMap(player.location, plugin, structure = Structure.SWAMP_HUT, title = "Swamp Hut")
+                                    createStructureMap(player.location, plugin, structure = Structure.SWAMP_HUT, title = "Swamp Hut")?.let {
+                                        player.give(it)
+                                    }
+                                }
+                            }
+                            subcommand("outpost") {
+                                playerExecutes { context, player ->
+                                    createStructureMap(player.location, plugin, structure = Structure.PILLAGER_OUTPOST, title = "Pillager Outpost")?.let {
+                                        player.give(it)
+                                    }
                                 }
                             }
                         }

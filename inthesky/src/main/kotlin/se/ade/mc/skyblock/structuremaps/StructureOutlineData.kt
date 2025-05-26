@@ -15,6 +15,9 @@ sealed interface StructureOutlineData {
 	/** Center X as assigned to map */
 	val centerX: Int
 
+	/** Center Y - from structure bounding box */
+	val centerY: Int
+
 	/** Center Z as assigned to map */
 	val centerZ: Int
 
@@ -24,6 +27,7 @@ sealed interface StructureOutlineData {
 		override val title: String,
 		override val scale: Int,
 		override val centerX: Int,
+		override val centerY: Int,
 		override val centerZ: Int,
 		val minX: Int,
 		val maxX: Int,
@@ -31,16 +35,5 @@ sealed interface StructureOutlineData {
 		val maxY: Int,
 		val minZ: Int,
 		val maxZ: Int,
-		val parts: List<Part> = listOf(),
 	): StructureOutlineData
 }
-
-@Serializable
-data class Part(
-	val minX: Int,
-	val maxX: Int,
-	val minY: Int,
-	val maxY: Int,
-	val minZ: Int,
-	val maxZ: Int,
-)

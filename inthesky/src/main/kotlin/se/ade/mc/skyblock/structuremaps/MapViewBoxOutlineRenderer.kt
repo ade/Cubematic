@@ -46,11 +46,19 @@ class MapViewBoxOutlineRenderer(
 		mapImageBuilder.axisLabelZ("${drawData.minZ} < z < ${drawData.maxZ}")
 		mapImageBuilder.boundingBox(minXpx, minZpx, maxXpx, maxZpx)
 
-		drawData.parts.forEach { part ->
-			val partMinXpx = worldToMapCoord(part.minX, drawData.centerX)
-			val partMaxXpx = worldToMapCoord(part.maxX, drawData.centerX)
-			val partMinZpx = worldToMapCoord(part.minZ, drawData.centerZ)
-			val partMaxZpx = worldToMapCoord(part.maxZ, drawData.centerZ)
+		val chunkX = drawData.centerX shr 4
+		val chunkZ = drawData.centerZ shr 4
+		val parts = map.world
+			?.getStructures(chunkX, chunkZ)
+			?.firstOrNull { drawData.centerY >= it.boundingBox.minY && drawData.centerY <= it.boundingBox.maxY }
+			?.pieces
+
+		parts?.forEach { part ->
+			val box = part.boundingBox
+			val partMinXpx = worldToMapCoord(box.minX.toInt(), drawData.centerX)
+			val partMaxXpx = worldToMapCoord(box.maxX.toInt(), drawData.centerX)
+			val partMinZpx = worldToMapCoord(box.minZ.toInt(), drawData.centerZ)
+			val partMaxZpx = worldToMapCoord(box.maxZ.toInt(), drawData.centerZ)
 
 			mapImageBuilder.boundingBox(partMinXpx, partMinZpx, partMaxXpx, partMaxZpx)
 		}
