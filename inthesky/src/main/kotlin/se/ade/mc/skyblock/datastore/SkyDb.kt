@@ -34,8 +34,6 @@ class SkyDb(private val plugin: JavaPlugin) {
 		tx {
 			StructureMapTable.replace {
 				it[StructureMapTable.mapId] = mapId
-				it[StructureMapTable.x] = x
-				it[StructureMapTable.z] = z
 				it[StructureMapTable.structureType] = structureType
 			}
 		}
@@ -50,8 +48,6 @@ class SkyDb(private val plugin: JavaPlugin) {
 				}.map {
 					StoredStructureMapData(
 						mapId = it[StructureMapTable.mapId],
-						x = it[StructureMapTable.x],
-						z = it[StructureMapTable.z],
 						structureTypeKey = it[StructureMapTable.structureType]
 					)
 				}.singleOrNull()

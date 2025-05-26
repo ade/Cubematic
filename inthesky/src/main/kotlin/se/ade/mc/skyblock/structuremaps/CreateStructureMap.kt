@@ -93,7 +93,7 @@ fun reloadStructureMapData(
 			data.structureTypeKey == it.structureType.key.toString()
 		}
 		structure?.let {
-			structureMapRenderDataOrNull(structure, Location(e.map.world, data.x, 0.0, data.z), plugin)
+			structureMapRenderDataOrNull(structure, Location(e.map.world, e.map.centerX.toDouble(), 0.0, e.map.centerZ.toDouble()), plugin)
 		}
 	}
 
