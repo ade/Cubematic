@@ -11,6 +11,7 @@ import org.bukkit.event.Listener
 import org.bukkit.event.entity.CreatureSpawnEvent
 import org.bukkit.event.entity.EntityDeathEvent
 import org.bukkit.event.entity.PiglinBarterEvent
+import org.bukkit.event.world.PortalCreateEvent
 import org.bukkit.inventory.ItemStack
 import se.ade.mc.skyblock.CubematicSkyPlugin
 import kotlin.random.Random
@@ -36,5 +37,10 @@ class NetherListener(private val plugin: CubematicSkyPlugin) : Listener {
 	@EventHandler
 	fun onEvent(event: PiglinBarterEvent) {
 		barterSchematicRule(event, plugin)
+	}
+
+	@EventHandler
+	fun onEvent(event: PortalCreateEvent) {
+		portalGeneratesNetherGrassRule(event)
 	}
 }

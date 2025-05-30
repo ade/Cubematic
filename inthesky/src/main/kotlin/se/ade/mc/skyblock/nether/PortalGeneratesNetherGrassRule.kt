@@ -3,6 +3,8 @@ package se.ade.mc.skyblock.nether
 import org.bukkit.event.world.PortalCreateEvent
 import org.bukkit.Material
 import org.bukkit.World
+import org.bukkit.block.Block
+import org.bukkit.block.BlockFace
 import kotlin.random.Random
 
 /**
@@ -22,18 +24,25 @@ fun portalGeneratesNetherGrassRule(e: PortalCreateEvent) {
 
     // Get the outline (perimeter) of the portal blocks at the base Y level
     val basePortalBlocks = portalBlocks.filter { it.y == baseY }
-    val outlinePositions = mutableSetOf<Pair<Int, Int>>()
+    val outlinePositions = mutableSetOf<Block>()
     val directions = listOf(
-        Pair(1, 0), Pair(-1, 0), Pair(0, 1), Pair(0, -1),
-        Pair(1, 1), Pair(1, -1), Pair(-1, 1), Pair(-1, -1)
-    )
+		BlockFace.WEST,
+		BlockFace.EAST,
+		BlockFace.NORTH,
+		BlockFace.SOUTH,
+		BlockFace.NORTH_EAST,
+		BlockFace.NORTH_WEST,
+		BlockFace.SOUTH_EAST,
+		BlockFace.SOUTH_WEST
+	)
     for (block in basePortalBlocks) {
-        for ((dx, dz) in directions) {
-            val nx = block.x + dx
-            val nz = block.z + dz
-            // Only add if not part of the portal base
-            if (basePortalBlocks.none { it.x == nx && it.z == nz }) {
-                outlinePositions.add(Pair(nx, nz))
+        for (face in directions) {
+            val neighbor = block
+				.getRelative(BlockFace.DOWN)
+				.getRelative(face)
+
+            if (basePortalBlocks.none { it.x == neighbor.x && it.z == neighbor.z }) {
+                outlinePositions.add(neighbor)
             }
         }
     }
@@ -44,9 +53,8 @@ fun portalGeneratesNetherGrassRule(e: PortalCreateEvent) {
     val nyliumCount = minOf(Random.nextInt(2, 5), outlinePositions.size)
 
     // Place netherrack at all outline positions (at baseY-1)
-    val outlineBlocks = outlinePositions.map { (x, z) -> world.getBlockAt(x, baseY - 1, z) }
-    outlineBlocks.forEach { it.type = Material.NETHERRACK }
+	outlinePositions.forEach { it.type = Material.NETHERRACK }
 
     // Replace nyliumCount of them with nylium
-    outlineBlocks.shuffled().take(nyliumCount).forEach { it.type = nyliumType }
+	outlinePositions.shuffled().take(nyliumCount).forEach { it.type = nyliumType }
 }
