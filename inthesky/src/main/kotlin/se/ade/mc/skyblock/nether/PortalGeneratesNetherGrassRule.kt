@@ -57,4 +57,27 @@ fun portalGeneratesNetherGrassRule(e: PortalCreateEvent) {
 
     // Replace nyliumCount of them with nylium
 	outlinePositions.shuffled().take(nyliumCount).forEach { it.type = nyliumType }
+
+	// TODO Could be configurable. Might drop extra depth and replace with other way to acquire netherrack.
+	val extraDepth = 2
+
+	// Fill 2 layers below outline with netherrack
+	for (block in outlinePositions) {
+		for (yOffset in 1..extraDepth) {
+			val belowBlock = block.getRelative(BlockFace.DOWN, yOffset)
+			if (belowBlock.type == Material.AIR) {
+				belowBlock.type = Material.NETHERRACK
+			}
+		}
+	}
+
+	// Also fill the area below the portal with netherrack
+	for (block in basePortalBlocks) {
+		for (yOffset in 1..(extraDepth+1)) {
+			val belowBlock = block.getRelative(BlockFace.DOWN, yOffset)
+			if (belowBlock.type == Material.AIR) {
+				belowBlock.type = Material.NETHERRACK
+			}
+		}
+	}
 }
