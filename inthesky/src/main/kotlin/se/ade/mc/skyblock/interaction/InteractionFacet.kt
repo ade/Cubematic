@@ -8,12 +8,14 @@ import org.bukkit.event.player.PlayerInteractEvent
 import se.ade.mc.cubematic.extensions.Aspect
 import se.ade.mc.skyblock.CubematicSkyPlugin
 import se.ade.mc.skyblock.mobs.witchDropsCauldronRule
+import se.ade.mc.skyblock.interaction.PushBlockInLavaRule
 
 class InteractionFacet(val plugin: CubematicSkyPlugin): Aspect(plugin) {
 	override fun enable() {
 		plugin.server.pluginManager.registerEvents(listener, plugin)
 		charcoalOnCampfireRecipe(plugin)
 		cutGlassRule(plugin)
+		addListener(PushBlockInLavaRule)
 	}
 
 	override fun disable() {

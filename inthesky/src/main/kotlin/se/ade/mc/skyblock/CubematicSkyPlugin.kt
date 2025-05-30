@@ -28,7 +28,7 @@ class CubematicSkyPlugin: JavaPlugin(), Listener {
 
     override fun onEnable() {
         server.pluginManager.registerEvents(this, this)
-        netherFacet.onEnable()
+        netherFacet.enable()
         traderFacet.enable()
         mobsFacet.enable()
         interactionFacet.enable()
@@ -42,7 +42,7 @@ class CubematicSkyPlugin: JavaPlugin(), Listener {
     override fun onDisable() {
         super.onDisable()
 
-        netherFacet.onDisable()
+        netherFacet.disable()
     }
 
     override fun getDefaultWorldGenerator(worldName: String, id: String?): ChunkGenerator {

@@ -1,13 +1,15 @@
 package se.ade.mc.skyblock.nether
 
+import se.ade.mc.cubematic.extensions.Aspect
 import se.ade.mc.skyblock.CubematicSkyPlugin
 
-class NetherFacet(private val plugin: CubematicSkyPlugin) {
-	fun onEnable() {
-		plugin.server.pluginManager.registerEvents(NetherListener(plugin), plugin)
+class NetherFacet(private val plugin: CubematicSkyPlugin): Aspect(plugin) {
+
+	override fun enable() {
+		addListener(NetherListener(plugin))
 	}
 
-	fun onDisable() {
+	override fun disable() {
 		// Nothing to do
 	}
 }
