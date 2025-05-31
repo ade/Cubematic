@@ -13,9 +13,10 @@ Automation plugin for Paper-based Minecraft servers.
   - Places block from dispenser.
 
 ## InTheSky
-Skyblock like plugin for Paper-based Minecraft servers.
+Skyblock-like plugin for Paper-based Minecraft servers.
 - Overworld generation
-  - Classic starter island
+  - Generates a starter island with dirt and an acacia tree.
+  - Classic starter island can optionally be generated (skips obtaining grass, lava, water)
   - Void world
   - (inactive) Microbiomes (small biomes around the player in a grid)
   - Structure boxes generation from vanilla generator (technical only - no blocks!)
@@ -23,22 +24,22 @@ Skyblock like plugin for Paper-based Minecraft servers.
   - Void nether
   - (inactive) Microbiomes
   - Structure boxes generation from vanilla generator (technical only - no blocks!)
-- General rule changes
-  - Grass block obtainable: Turn dirt into grass by right-clicking it with short grass
-  - Charcoal without furnace
-    - Set a log block on fire and wait for it to burn up. It will drop a charcoal item.
-    - Campfire allows burning logs to get charcoal.
-  - Wandering trader spawns much more often
-    - Sleeping in a bed grants a chance to spawn a wandering trader.
-    - The trader has a spawn chance based on the player with the highest level in the world.
-    - Each level gives a 1% chance to spawn the trader, all the way up to a max of 100% at level 100+.
-    - The trader will spawn next to the player with the highest level, within a 16 block radius
-    - The trader will only spawn if there isn't already one in the world.
-    - Trader will despawn after 2 days (as a naturally spawned one)
-    - This trader does not spawn with llamas
-    - Vanilla trader spawning has not been modified, but might not happen if a trader is already in the world.
+- Wandering trader spawns much more often
+  - Sleeping in a bed grants a chance to spawn a wandering trader.
+  - The trader has a spawn chance based on the player with the highest level in the world.
+  - Each level gives a 1% chance to spawn the trader, all the way up to a max of 100% at level 100+.
+  - The trader will spawn next to the player with the highest level, within a 16 block radius
+  - The trader will only spawn if there isn't already one in the world.
+  - Trader will despawn after 2 days (as a naturally spawned one)
+  - This trader does not spawn with llamas
+  - Vanilla trader spawning has not been modified, but might not happen if a trader is already in the world.
   - Pushing cobblestone into lava with a piston will create deepslate in the overworld or netherrack in the nether.
-- Lava progression
+- Grass block
+  - Turn dirt into grass by right-clicking it with short grass
+- Charcoal
+  - Set a log block on fire and wait for it to burn up. It will drop a charcoal item.
+  - Campfire allows burning logs to get charcoal.
+- Lava
   - Wandering Trader sells lava buckets for 10 echo shards
   - Wandering Trader sells echo shards for random items.
     - These items are hard to obtain and require some effort to get.
@@ -51,8 +52,13 @@ Skyblock like plugin for Paper-based Minecraft servers.
     - Pillager Outpost
   - Nether Fortress
     - Piglins have a small chance to add a map of a nether fortress when bartering.
-- Sand renewability improved
+- Sand
   - Cut glass blocks and glass bottles into sand blocks on the stonecutter.
+- Deep slate
+  - When cobblestone is pushed into lava with a piston, it turns into deepslate.
+- Netherrack
+  - When cobblestone is pushed into lava with a piston in the nether, it turns into netherrack.
+- 
 
 ### Enabling
 Edit bukkit.yml, set the generator for the world to CubematicSkyPlugin for both overworld and nether.
