@@ -17,7 +17,10 @@ class HardOverworldGenerator(
     private val plugin: CubematicSkyPlugin,
     private val originX: Int = 0,
     private val originY: Int = 64,
-    private val originZ: Int = 0
+    private val originZ: Int = 0,
+    private val trunkHeight: Int = 5,
+    private val crownHeight: Int = 4,
+    private val dirtBlocks: Int = 64
 ) : ChunkGenerator() {
     override fun generateSurface(
         worldInfo: WorldInfo,
@@ -43,10 +46,24 @@ class HardOverworldGenerator(
     }
 
     override fun getDefaultPopulators(world: World): List<BlockPopulator?> {
-        return listOf(Populator(originX, originY, originZ))
+        return listOf(Populator(
+            originX = originX,
+            originY = originY,
+            originZ = originZ,
+            trunkHeight = trunkHeight,
+            crownHeight = crownHeight,
+            dirtBlocks = dirtBlocks,
+        ))
     }
 
-    private class Populator(val originX: Int, val originY: Int, val originZ: Int) : BlockPopulator() {
+    private class Populator(
+        val originX: Int,
+        val originY: Int,
+        val originZ: Int,
+        private val trunkHeight: Int,
+        private val crownHeight: Int,
+        private val dirtBlocks: Int
+    ) : BlockPopulator() {
         override fun populate(
             worldInfo: WorldInfo,
             random: Random,
@@ -61,7 +78,7 @@ class HardOverworldGenerator(
         }
 
         private fun generateStartIslandAndTree(region: LimitedRegion, centerX: Int, y: Int, centerZ: Int) {
-            val dirtBlocks = 64 // Make this configurable later
+            val dirtBlocks = this.dirtBlocks
             val dirtPositions = mutableListOf<Pair<Int, Int>>()
             dirtPositions.add(Pair(centerX, centerZ))
             var layer = 1
@@ -90,7 +107,14 @@ class HardOverworldGenerator(
             for ((x, z) in dirtPositions) {
                 region.setType(x, y, z, Material.DIRT)
             }
-            generateAcaciaTree(region, centerX, y + 1, centerZ)
+            generateAcaciaTree(
+                region = region,
+                x = centerX,
+                y = y + 1,
+                z = centerZ,
+                trunkHeight = trunkHeight,
+                crownHeight = crownHeight
+            )
         }
 
         private fun generateAcaciaTree(
