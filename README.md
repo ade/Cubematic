@@ -117,3 +117,9 @@ When breaking a frame block:
 #### Limitations
 - Interdimensional travel is not supported
 - Moving/destroying the lodestone does not affect the portal once created
+
+# Development
+To start a debug server with plugins bundled:
+```bash
+./gradlew runServer
+```

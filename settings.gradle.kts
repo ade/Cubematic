@@ -8,6 +8,7 @@ include(
     "core",
     "automation",
     "dreams",
+    "hud",
     "inthesky",
     "portals",
 )
