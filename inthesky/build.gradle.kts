@@ -3,7 +3,7 @@ import net.minecrell.pluginyml.bukkit.BukkitPluginDescription
 import org.gradle.kotlin.dsl.invoke
 
 plugins {
-    kotlin("jvm") version "2.1.10"
+    kotlin("jvm")
     alias(libs.plugins.shadow)
     alias(libs.plugins.pluginYmlBukkit)
     alias(libs.plugins.kotlinx.serialization)

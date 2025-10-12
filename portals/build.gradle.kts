@@ -1,7 +1,7 @@
 import net.minecrell.pluginyml.bukkit.BukkitPluginDescription
 
 plugins {
-    kotlin("jvm") version "2.1.10"
+    kotlin("jvm")
     alias(libs.plugins.shadow)
     alias(libs.plugins.pluginYmlBukkit)
     alias(libs.plugins.kotlinx.serialization)

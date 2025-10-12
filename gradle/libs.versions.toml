@@ -1,13 +1,17 @@
 [versions]
-kotlin = "2.1.10"
-paper = "1.21.5-R0.1-SNAPSHOT"
+kotlin = "2.2.20"
+paper = "1.21.10-R0.1-SNAPSHOT"
 exposed = "0.60.0"
 sqlite = "3.44.1.0"
-minecraft = "1.21.7"
+minecraft = "1.21.10"
+kotlinx-coroutines = "1.9.0"
+kotlinx-serialization-json = "1.8.1"
+kaml = "0.54.0"
+multiverse = "4.3.14"
 
 [plugins]
-shadow = { id = "com.github.johnrengelman.shadow", version = "8.1.1" }
-pluginYmlBukkit = { id = "de.eldoria.plugin-yml.bukkit", version = "0.7.1" }
+shadow = { id = "com.gradleup.shadow", version = "9.2.0" }
+pluginYmlBukkit = { id = "de.eldoria.plugin-yml.bukkit", version = "0.8.0" }
 runPaper = { id = "xyz.jpenilla.run-paper", version = "2.3.1" }
 kotlinx-serialization = { id = "org.jetbrains.kotlin.plugin.serialization", version.ref = "kotlin" }
 
@@ -17,10 +21,10 @@ exposed-core = { group = "org.jetbrains.exposed", name = "exposed-core", version
 exposed-dao = { group = "org.jetbrains.exposed", name = "exposed-dao", version.ref = "exposed" }
 exposed-jdbc = { group = "org.jetbrains.exposed", name = "exposed-jdbc", version.ref = "exposed" }
 sqlite = { group = "org.xerial", name = "sqlite-jdbc", version.ref = "sqlite" }
-multiverse2 = { group = "com.onarandombox.multiversecore", name = "multiverse-core", version = "4.3.14" }
-kotlinx-coroutines-core = { group = "org.jetbrains.kotlinx", name = "kotlinx-coroutines-core", version = "1.9.0" }
-kaml = { group = "com.charleskorn.kaml", name = "kaml", version = "0.54.0" }
-kotlinx-serialization-json = { group = "org.jetbrains.kotlinx", name = "kotlinx-serialization-json", version = "1.8.1" }
+multiverse2 = { group = "com.onarandombox.multiversecore", name = "multiverse-core", version.ref = "multiverse" }
+kotlinx-coroutines-core = { group = "org.jetbrains.kotlinx", name = "kotlinx-coroutines-core", version.ref="kotlinx-coroutines" }
+kaml = { group = "com.charleskorn.kaml", name = "kaml", version.ref = "kaml" }
+kotlinx-serialization-json = { group = "org.jetbrains.kotlinx", name = "kotlinx-serialization-json", version.ref = "kotlinx-serialization-json" }
 
 [bundles]
 exposed = [ "exposed-core", "exposed-dao", "exposed-jdbc" ]
