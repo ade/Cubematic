@@ -37,6 +37,7 @@ tasks.shadowJar {
 	manifest {
 		attributes["paperweight-mappings-namespace"] = "mojang"
 	}
+	archiveBaseName.set("cubematic-dreams")
 }
 
 bukkit {
