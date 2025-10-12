@@ -11,9 +11,10 @@ repositories {
 }
 
 dependencies {
-    implementation(libs.paper)
-    implementation(libs.kaml)
-    implementation(libs.kotlinx.coroutines.core)
+	compileOnly(libs.paper)
+	compileOnly(kotlin("stdlib"))
+	compileOnly(libs.kaml)
+	compileOnly(libs.kotlinx.coroutines.core)
 }
 
 kotlin {

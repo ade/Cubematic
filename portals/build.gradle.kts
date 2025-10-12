@@ -14,12 +14,12 @@ repositories {
 }
 
 dependencies {
+	compileOnly(kotlin("stdlib"))
     compileOnly(libs.paper)
+    compileOnly(libs.sqlite)
+	compileOnly(libs.kaml)
 
-    implementation(project(":core"))
-    implementation(libs.sqlite)
-    implementation(libs.kaml)
-
+	implementation(project(":core"))
     testImplementation(kotlin("test"))
 }
 
@@ -47,4 +47,6 @@ bukkit {
     version = project.version.toString()
 
     apiVersion = "1.21"
+
+	depend = listOf("Cubematic-Runtime")
 }

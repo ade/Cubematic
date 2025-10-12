@@ -11,4 +11,5 @@ include(
     "hud",
     "inthesky",
     "portals",
+	"runtime"
 )

@@ -15,14 +15,14 @@ repositories {
 }
 
 dependencies {
+	compileOnly(kotlin("stdlib"))
 	compileOnly(libs.paper)
 	compileOnly(libs.multiverse2)
+	compileOnly(libs.sqlite)
+	compileOnly(libs.bundles.exposed)
+	compileOnly(libs.kaml)
 
 	implementation(project(":core"))
-	implementation(libs.sqlite)
-	implementation(libs.bundles.exposed)
-	implementation(libs.kaml)
-
 	testImplementation(kotlin("test"))
 }
 
@@ -48,6 +48,9 @@ bukkit {
 	description = "tbd"
 	version = project.version.toString()
 
+	apiVersion = "1.21"
+	depend = listOf("Cubematic-Runtime")
+
 	permissions {
 		register("skyblock.command") {
 			description = "Allows the player to use the skyblock command"
@@ -61,6 +64,4 @@ bukkit {
 			permission = "skyblock.command"
 		}
 	}
-
-	apiVersion = "1.21"
 }

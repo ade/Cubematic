@@ -16,13 +16,14 @@ repositories {
 }
 
 dependencies {
+	compileOnly(kotlin("stdlib"))
     compileOnly(libs.paper)
-    implementation(project(":core"))
-    implementation(libs.kaml)
-    implementation(libs.kotlinx.coroutines.core)
-    implementation(libs.sqlite)
-    implementation(libs.bundles.exposed)
+    compileOnly(libs.kaml)
+	compileOnly(libs.kotlinx.coroutines.core)
+	compileOnly(libs.sqlite)
+	compileOnly(libs.bundles.exposed)
 
+	implementation(project(":core"))
     testImplementation(kotlin("test"))
 }
 
@@ -63,6 +64,8 @@ bukkit {
     version = project.version.toString()
 
     apiVersion = "1.21"
+
+	depend = listOf("Cubematic-Runtime")
 
     permissions {
         register("cubematic.inthesky.commands") {

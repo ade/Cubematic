@@ -1,25 +1,29 @@
 import java.util.Properties
 import net.minecrell.pluginyml.bukkit.BukkitPluginDescription
+import org.gradle.kotlin.dsl.invoke
 
 plugins {
-	kotlin("jvm")
+	kotlin("jvm") version "2.1.10"
 	alias(libs.plugins.shadow)
 	alias(libs.plugins.pluginYmlBukkit)
 	alias(libs.plugins.kotlinx.serialization)
 }
 
-group = "se.ade.mc.cubematic.hud"
+group = "se.ade.mc.cubematic.runtime"
 
 repositories {
 	mavenCentral()
 }
 
 dependencies {
-	compileOnly(kotlin("stdlib"))
 	compileOnly(libs.paper)
-	compileOnly(libs.kaml)
 
 	implementation(project(":core"))
+	implementation(libs.kaml)
+	implementation(libs.kotlinx.coroutines.core)
+	implementation(libs.sqlite)
+	implementation(libs.bundles.exposed)
+
 	testImplementation(kotlin("test"))
 }
 
@@ -34,18 +38,17 @@ tasks.shadowJar {
 	manifest {
 		attributes["paperweight-mappings-namespace"] = "mojang"
 	}
+	archiveBaseName.set("cubematic-runtime")
 }
 
 bukkit {
-	main = "se.ade.mc.cubematic.hud.CubematicHudPlugin"
-	name = "Cubematic-Hud"
-	load = BukkitPluginDescription.PluginLoadOrder.POSTWORLD
+	main = "se.ade.mc.CubematicRuntimePlugin"
+	name = "Cubematic-Runtime"
+	load = BukkitPluginDescription.PluginLoadOrder.STARTUP
 
 	author = "ade"
 	description = "tbd"
 	version = project.version.toString()
 
 	apiVersion = "1.21"
-
-	depend = listOf("Cubematic-Runtime")
 }
