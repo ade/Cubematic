@@ -23,6 +23,7 @@ import se.ade.mc.cubematic.agent.config.InferenceProvider
 
 class MainAgent(
 	val history: List<Message>,
+	val context: QueryContext,
 	provider: InferenceProvider,
 	val sink: (String) -> Unit,
 	val onProcessEvent: (ProcessEvent) -> Unit
@@ -30,7 +31,7 @@ class MainAgent(
 	private var processCounter = 0
 
 	private val scope = CoroutineScope(Dispatchers.Default + SupervisorJob())
-	val agentConfig = AIAgentConfig(
+	private val agentConfig = AIAgentConfig(
 		prompt = Prompt.Companion.build("simple-calculator") {
 			system(
 				"""
@@ -61,27 +62,8 @@ class MainAgent(
 				You are running inside a server side Minecraft mod that allows players to chat with you.
 				
 				Information about the player who is chatting with you follows:
-				Name: ay_dizzle
-				Location: Overworld (world), at coordinates X: 100, Y: 64, Z: -200
-				Time: Day
-				Gamemode: Survival
-				Health: 20
-				Hunger: 20
-				Armor: 0
-				XP Level: 5
+				$context
 				
-				Inventory:
-				- Oak Wood Planks (32)
-				- Stick (10)
-				- Crafting Table (1)
-				- Stone Pickaxe (1)
-				- Apple (5)
-				- Dirt (64)
-				- Cobblestone (20)
-				- Sand (15)
-				- Iron Ore (10)
-				- Torch (16)
-				- Coal (8)
                 """.trimIndent()
 			)
 			history.forEach {
@@ -93,7 +75,7 @@ class MainAgent(
 	)
 
 	// Add the tool to the tool registry
-	val toolRegistry = ToolRegistry.Companion {
+	private val toolRegistry = ToolRegistry.Companion {
 		tools(DefaultTools())
 	}
 
@@ -116,7 +98,7 @@ class MainAgent(
 		}
 	)
 
-	suspend fun AIAgentFunctionalContext.runQuery(input: String): String {
+	private suspend fun AIAgentFunctionalContext.runQuery(input: String): String {
 		val rootId = processCounter++
 		onProcessEvent(ProcessEvent.Update(ProcessEntry(rootId, "Parsing/Reasoning...")))
 		val r = requestLLMStreaming(input)

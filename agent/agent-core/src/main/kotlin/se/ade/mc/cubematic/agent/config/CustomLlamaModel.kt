@@ -16,6 +16,6 @@ object CustomLlamaModel {
 			LLMCapability.Tools,
 			LLMCapability.OpenAIEndpoint.Completions
 		),
-		contextLength = 22_000
+		contextLength = 128_000
 	)
 }
