@@ -1,19 +1,32 @@
 [versions]
 kotlin = "2.2.20"
+ksp = "2.2.20-2.0.2"
 paper = "1.21.10-R0.1-SNAPSHOT"
 exposed = "0.60.0"
 sqlite = "3.44.1.0"
 minecraft = "1.21.10"
 kotlinx-coroutines = "1.9.0"
+kotlinx-datetime = "0.7.1-0.6.x-compat"
 kotlinx-serialization-json = "1.8.1"
 kaml = "0.54.0"
 multiverse = "4.3.14"
+ktor = "3.3.0"
+koog="0.5.0"
+kuri = "0.2.0"
+jetbrains-compose = "1.9.0"
+jetbrains-compose-viewmodel = "2.9.4"
+jetbrains-compose-material3 = "1.9.0-beta06"
+
 
 [plugins]
+kotlin-jvm = { id = "org.jetbrains.kotlin.jvm", version.ref = "kotlin" }
 shadow = { id = "com.gradleup.shadow", version = "9.2.0" }
 pluginYmlBukkit = { id = "de.eldoria.plugin-yml.bukkit", version = "0.8.0" }
 runPaper = { id = "xyz.jpenilla.run-paper", version = "2.3.1" }
 kotlinx-serialization = { id = "org.jetbrains.kotlin.plugin.serialization", version.ref = "kotlin" }
+ksp = { id = "com.google.devtools.ksp", version.ref = "ksp" }
+compose = { id = "org.jetbrains.compose", version.ref = "jetbrains-compose" }
+kotlin-compose = { id = "org.jetbrains.kotlin.plugin.compose", version.ref = "kotlin" }
 
 [libraries]
 paper = { group = "io.papermc.paper", name = "paper-api", version.ref = "paper" }
@@ -22,9 +35,35 @@ exposed-dao = { group = "org.jetbrains.exposed", name = "exposed-dao", version.r
 exposed-jdbc = { group = "org.jetbrains.exposed", name = "exposed-jdbc", version.ref = "exposed" }
 sqlite = { group = "org.xerial", name = "sqlite-jdbc", version.ref = "sqlite" }
 multiverse2 = { group = "com.onarandombox.multiversecore", name = "multiverse-core", version.ref = "multiverse" }
+
 kotlinx-coroutines-core = { group = "org.jetbrains.kotlinx", name = "kotlinx-coroutines-core", version.ref="kotlinx-coroutines" }
-kaml = { group = "com.charleskorn.kaml", name = "kaml", version.ref = "kaml" }
+kotlinx-coroutines-swing = { module = "org.jetbrains.kotlinx:kotlinx-coroutines-swing", version.ref = "kotlinx-coroutines" }
+kotlinx-datetime = { group = "org.jetbrains.kotlinx", name = "kotlinx-datetime", version.ref = "kotlinx-datetime" }
+
 kotlinx-serialization-json = { group = "org.jetbrains.kotlinx", name = "kotlinx-serialization-json", version.ref = "kotlinx-serialization-json" }
+compose-viewmodel = { module = "org.jetbrains.androidx.lifecycle:lifecycle-viewmodel-compose", version.ref = "jetbrains-compose-viewmodel" }
+compose-material3 = { module = "org.jetbrains.compose.material3:material3-desktop", version.ref = "jetbrains-compose-material3" }
+
+kaml = { group = "com.charleskorn.kaml", name = "kaml", version.ref = "kaml" }
+ktor-serialization-kotlinx-json = { module = "io.ktor:ktor-serialization-kotlinx-json", version.ref = "ktor" }
+ktor-client-content-negotiation = { module = "io.ktor:ktor-client-content-negotiation", version.ref = "ktor" }
+ktor-client-core = { module = "io.ktor:ktor-client-core", version.ref = "ktor" }
+se-ade-kuri-api = { group = "se.ade.kuri", name = "kuri-api", version.ref = "kuri" }
+se-ade-kuri-processor = { group = "se.ade.kuri", name = "kuri-processor", version.ref = "kuri" }
+koog = { module = "ai.koog:koog-agents", version.ref="koog" }
+
 
 [bundles]
 exposed = [ "exposed-core", "exposed-dao", "exposed-jdbc" ]
+plugin-runtime = [
+    "sqlite",
+    "kotlinx-coroutines-core",
+    "kotlinx-datetime",
+    "kotlinx-serialization-json",
+    "kaml",
+    "ktor-serialization-kotlinx-json",
+    "ktor-client-content-negotiation",
+    "ktor-client-core",
+    "se-ade-kuri-api",
+    "koog"
+]

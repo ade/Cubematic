@@ -24,6 +24,14 @@ dependencies {
 	implementation(libs.sqlite)
 	implementation(libs.bundles.exposed)
 
+	implementation(libs.koog)
+	implementation(libs.kotlinx.coroutines.core)
+	implementation(libs.kotlinx.datetime)
+	implementation(libs.ktor.client.core)
+	implementation(libs.ktor.client.content.negotiation)
+	implementation(libs.ktor.serialization.kotlinx.json)
+	implementation(libs.se.ade.kuri.api)
+
 	testImplementation(kotlin("test"))
 }
 

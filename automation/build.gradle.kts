@@ -56,22 +56,17 @@ tasks {
     }
 
     runServer {
+		val features = listOf("agent", "runtime", "hud", "inthesky", "portals") //, "dreams")
         // Configure the Minecraft version for our task.
         // This is the only required configuration besides applying the plugin.
         // Your plugin's jar (or shadowJar if present) will be used automatically.
         minecraftVersion(libs.versions.minecraft.get().toString())
-	    dependsOn(":runtime:shadowJar")
-        dependsOn(":hud:shadowJar")
-	    dependsOn(":inthesky:shadowJar")
-	    dependsOn(":portals:shadowJar")
-	    //dependsOn(":dreams:shadowJar")
+	    features.forEach {
+			dependsOn(":$it:shadowJar")
 
-	    // Add other plugin jars to the server
-        pluginJars(project(":runtime").tasks.named("shadowJar").get().outputs.files.first())
-	    pluginJars(project(":hud").tasks.named("shadowJar").get().outputs.files.first())
-	    pluginJars(project(":inthesky").tasks.named("shadowJar").get().outputs.files.first())
-	    pluginJars(project(":portals").tasks.named("shadowJar").get().outputs.files.first())
-	    //pluginJars(project(":dreams").tasks.named("shadowJar").get().outputs.files.first())
+		    // Add other plugin jars to the server
+		    pluginJars(project(":$it").tasks.named("shadowJar").get().outputs.files.first())
+	    }
 
         runDirectory.set(rootProject.layout.projectDirectory.dir(".servers/papermc"))
     }

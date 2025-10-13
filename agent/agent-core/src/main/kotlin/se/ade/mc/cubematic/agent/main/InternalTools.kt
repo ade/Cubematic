@@ -1,0 +1,42 @@
+package se.ade.mc.cubematic.agent.main
+
+import ai.koog.agents.core.tools.annotations.LLMDescription
+import ai.koog.agents.core.tools.annotations.Tool
+import ai.koog.agents.core.tools.reflect.ToolSet
+import se.ade.llmtest.core.wiki.CoreWikiClient
+import se.ade.llmtest.core.wiki.WikiParser
+
+// Implement a simple calculator tool that can add two numbers
+@LLMDescription("Tools for gathering information")
+class DefaultTools : ToolSet {
+	private val wikiClient = CoreWikiClient()
+
+	@Tool
+	@LLMDescription("Search for query in Minecraft Wiki and return a list of comma separated page names/titles.")
+	suspend fun search(
+		@LLMDescription("The search query. Should not be a sentence, but a keyword or a few keywords at most.")
+		query: String,
+	): String {
+		return wikiClient.searchPages(query).joinToString(", ")
+	}
+
+	@Tool
+	@LLMDescription("Get an extract of a page from Minecraft Wiki, which includes the most important information, but excludes details such as history, data values, etc.")
+	suspend fun getPageExtract(
+		@LLMDescription("The title/name of the page")
+		title: String,
+	): String {
+		return wikiClient.getPageContent(title)
+			?.let { WikiParser().pruneSections(it) }
+			?: "No extract found for page: $title"
+	}
+
+	@Tool
+	@LLMDescription("Get the full content of a page from Minecraft Wiki, including all details.")
+	suspend fun getPageContent(
+		@LLMDescription("The title/name of the page")
+		title: String,
+	): String {
+		return wikiClient.getPageContent(title) ?: "No content found for page: $title"
+	}
+}

@@ -12,6 +12,7 @@ buildscript {
 allprojects {
     repositories {
         mavenCentral()
+	    google()
         maven("https://repo.papermc.io/repository/maven-public/")
         maven("https://repo.onarandombox.com/content/groups/public/")
     }

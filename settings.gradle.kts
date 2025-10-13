@@ -6,6 +6,9 @@ plugins {
 
 include(
     "core",
+	"agent:agent-core",
+	"agent:agent-plugin",
+	"agent:agent-ui",
     "automation",
     "dreams",
     "hud",
