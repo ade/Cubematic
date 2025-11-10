@@ -1,11 +1,10 @@
 package se.ade.mc.cubematic.agent.main
 
 import kotlinx.serialization.Serializable
-import org.bukkit.GameMode
-import org.bukkit.Material
 
 @Serializable
 data class QueryContext(
+	val serverInfo: ServerInfo,
 	val playerName: String,
 	val playerLevel: Int,
 	val health: Int,
@@ -14,11 +13,11 @@ data class QueryContext(
 	val time: String,
 	val nearbyEntities: List<String>,
 	val inventoryItems: List<InventoryItem>,
-	val gameMode: GameMode,
+	val gameMode: String,
 ) {
 	@Serializable
 	data class InventoryItem(
-		val type: Material,
+		val type: String,
 		val quantity: Int
 	)
 
@@ -31,3 +30,7 @@ data class QueryContext(
 	)
 }
 
+@Serializable
+data class ServerInfo(
+	val version: String
+)

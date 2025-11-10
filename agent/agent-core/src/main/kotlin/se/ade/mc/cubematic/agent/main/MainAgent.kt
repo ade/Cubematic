@@ -20,35 +20,50 @@ import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.SupervisorJob
 import se.ade.mc.cubematic.agent.config.InferenceProvider
+import se.ade.mc.cubematic.agent.rags.QueryRequest
+import se.ade.mc.cubematic.agent.rags.QueryResponse
+import se.ade.mc.cubematic.agent.rags.RagServerTools
 
 class MainAgent(
 	val history: List<Message>,
 	val context: QueryContext,
+	val ragData: QueryResponse?,
 	provider: InferenceProvider,
-	val sink: (String) -> Unit,
 	val onProcessEvent: (ProcessEvent) -> Unit
 ) {
 	private var processCounter = 0
 
 	private val scope = CoroutineScope(Dispatchers.Default + SupervisorJob())
 	private val agentConfig = AIAgentConfig(
-		prompt = Prompt.Companion.build("simple-calculator") {
-			system(
-				"""
+		prompt = Prompt.Companion.build("agent") {
+			system {
+				text("""
                 You are an advanced minecraft wiki assistant, for use inside the game chat.
 				You answer questions by searching the Minecraft wiki using the provided tools.
-				You have no inherent knowledge about Minecraft. Pretend you don't know anything other than what you read.
-				NEVER answer any question without first searching for the answer using the tools, even if you think you know the answer.
-                Always respond with a clear, factual message explaining your result and how you motivate it.
+				
+				You have no inherent knowledge about Minecraft.
+				Pretend you don't know anything other than what you read.
+				NEVER answer any question without first knowing up to date facts from the wiki sources,
+				such as when searching for the answer using the tools, or from the provided context.
+				
+				You may however assume that the player DOES know a lot about minecraft and gaming in general.
+				That means you can describe things to the player using minecraft terminology.
+				(The player may ask follow up questions if they need more details.)
+                
+				Always respond with a clear, factual message explaining your result and how you motivate it.
 				Never make up facts, always use the tools to find the correct information.
 				Always use the correct format for calling tools. Specifically, don't markup the json with "```json"
-				Wiki pages are always titled with capital first letter on each word, e.g. "Diamond Sword", "Creeper", "Crafting Table".
-				If you receive ONLY a short #REDIRECT notice in a page text from the wiki, you should follow the redirect and get the info from the target page instead.
 				
-				Understanding the === Crafting === section in the wiki:
-				Here we get recipes for crafting, in a crafting table/grid. Columns are lettered A,B,C and rows 1,2,3.
-				A is the left column, B the middle column and C the right column.
-				1 is the top row, 2 the middle row and 3 the bottom row.
+				Crafting recipes in the wiki text are described in a grid, corresponding to the crafting table layout.
+				Each row in the grid represents a row in the crafting table, and each cell contains the item name.
+				Empty cells are represented by an underscore (_).
+				There is a comma between each cell in a row, and a new line between each row.
+				Cells with content are described using ONE letter. The mapping from letters to item names is given.
+				For example, a recipe for a wooden pickaxe would be described as:
+				Grid: (A: Oak Planks, B: Stick):
+				A,A,A
+				_,B,_
+				_,B,_
 				
 				Answers should fit in the game chat. Markdown is not supported in chat so don't use it.
 				Line breaks are not supported either, so no paragraphs or line-based formatting.
@@ -58,14 +73,32 @@ class MainAgent(
 				Respond in a gaming oriented style, as if you were a friendly and helpful player in the game chat.
 				There is no need to use full sentences, keep it short and to the point.
 				Respond only to the last question asked, ignore previous questions and answers in the chat history.
+				When answering, first begin quoting any relevant facts you found from the wiki, then give your final answer.
 				
 				You are running inside a server side Minecraft mod that allows players to chat with you.
 				
 				Information about the player who is chatting with you follows:
 				$context
 				
-                """.trimIndent()
-			)
+                """.trimIndent())
+
+				if(ragData != null) {
+					text("The following information was retrieved from the Minecraft Wiki using a RAG system.")
+					text("You may use facts from this information when answering the user's question.")
+					text("If the information is not sufficient to answer, use the provided tools to acquire more data.")
+					text("Note that the information may be pruned and not complete, read the full page content when needed.")
+					text("RAG Information:")
+					text(ragData.chunks.joinToString("\n\n---\n\n") {
+						"""
+					Page: ${it.pageName}
+					Content: ${it.content}
+					Breadcrumbs: ${it.breadcrumbs.joinToString(" > ")}
+					
+					Text: ${it.content}
+					""".trimIndent()
+					})
+				}
+			}
 			history.forEach {
 				message(it)
 			}
@@ -76,7 +109,8 @@ class MainAgent(
 
 	// Add the tool to the tool registry
 	private val toolRegistry = ToolRegistry.Companion {
-		tools(DefaultTools())
+		//tools(WikiTools())
+		tools(RagServerTools())
 	}
 
 	val agent = AIAgent.Companion<String, String>(
@@ -109,7 +143,8 @@ class MainAgent(
 
 			when (it) {
 				is StreamFrame.Append -> {
-					sink(it.text)
+					//sink(it.text)
+					onProcessEvent(ProcessEvent.TextSink(it.text))
 				}
 				is StreamFrame.ToolCall -> {}
 				is StreamFrame.End -> {}
@@ -161,7 +196,8 @@ class MainAgent(
 			val f2 = mutableListOf<StreamFrame>()
 			stream.collect {
 				if(it is StreamFrame.Append) {
-					sink(it.text)
+					//sink(it.text)
+					onProcessEvent(ProcessEvent.TextSink(it.text))
 				}
 				f2.add(it)
 			}

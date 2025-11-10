@@ -2,7 +2,6 @@ package se.ade.mc.cubematic.agent
 
 import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.launch
-import org.bukkit.entity.Entity
 import org.bukkit.entity.EntityType
 import org.bukkit.entity.Item
 import org.bukkit.entity.Player
@@ -10,9 +9,9 @@ import org.bukkit.event.EventHandler
 import org.bukkit.event.Listener
 import org.bukkit.event.player.PlayerChatEvent
 import org.bukkit.plugin.java.JavaPlugin
-import se.ade.mc.cubematic.agent.config.InferenceProvider
-import se.ade.mc.cubematic.agent.main.MainAgent
+import se.ade.mc.cubematic.agent.main.CubeAgentConvo
 import se.ade.mc.cubematic.agent.main.QueryContext
+import se.ade.mc.cubematic.agent.main.ServerInfo
 
 class CubematicAgentPlugin: JavaPlugin() {
 	override fun onEnable() {
@@ -32,7 +31,9 @@ class CubematicAgentPlugin: JavaPlugin() {
 			logger.info("Context: $context")
 
 			GlobalScope.launch {
-				val r = MainAgent(listOf(), context, InferenceProvider.local, {}, {}).agent.run(e.message)
+				val r = CubeAgentConvo().query(e.message, context) {
+					// Lambda (partial text response) not used for now
+				}
 				logger.info("Agent response: $r")
 				e.player.sendMessage(r)
 			}
@@ -54,6 +55,9 @@ class CubematicAgentPlugin: JavaPlugin() {
 			.take(16)
 
 		return QueryContext(
+			serverInfo = ServerInfo(
+				version = server.version
+			),
 			playerName = name,
 			playerLevel = level,
 			health = health.toInt(),
@@ -67,9 +71,9 @@ class CubematicAgentPlugin: JavaPlugin() {
 			time = getTimeString(),
 			nearbyEntities = entities,
 			inventoryItems = inventory.contents.filterNotNull().groupBy { it.type }.map { (type, items) ->
-				QueryContext.InventoryItem(type, items.sumOf { it.amount })
+				QueryContext.InventoryItem(type.key.toString(), items.sumOf { it.amount })
 			},
-			gameMode = gameMode
+			gameMode = gameMode.name
 		)
 	}
 

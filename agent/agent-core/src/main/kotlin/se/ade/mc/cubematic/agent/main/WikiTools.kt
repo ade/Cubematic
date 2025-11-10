@@ -8,7 +8,7 @@ import se.ade.llmtest.core.wiki.WikiParser
 
 // Implement a simple calculator tool that can add two numbers
 @LLMDescription("Tools for gathering information")
-class DefaultTools : ToolSet {
+class WikiTools : ToolSet {
 	private val wikiClient = CoreWikiClient()
 
 	@Tool

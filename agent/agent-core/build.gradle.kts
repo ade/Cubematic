@@ -6,7 +6,7 @@ plugins {
 
 dependencies {
 	compileOnly(kotlin("stdlib"))
-	compileOnly(libs.paper)
+	//compileOnly(libs.paper)
 	compileOnly(libs.kaml)
 
 	compileOnly(libs.koog)

@@ -12,8 +12,36 @@ import kotlinx.datetime.Clock
 import se.ade.mc.cubematic.agent.config.InferenceProvider
 import se.ade.mc.cubematic.agent.main.AgentProcess
 import se.ade.mc.cubematic.agent.main.AgentState
+import se.ade.mc.cubematic.agent.main.CubeAgentConvo
 import se.ade.mc.cubematic.agent.main.MainAgent
 import se.ade.mc.cubematic.agent.main.ProcessEvent
+import se.ade.mc.cubematic.agent.main.QueryContext
+import se.ade.mc.cubematic.agent.main.ServerInfo
+
+/*
+Context: QueryContext(playerName=ay_dizzle, playerLevel=0, health=20, foodLevel=20, location=LocationContext(worldName=world, x=4, y=65, z=0), time=dawn (30 seconds until morning), nearbyEntities=[], inventoryItems=[InventoryItem(type=COMPASS, quantity=1), InventoryItem(type=ACACIA_BUTTON, quantity=5)], gameMode=SURVIVAL)
+ */
+
+val fakeContext = QueryContext(
+	serverInfo = ServerInfo(version = "1.21.6"),
+	playerName = "Steve",
+	playerLevel = 5,
+	health = 20,
+	foodLevel = 20,
+	location = QueryContext.LocationContext(
+		worldName = "world",
+		x = 100,
+		y = 64,
+		z = 100,
+	),
+	time = "noon",
+	nearbyEntities = listOf("COW"),
+	inventoryItems = listOf(
+		QueryContext.InventoryItem(type = "WOODEN_SWORD", quantity = 1),
+		QueryContext.InventoryItem(type = "APPLE", quantity = 5),
+	),
+	gameMode = "SURVIVAL"
+)
 
 class AgentVm: ViewModel() {
 	val state = MutableStateFlow(AgentState())
@@ -22,24 +50,17 @@ class AgentVm: ViewModel() {
 	}
 
 	private val history = mutableListOf<Message>()
+	private val convo = CubeAgentConvo()
 
 	private suspend fun queryAgent(text: String) {
 		state.update {
 			it.copy(text = "", process = null)
 		}
-		val startTime = Clock.System.now()
-		val result = MainAgent(history,
-			provider = InferenceProvider.local,
-			sink = { t ->
-				state.update { it.copy(text = it.text + t) }
-			},
-			onProcessEvent = {
-				onProcessEvent(it)
-			}
-		).agent.run(text)
 
-		history.add(Message.User(text, RequestMetaInfo(startTime)))
-		history.add(Message.Assistant(result, ResponseMetaInfo(Clock.System.now())))
+		val result = convo.query(message = text, context = fakeContext) {
+			onProcessEvent(it)
+		}
+
 		state.update {
 			it.copy(text = result)
 		}
@@ -47,6 +68,13 @@ class AgentVm: ViewModel() {
 
 	private fun onProcessEvent(event: ProcessEvent) {
 		when(event) {
+			is ProcessEvent.TextSink -> {
+				state.update { st ->
+					st.copy(
+						text = st.text + event.text
+					)
+				}
+			}
 			is ProcessEvent.Update -> {
 				state.update { st ->
 					val current = st.process?.entries?.toMutableList() ?: mutableListOf()
