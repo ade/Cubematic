@@ -3,6 +3,8 @@
 package se.ade.mc.cubematic.extensions
 
 import com.mojang.brigadier.Command
+import com.mojang.brigadier.arguments.StringArgumentType
+import com.mojang.brigadier.builder.RequiredArgumentBuilder
 import com.mojang.brigadier.context.CommandContext
 import com.mojang.brigadier.tree.LiteralCommandNode
 import io.papermc.paper.command.brigadier.CommandSourceStack
@@ -53,6 +55,27 @@ class SubCommandBuilder(private val name: String) {
 		val subBuilder = SubCommandBuilder(name)
 		subBuilder.builder()
 		node.then(subBuilder.build())
+	}
+
+	/**
+	 * Adds a greedy string argument to the command and executes the given action with the argument and player.
+	 */
+	fun playerExecGreedyString(paramName: String = "argument", action: (context: CommandContext<CommandSourceStack>, arg: String, player: Player) -> Unit) {
+		node.then(
+			RequiredArgumentBuilder.argument<CommandSourceStack, String>(paramName, StringArgumentType.greedyString())
+				.executes { context ->
+					val sender = context.source.sender
+					val arg: String = context.getArgument(paramName, String::class.java)
+
+					if (sender is Player) {
+						action(context, arg, sender)
+					} else {
+						sender.sendMessage("This command can only be used by players.")
+					}
+
+					Command.SINGLE_SUCCESS
+				}
+		)
 	}
 
 	internal fun build(): LiteralCommandNode<CommandSourceStack> = node.build()

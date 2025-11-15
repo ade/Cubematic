@@ -12,11 +12,22 @@ import org.bukkit.plugin.java.JavaPlugin
 import se.ade.mc.cubematic.agent.main.CubeAgentConvo
 import se.ade.mc.cubematic.agent.main.QueryContext
 import se.ade.mc.cubematic.agent.main.ServerInfo
+import se.ade.mc.cubematic.extensions.commands
 
 class CubematicAgentPlugin: JavaPlugin() {
 	override fun onEnable() {
 		logger.info("Cubematic Agent Plugin enabled")
 		server.pluginManager.registerEvents(eventHandler, this)
+
+		commands {
+			command("ca") {
+				subcommand("ask") {
+					playerExecGreedyString("question") { ctx, s, player ->
+						player.sendMessage("You said: $s")
+					}
+				}
+			}
+		}
 	}
 
 	override fun onDisable() {

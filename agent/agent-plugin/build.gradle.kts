@@ -51,4 +51,18 @@ bukkit {
 	apiVersion = "1.21"
 
 	depend = listOf("Cubematic-Runtime")
+
+	permissions {
+		register("cubematic.agent.command") {
+			description = "Allows the player to use the agent commands"
+			default = BukkitPluginDescription.Permission.Default.TRUE
+		}
+	}
+
+	commands {
+		register("ca") {
+			description = "Cubematic AI agent command"
+			permission = "cubematic.agent.command"
+		}
+	}
 }
