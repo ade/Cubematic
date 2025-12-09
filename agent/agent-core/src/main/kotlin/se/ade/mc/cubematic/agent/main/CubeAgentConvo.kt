@@ -8,11 +8,15 @@ import se.ade.mc.cubematic.agent.config.InferenceProvider
 import se.ade.mc.cubematic.agent.rags.DefaultRagClient
 import se.ade.mc.cubematic.agent.rags.RagClient
 
-class CubeAgentConvo {
+class CubeAgentConvo(private val inferenceProvider: InferenceProvider) {
 	val ragClient: RagClient = DefaultRagClient()
 	val history = mutableListOf<Message>()
 
-	suspend fun query(message: String, context: QueryContext, sink: (ProcessEvent) -> Unit): String {
+	suspend fun query(
+		message: String,
+		context: QueryContext,
+		sink: (ProcessEvent) -> Unit
+	): String {
 		val startTime = Clock.System.now()
 
 		val ragResult = if(history.isEmpty()) ragClient.ragQuery(message).fold(
@@ -20,7 +24,7 @@ class CubeAgentConvo {
 			onFailure = { return "Error querying RAG server: ${it.message}" }
 		) else null
 
-		val agent = MainAgent(history, context, ragResult, InferenceProvider.local, sink)
+		val agent = MainAgent(history, context, ragResult, inferenceProvider, sink)
 
 		val resp = agent.agent.run(message)
 

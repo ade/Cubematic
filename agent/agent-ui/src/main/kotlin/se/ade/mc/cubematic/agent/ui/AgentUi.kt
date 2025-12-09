@@ -45,7 +45,7 @@ fun AgentUi() {
 	val state by viewModel.state.collectAsState()
 	val focusRequester = remember { FocusRequester() }
 
-	var text by remember { mutableStateOf("How can I get an ender chest") }
+	var text by remember { mutableStateOf("Describe the full process of making an ender chest") }
 	Column(modifier = Modifier.fillMaxSize()) {
 		AnimatedVisibility(visible = state.process != null) {
 			Column(modifier = Modifier

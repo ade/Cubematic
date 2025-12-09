@@ -4,6 +4,7 @@ plugins {
 	kotlin("jvm")
 	alias(libs.plugins.shadow)
 	alias(libs.plugins.pluginYmlBukkit)
+	alias(libs.plugins.kotlinx.serialization)
 }
 
 group = "se.ade.mc.cubematic.agent"

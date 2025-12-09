@@ -1,29 +1,97 @@
 package se.ade.mc.cubematic.agent
 
-import kotlinx.coroutines.GlobalScope
+import ai.koog.prompt.executor.clients.openai.OpenAIClientSettings
+import ai.koog.prompt.executor.clients.openai.OpenAILLMClient
+import ai.koog.prompt.executor.llms.SingleLLMPromptExecutor
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.SupervisorJob
 import kotlinx.coroutines.launch
+import kotlinx.serialization.Serializable
 import org.bukkit.entity.EntityType
 import org.bukkit.entity.Item
 import org.bukkit.entity.Player
-import org.bukkit.event.EventHandler
 import org.bukkit.event.Listener
-import org.bukkit.event.player.PlayerChatEvent
 import org.bukkit.plugin.java.JavaPlugin
+import se.ade.mc.cubematic.agent.config.ApiKeys
+import se.ade.mc.cubematic.agent.config.CustomLlamaModel
+import se.ade.mc.cubematic.agent.config.Executor
+import se.ade.mc.cubematic.agent.config.InferenceProvider
+import se.ade.mc.cubematic.agent.main.CubeAgent
 import se.ade.mc.cubematic.agent.main.CubeAgentConvo
+import se.ade.mc.cubematic.agent.main.ProcessEvent
 import se.ade.mc.cubematic.agent.main.QueryContext
 import se.ade.mc.cubematic.agent.main.ServerInfo
+import se.ade.mc.cubematic.config.configProvider
 import se.ade.mc.cubematic.extensions.commands
+import java.util.UUID
+
+@Serializable
+data class AgentConfig(
+	val apiKey: String = "",
+	val baseUrl: String = ""
+)
 
 class CubematicAgentPlugin: JavaPlugin() {
+	var config by configProvider { AgentConfig() }
+	private val scope: CoroutineScope = CoroutineScope(SupervisorJob() + Dispatchers.Default)
+	private val convoMap = mutableMapOf<UUID, CubeAgentConvo>()
+	private val cubeAgent = CubeAgent(InferenceProvider(
+		model = CustomLlamaModel.default,
+		executor = SingleLLMPromptExecutor(
+			OpenAILLMClient(
+				apiKey = config.apiKey,
+				settings = OpenAIClientSettings(
+					baseUrl = config.baseUrl
+				),
+			)
+		)
+	))
+
 	override fun onEnable() {
 		logger.info("Cubematic Agent Plugin enabled")
 		server.pluginManager.registerEvents(eventHandler, this)
 
 		commands {
 			command("ca") {
-				subcommand("ask") {
-					playerExecGreedyString("question") { ctx, s, player ->
-						player.sendMessage("You said: $s")
+				command("ask") {
+					withPlayer {
+						greedyString("question") { ctx, s, player ->
+							val context = player.queryContext()
+							logger.info("Context: $context")
+
+							scope.launch {
+								val uuid = player.uniqueId
+								val convo = cubeAgent.createConvo().also {
+									convoMap[uuid] = it
+								}
+
+								val r = convo.query(s, context) {
+									if(it is ProcessEvent.ProgressMessage)
+										player.sendMessage(it.message)
+								}
+
+								player.sendMessage(r)
+							}
+
+							player.sendMessage("Loading...")
+						}
+					}
+				}
+				command("re") {
+					withPlayer {
+						greedyString("response") { ctx, s, player ->
+							val playerContext = player.queryContext()
+							scope.launch {
+								convoMap.getOrPut(player.uniqueId) { cubeAgent.createConvo() }
+									.query(s, playerContext) {
+										// Lambda (partial text response) not used for now
+									}.let { resp ->
+										player.sendMessage(resp)
+									}
+							}
+							player.sendMessage("Loading...")
+						}
 					}
 				}
 			}
@@ -35,20 +103,7 @@ class CubematicAgentPlugin: JavaPlugin() {
 	}
 
 	private val eventHandler = object: Listener {
-		@EventHandler
-		fun onEvent(e: PlayerChatEvent) {
-			logger.info("Chat event: ${e.message}")
-			val context = e.player.queryContext()
-			logger.info("Context: $context")
 
-			GlobalScope.launch {
-				val r = CubeAgentConvo().query(e.message, context) {
-					// Lambda (partial text response) not used for now
-				}
-				logger.info("Agent response: $r")
-				e.player.sendMessage(r)
-			}
-		}
 	}
 
 	private fun Player.queryContext(): QueryContext {

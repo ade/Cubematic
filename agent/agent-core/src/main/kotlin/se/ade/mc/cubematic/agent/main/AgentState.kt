@@ -18,4 +18,5 @@ data class ProcessEntry(
 sealed interface ProcessEvent {
 	data class TextSink(val text: String): ProcessEvent
 	data class Update(val processEntry: ProcessEntry): ProcessEvent
+	data class ProgressMessage(val message: String): ProcessEvent
 }

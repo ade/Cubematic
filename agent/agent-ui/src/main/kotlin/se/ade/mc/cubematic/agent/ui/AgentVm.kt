@@ -1,5 +1,8 @@
 package se.ade.mc.cubematic.agent.ui
 
+import ai.koog.prompt.executor.clients.openai.OpenAIClientSettings
+import ai.koog.prompt.executor.clients.openai.OpenAILLMClient
+import ai.koog.prompt.executor.llms.SingleLLMPromptExecutor
 import ai.koog.prompt.message.Message
 import ai.koog.prompt.message.RequestMetaInfo
 import ai.koog.prompt.message.ResponseMetaInfo
@@ -9,11 +12,14 @@ import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import kotlinx.datetime.Clock
+import se.ade.mc.cubematic.agent.config.CustomLlamaModel
 import se.ade.mc.cubematic.agent.config.InferenceProvider
 import se.ade.mc.cubematic.agent.main.AgentProcess
 import se.ade.mc.cubematic.agent.main.AgentState
+import se.ade.mc.cubematic.agent.main.CubeAgent
 import se.ade.mc.cubematic.agent.main.CubeAgentConvo
 import se.ade.mc.cubematic.agent.main.MainAgent
+import se.ade.mc.cubematic.agent.main.ProcessEntry
 import se.ade.mc.cubematic.agent.main.ProcessEvent
 import se.ade.mc.cubematic.agent.main.QueryContext
 import se.ade.mc.cubematic.agent.main.ServerInfo
@@ -44,13 +50,27 @@ val fakeContext = QueryContext(
 )
 
 class AgentVm: ViewModel() {
+	private val config = loadConfig()
+
 	val state = MutableStateFlow(AgentState())
 	fun submit(t: String) {
 		viewModelScope.launch { queryAgent(t) }
 	}
 
+	private val agent = CubeAgent(InferenceProvider(
+		model = CustomLlamaModel.default,
+		executor = SingleLLMPromptExecutor(
+			OpenAILLMClient(
+				apiKey = config.apiKey,
+				settings = OpenAIClientSettings(
+					baseUrl = config.baseUrl
+				),
+			)
+		)
+	))
+
 	private val history = mutableListOf<Message>()
-	private val convo = CubeAgentConvo()
+	private val convo = agent.createConvo()
 
 	private suspend fun queryAgent(text: String) {
 		state.update {
@@ -85,6 +105,19 @@ class AgentVm: ViewModel() {
 						current.add(event.processEntry)
 					}
 					st.copy(process = AgentProcess(current))
+				}
+			}
+
+			is ProcessEvent.ProgressMessage -> {
+				val process = state.value.process?.entries ?: emptyList()
+				state.update {
+					it.copy(process = it.process?.copy(
+						entries = process + ProcessEntry(
+							id = -1,
+							text = event.message,
+							done = true
+						)
+					))
 				}
 			}
 		}

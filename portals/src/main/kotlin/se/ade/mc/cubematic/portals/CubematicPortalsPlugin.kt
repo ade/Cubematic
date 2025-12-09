@@ -28,14 +28,16 @@ class CubematicPortalsPlugin: JavaPlugin() {
 	private fun addCommands() {
 		commands {
 			command("cubematic") {
-				subcommand("portals") {
-					subcommand("debug") {
-						subcommand("give-compass") {
-							playerExecutes { context, player ->
-								val item = ItemStack(Material.COMPASS).also {
-									it.addEnchantment(Enchantment.VANISHING_CURSE, 1)
+				withPlayer {
+					command("portals") {
+						command("debug") {
+							command("give-compass") {
+								executes { context, player ->
+									val item = ItemStack(Material.COMPASS).also {
+										it.addEnchantment(Enchantment.VANISHING_CURSE, 1)
+									}
+									player.inventory.addItem(item)
 								}
-								player.inventory.addItem(item)
 							}
 						}
 					}
