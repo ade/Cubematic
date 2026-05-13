@@ -3,7 +3,7 @@ package se.ade.mc.cubematic.core.agent.main
 import ai.koog.prompt.message.Message
 import ai.koog.prompt.message.RequestMetaInfo
 import ai.koog.prompt.message.ResponseMetaInfo
-import kotlinx.datetime.Clock
+import kotlin.time.Clock
 import se.ade.mc.cubematic.core.agent.config.InferenceProvider
 import se.ade.mc.cubematic.core.agent.rags.DefaultRagClient
 import se.ade.mc.cubematic.core.agent.rags.RagClient

@@ -1,15 +1,12 @@
 package se.ade.mc.cubematic.core.agent.main
 
 import ai.koog.agents.core.agent.AIAgent
-import ai.koog.agents.core.agent.AIAgentFunctionalContext
 import ai.koog.agents.core.agent.config.AIAgentConfig
-import ai.koog.agents.core.agent.executeTool
+import ai.koog.agents.core.agent.context.AIAgentFunctionalContext
 import ai.koog.agents.core.agent.functionalStrategy
-import ai.koog.agents.core.agent.requestLLMStreaming
 import ai.koog.agents.core.feature.handler.agent.AgentCompletedContext
 import ai.koog.agents.core.feature.handler.agent.AgentStartingContext
 import ai.koog.agents.core.tools.ToolRegistry
-import ai.koog.agents.core.tools.reflect.tools
 import ai.koog.agents.features.eventHandler.feature.EventHandler
 import ai.koog.prompt.dsl.Prompt
 import ai.koog.prompt.message.Message
@@ -123,7 +120,7 @@ class MainAgent(
 		agentConfig = agentConfig,
 		installFeatures = {
 			install(EventHandler.Feature) {
-				onAgentStarting { eventContext: AgentStartingContext<*> ->
+				onAgentStarting { eventContext: AgentStartingContext ->
 					println("Starting agent: ${eventContext.agent.id}")
 				}
 				onAgentCompleted { eventContext: AgentCompletedContext ->
@@ -143,11 +140,20 @@ class MainAgent(
 			frames.add(it)
 
 			when (it) {
-				is StreamFrame.Append -> {
-					//sink(it.text)
-					onProcessEvent(ProcessEvent.TextSink(it.text))
+				is StreamFrame.DeltaFrame -> {
+					when (it) {
+						is StreamFrame.TextDelta -> {
+							onProcessEvent(ProcessEvent.TextSink(it.text))
+						}
+						is StreamFrame.ToolCallDelta -> {}
+					}
 				}
-				is StreamFrame.ToolCall -> {}
+				is StreamFrame.CompleteFrame -> {
+					when (it) {
+						is StreamFrame.ToolCallComplete -> {}
+						is StreamFrame.TextComplete -> {}
+					}
+				}
 				is StreamFrame.End -> {}
 			}
 		}
@@ -196,9 +202,14 @@ class MainAgent(
 			val stream = requestLLMStreaming()
 			val f2 = mutableListOf<StreamFrame>()
 			stream.collect {
-				if(it is StreamFrame.Append) {
+				val addText = when(it) {
+					is StreamFrame.TextDelta -> it.text
+					is StreamFrame.TextComplete -> it.text
+					else -> null
+				}
+				if(addText != null) {
 					//sink(it.text)
-					onProcessEvent(ProcessEvent.TextSink(it.text))
+					onProcessEvent(ProcessEvent.TextSink(addText))
 				}
 				f2.add(it)
 			}
