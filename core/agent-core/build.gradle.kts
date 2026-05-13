@@ -26,7 +26,7 @@ kotlin {
 				implementation(libs.se.ade.kuri.api)
 				implementation(libs.xmlutil.core)
 				implementation(libs.xmlutil.serialization)
-
+				implementation("org.slf4j:slf4j-simple:2.0.16")
 			}
 		}
 		val jvmMain by getting

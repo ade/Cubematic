@@ -53,17 +53,7 @@ class AgentVm: ViewModel() {
 	}
 
 	private val agent = CubeAgent(
-		InferenceProvider(
-			model = CustomLlamaModel.default,
-			executor = SingleLLMPromptExecutor(
-				OpenAILLMClient(
-					apiKey = config.apiKey,
-					settings = OpenAIClientSettings(
-						baseUrl = config.baseUrl
-					),
-				)
-			)
-		)
+		config.inferenceConfig.providers.first().asInferenceProvider()
 	)
 
 	private val history = mutableListOf<Message>()

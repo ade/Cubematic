@@ -8,16 +8,22 @@ import ai.koog.agents.core.feature.handler.agent.AgentCompletedContext
 import ai.koog.agents.core.feature.handler.agent.AgentStartingContext
 import ai.koog.agents.core.tools.ToolRegistry
 import ai.koog.agents.features.eventHandler.feature.EventHandler
+import ai.koog.agents.features.tracing.feature.Tracing
+import ai.koog.agents.features.tracing.writer.TraceFeatureMessageFileWriter
+import ai.koog.agents.features.tracing.writer.TraceFeatureMessageLogWriter
 import ai.koog.prompt.dsl.Prompt
+import ai.koog.prompt.executor.llms.all.simpleOpenRouterExecutor
 import ai.koog.prompt.message.Message
 import ai.koog.prompt.streaming.StreamFrame
 import ai.koog.prompt.streaming.toAssistantMessageOrNull
 import ai.koog.prompt.streaming.toToolCallMessages
+import io.github.oshai.kotlinlogging.KotlinLogging
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.SupervisorJob
 import se.ade.mc.cubematic.core.agent.config.InferenceProvider
 import se.ade.mc.cubematic.core.agent.rags.QueryResponse
+import kotlin.io.path.Path
 
 class MainAgent(
 	val history: List<Message>,
@@ -106,29 +112,33 @@ class MainAgent(
 	)
 
 	// Add the tool to the tool registry
-	private val toolRegistry = ToolRegistry.Companion {
+	private val toolRegistry = ToolRegistry {
 		tools(WikiTools())
 		//tools(RagServerTools(onProcessEvent))
 	}
 
-	val agent = AIAgent.Companion<String, String>(
+	val logger = KotlinLogging.logger { }
+
+	val agent = AIAgent<String, String>(
 		promptExecutor = provider.executor,
 		toolRegistry = toolRegistry,
 		strategy = functionalStrategy { input ->
 			runQuery(input)
 		},
-		agentConfig = agentConfig,
-		installFeatures = {
-			install(EventHandler.Feature) {
-				onAgentStarting { eventContext: AgentStartingContext ->
-					println("Starting agent: ${eventContext.agent.id}")
-				}
-				onAgentCompleted { eventContext: AgentCompletedContext ->
-					println("Result:\n${eventContext.result}")
-				}
+		agentConfig = agentConfig
+	) {
+		install(EventHandler.Feature) {
+			onLLMStreamingFrameReceived {
+				logger.info { "onLLMStreamingFrameReceived ${it.streamFrame}" }
+			}
+			onAgentStarting { eventContext: AgentStartingContext ->
+				println("Starting agent: ${eventContext.agent.id}")
+			}
+			onAgentCompleted { eventContext: AgentCompletedContext ->
+				println("Result:\n${eventContext.result}")
 			}
 		}
-	)
+	}
 
 	private suspend fun AIAgentFunctionalContext.runQuery(input: String): String {
 		val rootId = processCounter++
@@ -146,12 +156,14 @@ class MainAgent(
 							onProcessEvent(ProcessEvent.TextSink(it.text))
 						}
 						is StreamFrame.ToolCallDelta -> {}
+						is StreamFrame.ReasoningDelta -> {}
 					}
 				}
 				is StreamFrame.CompleteFrame -> {
 					when (it) {
 						is StreamFrame.ToolCallComplete -> {}
 						is StreamFrame.TextComplete -> {}
+						is StreamFrame.ReasoningComplete -> {}
 					}
 				}
 				is StreamFrame.End -> {}
