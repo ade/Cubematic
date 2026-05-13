@@ -19,12 +19,14 @@ class CubeAgentConvo(private val inferenceProvider: InferenceProvider) {
 	): String {
 		val startTime = Clock.System.now()
 
+		/*
 		val ragResult = if(history.isEmpty()) ragClient.ragQuery(message).fold(
 			onSuccess = { it },
 			onFailure = { return "Error querying RAG server: ${it.message}" }
 		) else null
+		*/
 
-		val agent = MainAgent(history, context, ragResult, inferenceProvider, sink)
+		val agent = MainAgent(history, context, null, inferenceProvider, sink)
 
 		val resp = agent.agent.run(message)
 

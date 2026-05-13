@@ -111,8 +111,8 @@ class MainAgent(
 
 	// Add the tool to the tool registry
 	private val toolRegistry = ToolRegistry.Companion {
-		//tools(WikiTools())
-		tools(RagServerTools(onProcessEvent))
+		tools(WikiTools())
+		//tools(RagServerTools(onProcessEvent))
 	}
 
 	val agent = AIAgent.Companion<String, String>(
