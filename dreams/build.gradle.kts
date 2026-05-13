@@ -22,7 +22,7 @@ dependencies {
 	compileOnly(libs.bundles.exposed)
 	compileOnly(libs.kaml)
 
-	implementation(project(":core"))
+	implementation(project(":core:plugin-core"))
 	testImplementation(kotlin("test"))
 }
 

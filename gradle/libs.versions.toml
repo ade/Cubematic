@@ -16,6 +16,8 @@ kuri = "0.2.0"
 jetbrains-compose = "1.9.0"
 jetbrains-compose-viewmodel = "2.9.4"
 jetbrains-compose-material3 = "1.9.0-beta06"
+agp = "8.10.1"
+xml-serialization="0.91.3"
 
 
 [plugins]
@@ -27,6 +29,10 @@ kotlinx-serialization = { id = "org.jetbrains.kotlin.plugin.serialization", vers
 ksp = { id = "com.google.devtools.ksp", version.ref = "ksp" }
 compose = { id = "org.jetbrains.compose", version.ref = "jetbrains-compose" }
 kotlin-compose = { id = "org.jetbrains.kotlin.plugin.compose", version.ref = "kotlin" }
+kotlin-multiplatform = { id = "org.jetbrains.kotlin.multiplatform", version.ref = "kotlin" }
+android-application = { id = "com.android.application", version.ref = "agp" }
+android-library = { id = "com.android.library", version.ref = "agp" }
+
 
 [libraries]
 paper = { group = "io.papermc.paper", name = "paper-api", version.ref = "paper" }
@@ -51,6 +57,9 @@ ktor-client-core = { module = "io.ktor:ktor-client-core", version.ref = "ktor" }
 se-ade-kuri-api = { group = "se.ade.kuri", name = "kuri-api", version.ref = "kuri" }
 se-ade-kuri-processor = { group = "se.ade.kuri", name = "kuri-processor", version.ref = "kuri" }
 koog = { module = "ai.koog:koog-agents", version.ref="koog" }
+
+xmlutil-core = { module = "io.github.pdvrieze.xmlutil:core", version.ref="xml-serialization" }
+xmlutil-serialization = { module = "io.github.pdvrieze.xmlutil:serialization", version.ref="xml-serialization" }
 
 
 [bundles]

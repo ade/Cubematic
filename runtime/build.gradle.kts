@@ -18,7 +18,7 @@ repositories {
 dependencies {
 	compileOnly(libs.paper)
 
-	implementation(project(":core"))
+	implementation(project(":core:plugin-core"))
 	implementation(libs.kaml)
 	implementation(libs.kotlinx.coroutines.core)
 	implementation(libs.sqlite)

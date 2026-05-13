@@ -23,7 +23,7 @@ dependencies {
 	compileOnly(libs.sqlite)
 	compileOnly(libs.bundles.exposed)
 
-	implementation(project(":core"))
+	implementation(project(":core:plugin-core"))
     testImplementation(kotlin("test"))
 }
 

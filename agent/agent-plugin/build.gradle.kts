@@ -25,8 +25,8 @@ dependencies {
 	compileOnly(libs.ktor.serialization.kotlinx.json)
 	compileOnly(libs.se.ade.kuri.api)
 
-	implementation(project(":core"))
-	implementation(project(":agent:agent-core"))
+	implementation(project(":core:agent-core"))
+	implementation(project(":core:plugin-core"))
 }
 
 kotlin {

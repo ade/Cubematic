@@ -21,7 +21,7 @@ group = "se.ade.mc.cubematic.agent.ui"
 version = "1.0-SNAPSHOT"
 
 dependencies {
-	implementation(project(":agent:agent-core"))
+	implementation(project(":core:agent-core"))
 	implementation(libs.bundles.plugin.runtime)
 
 	// Note, if you develop a library, you should use compose.desktop.common.

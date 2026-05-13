@@ -19,7 +19,7 @@ dependencies {
 	compileOnly(libs.paper)
 	compileOnly(libs.kaml)
 
-	implementation(project(":core"))
+	implementation(project(":core:plugin-core"))
 	testImplementation(kotlin("test"))
 }
 
