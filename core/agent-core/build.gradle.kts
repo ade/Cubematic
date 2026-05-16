@@ -11,6 +11,9 @@ plugins {
 }
 
 kotlin {
+	compilerOptions {
+		jvmToolchain(21)
+	}
 	androidTarget()
 	jvm()
 
@@ -29,7 +32,11 @@ kotlin {
 				implementation("org.slf4j:slf4j-simple:2.0.16")
 			}
 		}
-		val jvmMain by getting
+		val jvmMain by getting {
+			dependencies {
+				implementation(project(":core:wiki-parser"))
+			}
+		}
 		val androidMain by getting
 	}
 

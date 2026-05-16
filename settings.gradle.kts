@@ -24,6 +24,7 @@ plugins {
 include(
     "core:agent-core",
     "core:plugin-core",
+    "core:wiki-parser",
 	"agent:agent-plugin",
 	"agent:agent-ui",
     "automation",

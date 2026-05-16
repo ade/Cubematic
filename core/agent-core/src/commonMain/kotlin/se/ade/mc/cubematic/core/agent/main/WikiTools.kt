@@ -21,22 +21,20 @@ class WikiTools : ToolSet {
 	}
 
 	@Tool
-	@LLMDescription("Get an extract of a page from Minecraft Wiki, which includes the most important information, but excludes details such as history, data values, etc.")
-	suspend fun getPageExtract(
-		@LLMDescription("The title/name of the page")
-		title: String,
-	): String {
-		return wikiClient.getPageContent(title)
-			?.let { WikiParser().pruneSections(it) }
-			?: "No extract found for page: $title"
-	}
-
-	@Tool
-	@LLMDescription("Get the full content of a page from Minecraft Wiki, including all details.")
+	@LLMDescription("Get the full content of a page from Minecraft Wiki, converted to markdown.")
 	suspend fun getPageContent(
 		@LLMDescription("The title/name of the page")
 		title: String,
 	): String {
-		return wikiClient.getPageContent(title) ?: "No content found for page: $title"
+		val pageContent = wikiClient.getPageContent(title)
+			?: return "No content found for page: $title"
+
+		val pruned = WikiParser().pruneSections(pageContent)
+
+		val markdown = WikiTextConvert.optimizeForAgent(title, pruned)
+
+		println(markdown)
+
+		return markdown
 	}
 }
