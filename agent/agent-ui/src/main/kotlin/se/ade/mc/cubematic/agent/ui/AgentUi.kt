@@ -12,6 +12,9 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
+import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.lazy.items
+import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.Button
 import androidx.compose.material3.CircularProgressIndicator
@@ -36,61 +39,105 @@ import androidx.compose.ui.input.key.KeyEventType
 import androidx.compose.ui.input.key.key
 import androidx.compose.ui.input.key.onPreviewKeyEvent
 import androidx.compose.ui.input.key.type
+import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.viewmodel.compose.viewModel
 
 @Composable
 fun AgentUi() {
-	val viewModel = viewModel { AgentVm() }
-	val state by viewModel.state.collectAsState()
-	val focusRequester = remember { FocusRequester() }
+    val viewModel = viewModel { AgentVm() }
+    val state by viewModel.state.collectAsState()
+    val focusRequester = remember { FocusRequester() }
+    val listState = rememberLazyListState()
 
-	var text by remember { mutableStateOf("Describe the full process of making an ender chest") }
-	Column(modifier = Modifier.fillMaxSize()) {
-		AnimatedVisibility(visible = state.process != null) {
-			Column(modifier = Modifier
-				.fillMaxWidth()
-				.clip(shape = RoundedCornerShape(8.dp))
-				.border(2.dp, MaterialTheme.colorScheme.primary, shape = RoundedCornerShape(8.dp))
-				.background(MaterialTheme.colorScheme.primaryContainer)
-				.padding(10.dp)
-			) {
-				state.process?.entries?.forEach { entry ->
-					Row(verticalAlignment = Alignment.CenterVertically) {
-						if (entry.done) Text("✓") else CircularProgressIndicator(modifier = Modifier.size(16.dp))
-						Spacer(Modifier.width(8.dp))
-						Text(text = entry.text)
-					}
-				}
-			}
-			Spacer(Modifier.height(10.dp))
-		}
-		Text(modifier = Modifier.weight(1f), text = state.text)
-		HorizontalDivider()
-		Row {
-			TextField(
-				modifier = Modifier.weight(1f)
-					.focusRequester(focusRequester)
-					.onPreviewKeyEvent { keyEvent ->
-						if (keyEvent.key == Key.Enter && keyEvent.type == KeyEventType.KeyDown) {
-							viewModel.submit(text)
-							text = ""
-							true
-						} else {
-							false
-						}
-					},
-				onValueChange = { text = it }, value = text)
-			Button(onClick = {
-				viewModel.submit(text)
-				text = ""
-			}) {
-				Text(">")
-			}
-		}
-	}
+    var text by remember { mutableStateOf("Describe the full process of making an ender chest") }
 
-	LaunchedEffect(Unit) {
-		focusRequester.requestFocus()
-	}
+    // Auto-scroll to the bottom whenever entries change
+    LaunchedEffect(state.entries.size, state.entries.lastOrNull()?.response) {
+        if (state.entries.isNotEmpty()) {
+            listState.animateScrollToItem(state.entries.lastIndex)
+        }
+    }
+
+    Column(modifier = Modifier.fillMaxSize()) {
+        LazyColumn(
+            state = listState,
+            modifier = Modifier.weight(1f).fillMaxWidth(),
+        ) {
+            items(state.entries) { entry ->
+                ChatEntryView(entry)
+                HorizontalDivider(modifier = Modifier.padding(vertical = 4.dp))
+            }
+        }
+
+        HorizontalDivider()
+        Row {
+            TextField(
+                modifier = Modifier.weight(1f)
+                    .focusRequester(focusRequester)
+                    .onPreviewKeyEvent { keyEvent ->
+                        if (keyEvent.key == Key.Enter && keyEvent.type == KeyEventType.KeyDown) {
+                            viewModel.submit(text)
+                            text = ""
+                            true
+                        } else {
+                            false
+                        }
+                    },
+                onValueChange = { text = it }, value = text
+            )
+            Button(onClick = {
+                viewModel.submit(text)
+                text = ""
+            }) {
+                Text(">")
+            }
+        }
+    }
+
+    LaunchedEffect(Unit) {
+        focusRequester.requestFocus()
+    }
+}
+
+@Composable
+private fun ChatEntryView(entry: ChatEntry) {
+    Column(modifier = Modifier.fillMaxWidth().padding(vertical = 6.dp)) {
+        // User query
+        Text(
+            text = entry.query,
+            fontWeight = FontWeight.Bold,
+            color = MaterialTheme.colorScheme.primary,
+            modifier = Modifier.padding(bottom = 4.dp),
+        )
+
+        // Process steps (shown while streaming)
+        AnimatedVisibility(visible = entry.process != null) {
+            Column(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .clip(shape = RoundedCornerShape(8.dp))
+                    .border(2.dp, MaterialTheme.colorScheme.primary, shape = RoundedCornerShape(8.dp))
+                    .background(MaterialTheme.colorScheme.primaryContainer)
+                    .padding(10.dp)
+            ) {
+                entry.process?.entries?.forEach { step ->
+                    Row(verticalAlignment = Alignment.CenterVertically) {
+                        if (step.done) Text("✓") else CircularProgressIndicator(modifier = Modifier.size(16.dp))
+                        Spacer(Modifier.width(8.dp))
+                        Text(text = step.text)
+                    }
+                }
+            }
+        }
+
+        if (entry.process != null) Spacer(Modifier.height(6.dp))
+
+        // Response text
+        if (entry.response.isNotEmpty()) {
+            Text(text = entry.response)
+        } else if (entry.isStreaming) {
+            CircularProgressIndicator(modifier = Modifier.size(20.dp))
+        }
+    }
 }
