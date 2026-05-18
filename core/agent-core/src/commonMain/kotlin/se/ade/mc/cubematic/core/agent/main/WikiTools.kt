@@ -4,7 +4,7 @@ import ai.koog.agents.core.tools.annotations.LLMDescription
 import ai.koog.agents.core.tools.annotations.Tool
 import ai.koog.agents.core.tools.reflect.ToolSet
 import se.ade.mc.cubematic.core.agent.wiki.CoreWikiClient
-import se.ade.mc.cubematic.core.agent.wiki.WikiParser
+import se.ade.mc.cubematic.core.agent.wiki.WikiTextPruner
 
 // Implement a simple calculator tool that can add two numbers
 @LLMDescription("Tools for gathering information")
@@ -27,9 +27,24 @@ class WikiTools : ToolSet {
 		title: String,
 	): String {
 		val pageContent = wikiClient.getPageContent(title)
-			?: return "No content found for page: $title"
+			?.let {
+				// Check for redirect
+				val redirectTarget = "^#REDIRECT \\[\\[(.*)]]".toRegex(RegexOption.IGNORE_CASE)
+					.find(it.trim())
+					?.groups
+					?.get(1)
+					?.value
 
-		val pruned = WikiParser().pruneSections(pageContent)
+				if (redirectTarget == null) it
+				else {
+					// Fetch the redirect target instead
+					println("$title redirecting to $redirectTarget")
+					return@let getPageContent(redirectTarget)
+				}
+			}
+			?: return "Page not found: $title"
+
+		val pruned = WikiTextPruner.prune(pageContent)
 
 		val markdown = WikiTextConvert.optimizeForAgent(title, pruned)
 

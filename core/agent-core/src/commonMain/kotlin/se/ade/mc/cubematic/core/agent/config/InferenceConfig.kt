@@ -17,13 +17,15 @@ data class InferenceConfig(
 	val providers: List<InferenceProviderConfig> = listOf(),
 ) {
 	companion object {
-		val defaultCapabilities = InferenceConfigCapabilities()
+		val defaultCapabilities = InferenceModelConfig()
 	}
 }
 
 @Serializable
-data class InferenceConfigCapabilities(
-	val toolCalling: Boolean = false,
+data class InferenceModelConfig(
+	val id: String = "default",
+	val contextLength: Int = 128_000,
+	val toolCalling: Boolean = true,
 ) {
 	fun asLlmCapabilities(): List<LLMCapability> {
 		return buildList {
@@ -47,9 +49,7 @@ sealed interface InferenceProviderConfig {
 	@SerialName("openrouter")
 	data class OpenRouterInferenceConfig(
 		val apiKey: String,
-		val modelId: String,
-		val contextLength: Int = 128_000,
-		val capabilities: InferenceConfigCapabilities = defaultCapabilities
+		val model: InferenceModelConfig = defaultCapabilities
 	): InferenceProviderConfig
 
 	@Serializable
@@ -57,7 +57,7 @@ sealed interface InferenceProviderConfig {
 	data class OpenAIInferenceConfig(
 		val apiKey: String,
 		val baseUrl: String,
-		val capabilities: InferenceConfigCapabilities = defaultCapabilities,
+		val model: InferenceModelConfig = defaultCapabilities,
 	): InferenceProviderConfig
 
 	fun asInferenceProvider(): InferenceProvider {
@@ -66,9 +66,9 @@ sealed interface InferenceProviderConfig {
 				return InferenceProvider(
 					model = LLModel(
 						provider = LLMProvider.OpenRouter,
-						id = this.modelId,
-						capabilities = capabilities.asLlmCapabilities(),
-						contextLength = contextLength.toLong(),
+						id = this.model.id,
+						capabilities = model.asLlmCapabilities(),
+						contextLength = model.contextLength.toLong(),
 					),
 					executor = MultiLLMPromptExecutor(
 						OpenRouterLLMClient(this.apiKey)
@@ -80,7 +80,7 @@ sealed interface InferenceProviderConfig {
 					model = LLModel(
 						provider = LLMProvider.OpenAI,
 						id = "<placeholder>",
-						capabilities = capabilities.asLlmCapabilities() + LLMCapability.OpenAIEndpoint.Completions,
+						capabilities = model.asLlmCapabilities() + LLMCapability.OpenAIEndpoint.Completions,
 						contextLength = 128_000
 					),
 					executor = MultiLLMPromptExecutor(

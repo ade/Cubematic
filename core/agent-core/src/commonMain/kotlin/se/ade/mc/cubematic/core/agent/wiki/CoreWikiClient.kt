@@ -46,7 +46,11 @@ class CoreWikiClient {
 		println("Fetching URL: $url")
 		val response: PageContentResponse = client.get(url).body()
 		val page = response.query.pages.values.firstOrNull()
-		return page?.revisions?.firstOrNull()?.content
+
+		if(page?.pageid == -1 || page?.revisions.isNullOrEmpty())
+			return null // Page was missing
+
+		return page.revisions.firstOrNull()?.content
 	}
 
 	suspend fun getRawPageContent(pageTitle: String): String? {
@@ -152,10 +156,10 @@ private data class QueryWithRevisions(
 
 @Serializable
 private data class WikiPageWithRevisions(
-	val pageid: Int,
+	val pageid: Int? = -1,
 	val ns: Int,
 	val title: String,
-	val revisions: List<Revision>
+	val revisions: List<Revision>? = null
 )
 
 @Serializable

@@ -1,10 +1,40 @@
-package se.ade.mc.wiki.md
+package se.ade.mc.cubematic.core.agent.wiki
+
+private val removeSections = listOf(
+	"Achievements",
+	"Advancements",
+	"Data values",
+	"Video",
+	"Videos",
+	"Sounds",
+	"History",
+	"Issues",
+	"Trivia",
+	"Gallery",
+	"See also",
+	"Notes",
+	"References",
+	"External links",
+	"Navigation",
+	"Data history",
+	"Mojang screenshots",
+	"Screenshots",
+	"In other media"
+)
 
 object WikiTextPruner {
 	fun prune(text: String): String {
-		return removeGallery(text).let {
-			removeLangLinks(it)
+		return removeSections(removeLangLinks(removeGallery(text)))
+	}
+
+	private fun removeSections(pageText: String): String {
+		var text = pageText
+		removeSections.forEach { section ->
+			val regex = Regex("==\\s*$section\\s*==[\\s\\S]*?(?=(==|$))", RegexOption.IGNORE_CASE)
+			text = text.replace(regex, "")
 		}
+
+		return text.trim()
 	}
 
 	/**
