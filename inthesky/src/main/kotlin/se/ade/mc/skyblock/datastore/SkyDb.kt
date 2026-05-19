@@ -1,14 +1,16 @@
 package se.ade.mc.skyblock.datastore
 
 import org.bukkit.plugin.java.JavaPlugin
-import org.jetbrains.exposed.sql.Database
-import org.jetbrains.exposed.sql.SchemaUtils.create
-import org.jetbrains.exposed.sql.Transaction
-import org.jetbrains.exposed.sql.exists
-import org.jetbrains.exposed.sql.replace
-import org.jetbrains.exposed.sql.selectAll
-import org.jetbrains.exposed.sql.transactions.TransactionManager
-import org.jetbrains.exposed.sql.transactions.transaction
+import org.jetbrains.exposed.v1.jdbc.Database
+import org.jetbrains.exposed.v1.jdbc.SchemaUtils.create
+import org.jetbrains.exposed.v1.core.Transaction
+import org.jetbrains.exposed.v1.core.eq
+import org.jetbrains.exposed.v1.jdbc.JdbcTransaction
+import org.jetbrains.exposed.v1.jdbc.exists
+import org.jetbrains.exposed.v1.jdbc.replace
+import org.jetbrains.exposed.v1.jdbc.selectAll
+import org.jetbrains.exposed.v1.jdbc.transactions.TransactionManager
+import org.jetbrains.exposed.v1.jdbc.transactions.transaction
 import se.ade.mc.skyblock.structuremaps.StoredStructureMapData
 import java.io.File
 import java.sql.Connection
@@ -54,6 +56,6 @@ class SkyDb(private val plugin: JavaPlugin) {
 		}
 	}
 
-	private fun <T> tx(statement: Transaction.() -> T) = transaction(db, statement)
+	private fun <T> tx(statement: JdbcTransaction.() -> T) = transaction(db, statement = statement)
 }
 

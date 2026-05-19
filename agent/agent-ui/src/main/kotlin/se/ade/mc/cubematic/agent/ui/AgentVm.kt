@@ -54,6 +54,16 @@ class AgentVm: ViewModel() {
 
 		val result = convo.query(message = text, context = fakeContext) {
 			onProcessEvent(it)
+		}.getOrElse {
+			state.update { st ->
+				val list = st.entries.toMutableList()
+				val last = st.entries.lastOrNull()
+				if(last != null) {
+					list[list.lastIndex] = last.copy(response = "Error: ${it.message}", isStreaming = false, process = null)
+				}
+				st.copy(entries = list)
+			}
+			return
 		}
 
 		// Mark the last entry as done with the final response

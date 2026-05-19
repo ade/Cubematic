@@ -22,7 +22,7 @@ allprojects {
 }
 
 task("jars") {
-	val features = listOf("automation", "dreams", "hud", "inthesky", "portals", "runtime")
+	val features = listOf("agent:agent-plugin", "automation", "dreams", "hud", "inthesky", "portals", "runtime")
 	features.forEach {
 		dependsOn("$it:shadowJar")
 	}

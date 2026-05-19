@@ -1,6 +1,6 @@
 package se.ade.mc.cubematic.dreams.datastore
 
-import org.jetbrains.exposed.sql.Table
+import org.jetbrains.exposed.v1.core.Table
 
 object PlayerStatusTable: Table() {
 	val uuid = varchar("uuid", 36).uniqueIndex()

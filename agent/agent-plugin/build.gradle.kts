@@ -25,8 +25,8 @@ dependencies {
 	compileOnly(libs.ktor.serialization.kotlinx.json)
 	compileOnly(libs.se.ade.kuri.api)
 
-	implementation(project(":core:agent-core"))
-	implementation(project(":core:plugin-core"))
+	compileOnly(project(":core:agent-core"))
+	compileOnly(project(":core:plugin-core"))
 }
 
 kotlin {
@@ -61,7 +61,7 @@ bukkit {
 	}
 
 	commands {
-		register("ca") {
+		register("qb") {
 			description = "Cubematic AI agent command"
 			permission = "cubematic.agent.command"
 		}

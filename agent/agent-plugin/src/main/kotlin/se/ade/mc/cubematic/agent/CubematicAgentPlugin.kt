@@ -2,7 +2,7 @@ package se.ade.mc.cubematic.agent
 
 import ai.koog.prompt.executor.clients.openai.OpenAIClientSettings
 import ai.koog.prompt.executor.clients.openai.OpenAILLMClient
-import ai.koog.prompt.executor.llms.SingleLLMPromptExecutor
+import ai.koog.prompt.executor.llms.MultiLLMPromptExecutor
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.SupervisorJob
@@ -15,43 +15,51 @@ import org.bukkit.event.Listener
 import org.bukkit.plugin.java.JavaPlugin
 import se.ade.mc.cubematic.core.agent.config.CustomLlamaModel
 import se.ade.mc.cubematic.core.agent.config.InferenceProvider
-import se.ade.mc.cubematic.agent.main.CubeAgent
-import se.ade.mc.cubematic.agent.main.CubeAgentConvo
-import se.ade.mc.cubematic.agent.main.ProcessEvent
-import se.ade.mc.cubematic.agent.main.QueryContext
-import se.ade.mc.cubematic.agent.main.ServerInfo
 import se.ade.mc.cubematic.config.configProvider
+import se.ade.mc.cubematic.core.agent.config.InferenceConfig
+import se.ade.mc.cubematic.core.agent.config.InferenceModelConfig
+import se.ade.mc.cubematic.core.agent.config.InferenceProviderConfig
+import se.ade.mc.cubematic.core.agent.main.CubeAgent
+import se.ade.mc.cubematic.core.agent.main.CubeAgentConvo
+import se.ade.mc.cubematic.core.agent.main.ProcessEvent
+import se.ade.mc.cubematic.core.agent.main.QueryContext
+import se.ade.mc.cubematic.core.agent.main.ServerInfo
 import se.ade.mc.cubematic.extensions.commands
 import java.util.UUID
 
 @Serializable
 data class AgentConfig(
 	val apiKey: String = "",
-	val baseUrl: String = ""
+	val baseUrl: String = "",
+	val inferenceConfig: InferenceConfig = InferenceConfig(
+		providers = listOf(
+			InferenceProviderConfig.OpenAIInferenceConfig(
+				apiKey = "example",
+				baseUrl = "example",
+				model = InferenceModelConfig(
+					id = "default",
+					contextLength = 128_000,
+				)
+			)
+		)
+	),
 )
 
+@Suppress("UnstableApiUsage")
 class CubematicAgentPlugin: JavaPlugin() {
 	var config by configProvider { AgentConfig() }
 	private val scope: CoroutineScope = CoroutineScope(SupervisorJob() + Dispatchers.Default)
 	private val convoMap = mutableMapOf<UUID, CubeAgentConvo>()
-	private val cubeAgent = CubeAgent(InferenceProvider(
-		model = CustomLlamaModel.default,
-		executor = SingleLLMPromptExecutor(
-			OpenAILLMClient(
-				apiKey = config.apiKey,
-				settings = OpenAIClientSettings(
-					baseUrl = config.baseUrl
-				),
-			)
-		)
-	))
+	private val cubeAgent = CubeAgent(
+		config.inferenceConfig.providers.first().asInferenceProvider()
+	)
 
 	override fun onEnable() {
 		logger.info("Cubematic Agent Plugin enabled")
 		server.pluginManager.registerEvents(eventHandler, this)
 
 		commands {
-			command("ca") {
+			command("qb") {
 				command("ask") {
 					withPlayer {
 						greedyString("question") { ctx, s, player ->
@@ -64,12 +72,15 @@ class CubematicAgentPlugin: JavaPlugin() {
 									convoMap[uuid] = it
 								}
 
-								val r = convo.query(s, context) {
+								val resp = convo.query(s, context) {
 									if(it is ProcessEvent.ProgressMessage)
 										player.sendMessage(it.message)
+								}.getOrElse {
+									player.sendMessage("An error occurred: ${it.message}")
+									return@launch
 								}
 
-								player.sendMessage(r)
+								player.sendMessage(resp)
 							}
 
 							player.sendMessage("Loading...")
@@ -84,7 +95,12 @@ class CubematicAgentPlugin: JavaPlugin() {
 								convoMap.getOrPut(player.uniqueId) { cubeAgent.createConvo() }
 									.query(s, playerContext) {
 										// Lambda (partial text response) not used for now
-									}.let { resp ->
+									}
+									.getOrElse {
+										player.sendMessage("An error occurred: ${it.message}")
+										return@launch
+									}
+									.let { resp ->
 										player.sendMessage(resp)
 									}
 							}

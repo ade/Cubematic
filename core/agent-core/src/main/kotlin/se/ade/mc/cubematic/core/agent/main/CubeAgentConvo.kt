@@ -16,7 +16,7 @@ class CubeAgentConvo(private val inferenceProvider: InferenceProvider) {
 		message: String,
 		context: QueryContext,
 		sink: (ProcessEvent) -> Unit
-	): String {
+	): Result<String> {
 		val startTime = Clock.System.now()
 
 		/*
@@ -28,11 +28,15 @@ class CubeAgentConvo(private val inferenceProvider: InferenceProvider) {
 
 		val agent = MainAgent(history, context, null, inferenceProvider, sink)
 
-		val resp = agent.agent.run(message)
+		val response = runCatching {
+			agent.agent.run(message)
+		}.getOrElse {
+			return Result.failure(Exception("Failed agent run", it))
+		}
 
 		history.add(Message.User(message, RequestMetaInfo(startTime)))
-		history.add(Message.Assistant(resp, ResponseMetaInfo(Clock.System.now())))
+		history.add(Message.Assistant(response, ResponseMetaInfo(Clock.System.now())))
 
-		return resp
+		return Result.success(response)
 	}
 }

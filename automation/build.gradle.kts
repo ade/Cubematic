@@ -4,7 +4,6 @@ plugins {
     kotlin("jvm")
     alias(libs.plugins.shadow)
     alias(libs.plugins.pluginYmlBukkit)
-    alias(libs.plugins.runPaper)
     alias(libs.plugins.kotlinx.serialization)
 }
 
@@ -53,21 +52,5 @@ tasks {
             attributes["paperweight-mappings-namespace"] = "mojang"
         }
         archiveBaseName.set("cubematic-automation")
-    }
-
-    runServer {
-		val features = listOf("agent:agent-plugin", "runtime", "hud", "inthesky", "portals") //, "dreams")
-        // Configure the Minecraft version for our task.
-        // This is the only required configuration besides applying the plugin.
-        // Your plugin's jar (or shadowJar if present) will be used automatically.
-        minecraftVersion(libs.versions.minecraft.get().toString())
-	    features.forEach {
-			dependsOn(":$it:shadowJar")
-
-		    // Add other plugin jars to the server
-		    pluginJars(project(":$it").tasks.named("shadowJar").get().outputs.files.first())
-	    }
-
-        runDirectory.set(rootProject.layout.projectDirectory.dir(".servers/papermc"))
     }
 }
