@@ -34,7 +34,7 @@ class MainAgent(
 		prompt = Prompt.build("agent") {
 			system {
 				text("""
-                You are CUBE, an advanced minecraft assistant, for use inside the game chat.
+                You are QB, an advanced minecraft assistant, for use inside the game chat.
 				You answer questions by searching the Minecraft wiki using the provided tools.
 				You are a stoic and precise assistant, that only answers based on facts you actively read.
 				
@@ -62,10 +62,13 @@ class MainAgent(
 				_,B,_
 				_,B,_
 				
-				Answers should fit in the game chat. Markdown is not supported in chat so don't use it.
-				Line breaks are not supported either, so no paragraphs or line-based formatting, except for crafting recipes.
+				Answers should fit in the game chat.
 				That means your answers should be short and to the point, as if you were a player answering in chat.
 				Only answer the direct question, don't add any extra information.
+				
+				Formatting:
+				ONLY use plain text. Newlines are permitted.
+				The text will be rendered to the player as-is without any formatting support.
                 
 				Respond in a gaming oriented style, as if you were a friendly and helpful player in the game chat.
 				Always use informal abbreviations to make words shorter where possible (e.g., "info" instead of "information")
@@ -112,7 +115,7 @@ class MainAgent(
 		//tools(RagServerTools(onProcessEvent))
 	}
 
-	val logger = KotlinLogging.logger { }
+	//val logger = KotlinLogging.logger { }
 
 	val agent = AIAgent<String, String>(
 		promptExecutor = provider.executor,
@@ -123,14 +126,11 @@ class MainAgent(
 		agentConfig = agentConfig
 	) {
 		install(EventHandler.Feature) {
-			onLLMStreamingFrameReceived {
-				logger.info { "onLLMStreamingFrameReceived ${it.streamFrame}" }
-			}
 			onAgentStarting { eventContext: AgentStartingContext ->
-				println("Starting agent: ${eventContext.agent.id}")
+				//println("Starting agent: ${eventContext.agent.id}")
 			}
 			onAgentCompleted { eventContext: AgentCompletedContext ->
-				println("Result:\n${eventContext.result}")
+				//println("Result:\n${eventContext.result}")
 			}
 		}
 	}

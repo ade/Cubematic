@@ -8,6 +8,8 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.SupervisorJob
 import kotlinx.coroutines.launch
 import kotlinx.serialization.Serializable
+import net.kyori.adventure.text.Component
+import net.kyori.adventure.text.format.NamedTextColor
 import org.bukkit.entity.EntityType
 import org.bukkit.entity.Item
 import org.bukkit.entity.Player
@@ -80,7 +82,10 @@ class CubematicAgentPlugin: JavaPlugin() {
 									return@launch
 								}
 
-								player.sendMessage(resp)
+								player.sendMessage(
+									Component.text("<QB> ")
+										.append(Component.text(resp).color(NamedTextColor.LIGHT_PURPLE))
+								)
 							}
 
 							player.sendMessage("Loading...")
