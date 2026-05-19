@@ -106,7 +106,10 @@ class CubematicAgentPlugin: JavaPlugin() {
 										return@launch
 									}
 									.let { resp ->
-										player.sendMessage(resp)
+										player.sendMessage(
+											Component.text("<QB> ")
+												.append(Component.text(resp).color(NamedTextColor.LIGHT_PURPLE))
+										)
 									}
 							}
 							player.sendMessage("Loading...")
