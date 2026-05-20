@@ -8,6 +8,7 @@ class CubematicDreamsPlugin: JavaPlugin() {
 
 	override fun onEnable() {
 		facet.onEnable()
+		/* TODO outdated
 		commands {
 			command("dream") {
 				subcommand("create") {
@@ -44,6 +45,8 @@ class CubematicDreamsPlugin: JavaPlugin() {
 				}
 			}
 		}
+
+		 */
 	}
 
 	override fun onDisable() {
