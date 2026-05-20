@@ -85,11 +85,11 @@ class MainAgent(
                 """.trimIndent())
 
 				if(ragData != null) {
-					text("The following information was retrieved from the Minecraft Wiki using a RAG system.")
-					text("You may use facts from this information when answering the user's question.")
-					text("If the information is not sufficient to answer, use the provided tools to acquire more data.")
-					text("Note that the information may be pruned and not complete, read the full page content when needed.")
-					text("RAG Information:")
+					text("The following information was retrieved from the Minecraft Wiki using a RAG system.\n")
+					text("You may use facts from this information when answering the user's question.\n")
+					text("If the information is not sufficient to answer, use the provided tools to acquire more data.\n")
+					text("Note that the information may be pruned and not complete, read the full page content when needed.\n")
+					text("RAG Information:\n")
 					text(ragData.chunks.joinToString("\n\n---\n\n") {
 						"""
 					Page: ${it.pageName}
@@ -99,6 +99,20 @@ class MainAgent(
 					Text: ${it.content}
 					""".trimIndent()
 					})
+				}
+
+				if(context.chatHistory.isNotEmpty()) {
+					text("""
+					For context, here is the public chat history.
+					The format mirrors that of the minecraft chat e.g. <name> <message> (oldest messages first).
+					Note that all or parts of this history may be irrelevant to the question asked, ignore if so.
+					History:
+					""".trimIndent())
+
+					for (msg in context.chatHistory) {
+						text("<${msg.first}> ${msg.second}\n\n")
+					}
+					text("(End of chat history.)")
 				}
 			}
 			history.forEach {

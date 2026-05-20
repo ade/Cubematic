@@ -14,6 +14,7 @@ data class QueryContext(
 	val nearbyEntities: List<String>,
 	val inventoryItems: List<InventoryItem>,
 	val gameMode: String,
+	val chatHistory: List<Pair<String, String>> = emptyList()
 ) {
 	@Serializable
 	data class InventoryItem(

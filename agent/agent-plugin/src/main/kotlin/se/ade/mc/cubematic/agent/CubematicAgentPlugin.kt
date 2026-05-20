@@ -3,6 +3,7 @@ package se.ade.mc.cubematic.agent
 import ai.koog.prompt.executor.clients.openai.OpenAIClientSettings
 import ai.koog.prompt.executor.clients.openai.OpenAILLMClient
 import ai.koog.prompt.executor.llms.MultiLLMPromptExecutor
+import io.papermc.paper.command.brigadier.argument.ArgumentTypes.player
 import io.papermc.paper.event.player.AsyncChatEvent
 import io.papermc.paper.event.player.ChatEvent
 import kotlinx.coroutines.CoroutineScope
@@ -36,6 +37,8 @@ import kotlin.time.Clock
 import kotlin.time.Duration.Companion.minutes
 import kotlin.time.Instant
 
+private const val MAX_CHAT_HISTORY = 10
+
 @Serializable
 data class AgentConfig(
 	val apiKey: String = "",
@@ -63,6 +66,7 @@ class CubematicAgentPlugin: JavaPlugin() {
 	private val cubeAgent = CubeAgent(
 		config.inferenceConfig.providers.first().asInferenceProvider()
 	)
+	private val chatHistory: MutableList<Pair<String, String>> = mutableListOf()
 
 	override fun onEnable() {
 		logger.info("Cubematic Agent Plugin enabled")
@@ -138,10 +142,11 @@ class CubematicAgentPlugin: JavaPlugin() {
 	private val eventHandler = object: Listener {
 		@EventHandler
 		fun onAsyncChatEvent(event: ChatEvent) {
-			event.message().toString().takeIf { it.lowercase().contains("@qb") }?.let {
+			val message = event.message().toString()
+
+			if(message.lowercase().contains("@qb")) {
 				val player = event.player
-				val question = it
-				val context = player.queryContext()
+				val context = player.queryContext(chatHistory)
 
 				scope.launch {
 					val gc = globalConvo
@@ -154,7 +159,7 @@ class CubematicAgentPlugin: JavaPlugin() {
 						gc.second
 					}
 
-					val resp = convo.query(question, context) {
+					val resp = convo.query(message, context) {
 						if(it is ProcessEvent.ProgressMessage)
 							server.qbSendMessage("[${it.message}]")
 					}.getOrElse {
@@ -165,10 +170,18 @@ class CubematicAgentPlugin: JavaPlugin() {
 					server.qbSendMessage(resp)
 				}
 			}
+
+			val senderName = event.player.name
+
+			while(chatHistory.size >= MAX_CHAT_HISTORY) {
+				chatHistory.removeAt(0)
+			}
+
+			chatHistory.add(senderName to message)
 		}
 	}
 
-	private fun Player.queryContext(): QueryContext {
+	private fun Player.queryContext(chatHistory: List<Pair<String, String>> = emptyList()): QueryContext {
 		val entities = location.getNearbyEntities(16.0,16.0,16.0)
 			.filter { it.type != EntityType.PLAYER }
 			.groupBy { it.type.name + if(it is Item) { ":" + it.itemStack.type.name } else "" }
@@ -201,7 +214,8 @@ class CubematicAgentPlugin: JavaPlugin() {
 			inventoryItems = inventory.contents.filterNotNull().groupBy { it.type }.map { (type, items) ->
 				QueryContext.InventoryItem(type.key.toString(), items.sumOf { it.amount })
 			},
-			gameMode = gameMode.name
+			gameMode = gameMode.name,
+			chatHistory = chatHistory,
 		)
 	}
 
