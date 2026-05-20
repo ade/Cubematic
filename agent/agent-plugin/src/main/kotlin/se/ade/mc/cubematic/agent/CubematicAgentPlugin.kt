@@ -3,16 +3,20 @@ package se.ade.mc.cubematic.agent
 import ai.koog.prompt.executor.clients.openai.OpenAIClientSettings
 import ai.koog.prompt.executor.clients.openai.OpenAILLMClient
 import ai.koog.prompt.executor.llms.MultiLLMPromptExecutor
+import io.papermc.paper.event.player.AsyncChatEvent
+import io.papermc.paper.event.player.ChatEvent
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.SupervisorJob
 import kotlinx.coroutines.launch
 import kotlinx.serialization.Serializable
+import net.kyori.adventure.audience.Audience
 import net.kyori.adventure.text.Component
 import net.kyori.adventure.text.format.NamedTextColor
 import org.bukkit.entity.EntityType
 import org.bukkit.entity.Item
 import org.bukkit.entity.Player
+import org.bukkit.event.EventHandler
 import org.bukkit.event.Listener
 import org.bukkit.plugin.java.JavaPlugin
 import se.ade.mc.cubematic.core.agent.config.CustomLlamaModel
@@ -28,6 +32,9 @@ import se.ade.mc.cubematic.core.agent.main.QueryContext
 import se.ade.mc.cubematic.core.agent.main.ServerInfo
 import se.ade.mc.cubematic.extensions.commands
 import java.util.UUID
+import kotlin.time.Clock
+import kotlin.time.Duration.Companion.minutes
+import kotlin.time.Instant
 
 @Serializable
 data class AgentConfig(
@@ -51,6 +58,7 @@ data class AgentConfig(
 class CubematicAgentPlugin: JavaPlugin() {
 	var config by configProvider { AgentConfig() }
 	private val scope: CoroutineScope = CoroutineScope(SupervisorJob() + Dispatchers.Default)
+	private var globalConvo: Pair<Instant, CubeAgentConvo>? = null
 	private val convoMap = mutableMapOf<UUID, CubeAgentConvo>()
 	private val cubeAgent = CubeAgent(
 		config.inferenceConfig.providers.first().asInferenceProvider()
@@ -66,7 +74,7 @@ class CubematicAgentPlugin: JavaPlugin() {
 					withPlayer {
 						greedyString("question") { ctx, s, player ->
 							val context = player.queryContext()
-							logger.info("Context: $context")
+							//logger.info("Context: $context")
 
 							scope.launch {
 								val uuid = player.uniqueId
@@ -82,10 +90,7 @@ class CubematicAgentPlugin: JavaPlugin() {
 									return@launch
 								}
 
-								player.sendMessage(
-									Component.text("<QB> ")
-										.append(Component.text(resp).color(NamedTextColor.LIGHT_PURPLE))
-								)
+								player.qbSendMessage(resp)
 							}
 
 							player.sendMessage("Loading...")
@@ -106,10 +111,7 @@ class CubematicAgentPlugin: JavaPlugin() {
 										return@launch
 									}
 									.let { resp ->
-										player.sendMessage(
-											Component.text("<QB> ")
-												.append(Component.text(resp).color(NamedTextColor.LIGHT_PURPLE))
-										)
+										player.qbSendMessage(resp)
 									}
 							}
 							player.sendMessage("Loading...")
@@ -120,12 +122,50 @@ class CubematicAgentPlugin: JavaPlugin() {
 		}
 	}
 
+	private fun Audience.qbSendMessage(t: String) {
+		sendMessage(
+			Component.text("<")
+				.append(Component.text("QB").color(NamedTextColor.LIGHT_PURPLE))
+				.append(Component.text("> "))
+				.append(Component.text(t))
+		)
+	}
+
 	override fun onDisable() {
 		logger.info("Cubematic Agent Plugin disabled")
 	}
 
 	private val eventHandler = object: Listener {
+		@EventHandler
+		fun onAsyncChatEvent(event: ChatEvent) {
+			event.message().toString().takeIf { it.lowercase().contains("@qb") }?.let {
+				val player = event.player
+				val question = it
+				val context = player.queryContext()
 
+				scope.launch {
+					val gc = globalConvo
+
+					val convo = if(gc == null || Clock.System.now() - gc.first > 15.minutes) {
+						cubeAgent.createConvo().also { c ->
+							globalConvo = Clock.System.now() to c
+						}
+					} else {
+						gc.second
+					}
+
+					val resp = convo.query(question, context) {
+						if(it is ProcessEvent.ProgressMessage)
+							server.qbSendMessage("[${it.message}]")
+					}.getOrElse {
+						server.sendMessage(Component.text("<QB> ").append(Component.text("An error occurred: ${it.message}").color(NamedTextColor.RED)))
+						return@launch
+					}
+
+					server.qbSendMessage(resp)
+				}
+			}
+		}
 	}
 
 	private fun Player.queryContext(): QueryContext {
