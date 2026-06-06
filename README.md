@@ -1,5 +1,13 @@
 # Cubematic
 A few of my implementations of Minecraft plugins for Paper-based servers.
+Also a WIP Fabric version of the agent plugin.
+
+## Agent
+AI Agent plugin for Paper-based Minecraft servers.
+- Ask a question privately using "/qb ask <question>"
+- Reply to the last response with "/qb re <question>"
+- Start a new conversation with "/qb ask" again.
+- Ask in public by mentioning agent with "@qb" in message.
 
 ## Automation
 Automation plugin for Paper-based Minecraft servers.
@@ -118,8 +126,15 @@ When breaking a frame block:
 - Interdimensional travel is not supported
 - Moving/destroying the lodestone does not affect the portal once created
 
-# Development
+# Development (paper)
 To start a debug server with plugins bundled:
 ```bash
-./gradlew runServer
+./gradlew runtime:runServer
+```
+
+# Fabric WIP
+The project has a WIP Fabric version for the agent plugin in the 'fabric' folder.
+To start a fabric server, run the following command:
+```bash
+./gradlew fabric:agent:runServer
 ```

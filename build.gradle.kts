@@ -9,6 +9,21 @@ buildscript {
         mavenCentral()
         maven("https://repo.papermc.io/repository/maven-public/")
     }
+
+	///// BEGIN FIX - AGP bundled ASM version clashes with Loom /////
+	// Because we need a version of ASM that can handle Java 25
+	configurations.classpath {
+		resolutionStrategy {
+			force(
+				"org.ow2.asm:asm:9.8",
+				"org.ow2.asm:asm-commons:9.8",
+				"org.ow2.asm:asm-tree:9.8",
+				"org.ow2.asm:asm-analysis:9.8",
+				"org.ow2.asm:asm-util:9.8",
+			)
+		}
+	}
+	///// END FIX - AGP bundled ASM version clashes with Loom /////
 }
 
 allprojects {

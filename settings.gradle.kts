@@ -2,6 +2,10 @@ rootProject.name = "Cubematic"
 
 pluginManagement {
 	repositories {
+		maven {
+			name = "Fabric"
+			url = uri("https://maven.fabricmc.net/")
+		}
 		maven("https://maven.pkg.jetbrains.space/public/p/compose/dev")
 		google()
 		gradlePluginPortal()
@@ -14,6 +18,10 @@ pluginManagement {
 				useModule("com.android.tools.build:gradle:${requested.version}")
 			}
 		}
+	}
+
+	plugins {
+		id("net.fabricmc.fabric-loom") version providers.gradleProperty("loom_version")
 	}
 }
 
@@ -32,5 +40,6 @@ include(
     "hud",
     "inthesky",
     "portals",
-	"runtime"
+	"runtime",
+	"fabric:agent"
 )
