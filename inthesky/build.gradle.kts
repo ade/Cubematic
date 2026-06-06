@@ -31,7 +31,7 @@ tasks.test {
     useJUnitPlatform()
 }
 kotlin {
-    jvmToolchain(21)
+    jvmToolchain(25)
 }
 
 tasks.shadowJar {
@@ -63,7 +63,7 @@ bukkit {
     description = "tbd"
     version = project.version.toString()
 
-    apiVersion = "1.21"
+    apiVersion = "26.1"
 
 	depend = listOf("Cubematic-Runtime")
 

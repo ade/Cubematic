@@ -4,6 +4,7 @@ import org.bukkit.Location
 import org.bukkit.World
 import org.bukkit.entity.EntityType
 import org.bukkit.entity.WanderingTrader
+import org.bukkit.event.world.ClockTimeSkipEvent
 import org.bukkit.event.world.TimeSkipEvent
 import org.bukkit.plugin.java.JavaPlugin
 import kotlin.random.Random
@@ -12,7 +13,7 @@ fun spawnTraderRule(e: TimeSkipEvent, plugin: JavaPlugin) {
 	// newTime will normally be 0 here == morning.
 	val newTime = (e.world.time + e.skipAmount) % 24000L
 
-	if(e.skipReason == TimeSkipEvent.SkipReason.NIGHT_SKIP && e.skipAmount > 100L) {
+	if(e.skipReason == ClockTimeSkipEvent.SkipReason.NIGHT_SKIP && e.skipAmount > 100L) {
 		if(hasTraderAlready(e.world)) {
 			// Trader already spawned, do nothing
 			return

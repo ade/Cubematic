@@ -12,7 +12,7 @@ plugins {
 
 kotlin {
 	compilerOptions {
-		jvmToolchain(21)
+		jvmToolchain(25)
 	}
 	androidTarget()
 	jvm()
@@ -21,6 +21,7 @@ kotlin {
 		val commonMain by getting {
 			dependencies {
 				implementation(libs.koog)
+				implementation(libs.koog.additions)
 				implementation(libs.kotlinx.coroutines.core)
 				implementation(libs.ktor.client.core)
 				implementation(libs.ktor.client.content.negotiation)

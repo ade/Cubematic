@@ -8,12 +8,11 @@ import ai.koog.agents.core.feature.handler.agent.AgentCompletedContext
 import ai.koog.agents.core.feature.handler.agent.AgentStartingContext
 import ai.koog.agents.core.tools.ToolRegistry
 import ai.koog.agents.features.eventHandler.feature.EventHandler
-import ai.koog.prompt.dsl.Prompt
+import ai.koog.prompt.Prompt
 import ai.koog.prompt.message.Message
+import ai.koog.prompt.message.MessagePart
 import ai.koog.prompt.streaming.StreamFrame
-import ai.koog.prompt.streaming.toAssistantMessageOrNull
-import ai.koog.prompt.streaming.toToolCallMessages
-import io.github.oshai.kotlinlogging.KotlinLogging
+import ai.koog.prompt.streaming.toMessageResponse
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.SupervisorJob
@@ -181,12 +180,12 @@ class MainAgent(
 
 		onProcessEvent(ProcessEvent.Update(ProcessEntry(rootId, "Parsing/Reasoning", done = true)))
 
-		val reply = frames.toAssistantMessageOrNull()
+		val reply = frames.toMessageResponse().textContent().takeIf { it.isNotEmpty() }
 		if(reply != null) {
-			return reply.content
+			return reply
 		}
 
-		val toolCalls = frames.toToolCallMessages()
+		val toolCalls = frames.toMessageResponse().parts.filterIsInstance<MessagePart.Tool.Call>()
 		assert(toolCalls.size == 1) {
 			"Expected one tool call, got ${toolCalls.size}"
 		}
@@ -198,27 +197,23 @@ class MainAgent(
 		return response
 	}
 
-	private suspend fun AIAgentFunctionalContext.resolveCall(tc: Message.Tool.Call): String {
-		println("Resolving tool call: ${tc.tool} (${tc.content})")
+	private suspend fun AIAgentFunctionalContext.resolveCall(tc: MessagePart.Tool.Call): String {
+		println("Resolving tool call: ${tc.tool} (${tc.args})")
 
 		val id = processCounter++
-		onProcessEvent(ProcessEvent.Update(ProcessEntry(id, "Call tool ${tc.tool}: ${tc.content}")))
+		onProcessEvent(ProcessEvent.Update(ProcessEntry(id, "Call tool ${tc.tool}: ${tc.args}")))
 
 		llm.writeSession {
-			updatePrompt {
-				tool {
-					call(tc)
-				}
+			appendPrompt {
+				toolCall(tc)
 			}
 		}
 
 		val toolResult = executeTool(tc)
 
 		val out = llm.writeSession {
-			updatePrompt {
-				tool {
-					result(toolResult.toMessage())
-				}
+			appendPrompt {
+				toolResult(toolResult.toMessagePart())
 			}
 			val stream = requestLLMStreaming()
 			val f2 = mutableListOf<StreamFrame>()
@@ -237,17 +232,26 @@ class MainAgent(
 			f2
 		}
 
-		onProcessEvent(ProcessEvent.Update(ProcessEntry(id, "Call tool ${tc.tool}: ${tc.content}", done = true)))
+		onProcessEvent(ProcessEvent.Update(ProcessEntry(id, "Call tool ${tc.tool}: ${tc.args}", done = true)))
 
-		val tools = out.toToolCallMessages()
+		val tools = out.toMessageResponse().parts.filterIsInstance<MessagePart.Tool.Call>()
 		return if(tools.isNotEmpty()) {
 			assert(tools.size == 1) {
 				"Expected at most one tool call, got ${tools.size}"
 			}
 			resolveCall(tools[0])
 		} else {
-			out.toAssistantMessageOrNull()?.content
+			out.toMessageResponse().textContent()
 				?: throw IllegalStateException("Expected an assistant message or a tool call, got nothing")
 		}
 	}
 }
+
+/*
+public fun Iterable<StreamFrame>.toToolCallMessages(): List<MessagePart.Tool.Call> =
+	toToolCallMessages().filterIsInstance<Message.Tool.Call>()
+*/
+/*
+public fun Iterable<StreamFrame>.toAssistantMessageOrNull(): Message.Assistant? =
+	toMessageResponse().filterIsInstance<Message.Assistant>().singleOrNull()
+*/

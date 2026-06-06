@@ -29,7 +29,7 @@ tasks.test {
 }
 
 kotlin {
-    jvmToolchain(21)
+    jvmToolchain(25)
 }
 
 bukkit {
@@ -41,7 +41,7 @@ bukkit {
     description = "auto-crafting, block-placing, block-breaking, teleportation"
     version = project.version.toString()
 
-    apiVersion = "1.21"
+    apiVersion = "26.1"
 
 	depend = listOf("Cubematic-Runtime")
 }
