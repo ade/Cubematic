@@ -3,9 +3,9 @@
 	"id": "cubematic-agent",
 	"version": "${version}",
 	"name": "Cubematic-Agent",
-	"description": "This is an example description! Tell everyone what your mod is about!",
+	"description": "In-game LLM powered chatbot for Minecraft servers.",
 	"authors": [
-		"Me!"
+		"ade"
 	],
 	"contact": {
 		"homepage": "https://fabricmc.net/",

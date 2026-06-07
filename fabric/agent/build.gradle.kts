@@ -4,6 +4,7 @@ plugins {
 	id("net.fabricmc.fabric-loom")
 	`maven-publish`
 	alias(libs.plugins.kotlin.jvm)
+	alias(libs.plugins.kotlinx.serialization)
 }
 
 loom {
@@ -17,6 +18,17 @@ loom {
 	}
 }
 
+// Libraries that are not Fabric mods but need to be bundled into (and resolvable from) the
+// final mod jar. Kotlin/kotlinx artifacts are intentionally excluded as they are provided by
+// fabric-language-kotlin at runtime.
+val bundleRuntime: Configuration by configurations.creating {
+	isCanBeResolved = true
+	isCanBeConsumed = false
+}
+
+// Make the bundled libraries available on the dev compile/runtime classpaths.
+configurations.implementation.configure { extendsFrom(bundleRuntime) }
+
 dependencies {
 	// To change the versions see the gradle.properties file
 	minecraft("com.mojang:minecraft:${providers.gradleProperty("fabric_minecraft_version").get()}")
@@ -26,6 +38,45 @@ dependencies {
 	// Fabric API. This is technically optional, but you probably want it anyway.
 	implementation("net.fabricmc.fabric-api:fabric-api:${providers.gradleProperty("fabric_api_version").get()}")
 	implementation("net.fabricmc:fabric-language-kotlin:${providers.gradleProperty("fabric_kotlin_version").get()}")
+
+
+
+	// Shared agent logic. Its (implementation-scoped) transitive runtime deps are present on the
+	// dev runtime classpath automatically.
+	implementation(project(":core:agent-core"))
+
+	// Third-party libraries required at runtime by the agent. Declared in a dedicated configuration
+	// so they can both be compiled/run against in dev and bundled (JiJ) into the published mod jar.
+	bundleRuntime(libs.kaml)
+	bundleRuntime(libs.koog)
+	bundleRuntime(libs.ktor.client.core)
+	bundleRuntime(libs.ktor.client.content.negotiation)
+	bundleRuntime(libs.ktor.serialization.kotlinx.json)
+	bundleRuntime(libs.se.ade.kuri.api)
+	bundleRuntime(libs.xmlutil.core)
+	bundleRuntime(libs.xmlutil.serialization)
+
+	// Nest the local Cubematic projects directly into the mod jar.
+	include(project(":core:agent-core"))
+	include(project(":core:wiki-parser"))
+}
+
+// Bundle (jar-in-jar) the external agent runtime libraries and their transitive dependencies into
+// the final mod jar, skipping anything already provided by Minecraft / Fabric / Kotlin.
+afterEvaluate {
+	val excludedGroups = setOf(
+		"org.jetbrains.kotlin",
+		"org.jetbrains.kotlinx",
+		"net.fabricmc",
+		"net.minecraft",
+		"com.mojang",
+	)
+	bundleRuntime.resolvedConfiguration.resolvedArtifacts
+		.map { it.moduleVersion.id }
+		.filter { it.group !in excludedGroups }
+		.map { "${it.group}:${it.name}:${it.version}" }
+		.distinct()
+		.forEach { coordinate -> dependencies.add("include", coordinate) }
 }
 
 tasks.processResources {
@@ -59,6 +110,7 @@ java {
 }
 
 tasks.jar {
+	archiveBaseName = "cubematic-agent-fabric"
 	val projectName = project.name
 	inputs.property("projectName", projectName)
 
@@ -71,6 +123,7 @@ tasks.jar {
 publishing {
 	publications {
 		register<MavenPublication>("mavenJava") {
+			artifactId = "cubematic-agent-fabric"
 			from(components["java"])
 		}
 	}
