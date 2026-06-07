@@ -246,12 +246,3 @@ class MainAgent(
 		}
 	}
 }
-
-/*
-public fun Iterable<StreamFrame>.toToolCallMessages(): List<MessagePart.Tool.Call> =
-	toToolCallMessages().filterIsInstance<Message.Tool.Call>()
-*/
-/*
-public fun Iterable<StreamFrame>.toAssistantMessageOrNull(): Message.Assistant? =
-	toMessageResponse().filterIsInstance<Message.Assistant>().singleOrNull()
-*/

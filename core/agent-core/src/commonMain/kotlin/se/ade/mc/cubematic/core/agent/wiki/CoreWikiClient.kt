@@ -35,7 +35,7 @@ class CoreWikiClient {
 
 	suspend fun getPageExtract(pageTitle: String): String? {
 		val url = "$baseUrl${KuriWikiPaths.pageExtract(title = pageTitle)}"
-		println("Fetching URL: $url")
+		//println("Fetching URL: $url")
 		val response: PageExtractResponse = client.get(url).body()
 		val page = response.query.pages.values.firstOrNull()
 		return page?.extract
@@ -43,7 +43,7 @@ class CoreWikiClient {
 
 	suspend fun getPageContent(pageTitle: String): String? {
 		val url = "$baseUrl${KuriWikiPaths.pageContent(title = pageTitle)}"
-		println("Fetching URL: $url")
+		//println("Fetching URL: $url")
 		val response: PageContentResponse = client.get(url).body()
 		val page = response.query.pages.values.firstOrNull()
 
@@ -55,14 +55,14 @@ class CoreWikiClient {
 
 	suspend fun getRawPageContent(pageTitle: String): String? {
 		val url = "$baseUrl${KuriWikiPaths.pageRawContent(title = pageTitle)}"
-		println("Fetching URL: $url")
+		//println("Fetching URL: $url")
 		val response: String = client.get(url).bodyAsText()
 		return response
 	}
 
 	suspend fun searchPages(query: String): List<String> {
 		val url = "$baseUrl${KuriWikiPaths.search(query = query)}"
-		println("Fetching URL: $url")
+		//println("Fetching URL: $url")
 		val response: SearchResponse = client.get(url).body()
 		return response.query.search.map { it.title }
 	}

@@ -23,8 +23,10 @@ class WikiTools : ToolSet {
 	@Tool
 	@LLMDescription("Get the full content of a page from Minecraft Wiki, converted to markdown.")
 	suspend fun getPageContent(
-		@LLMDescription("The title/name of the page")
+		@LLMDescription("The title/name of the page.")
 		title: String,
+		@LLMDescription("Few-word status update to user of why the page is being read.")
+		rationale: String,
 	): String {
 		val pageContent = wikiClient.getPageContent(title)
 			?.let {
@@ -38,8 +40,8 @@ class WikiTools : ToolSet {
 				if (redirectTarget == null) it
 				else {
 					// Fetch the redirect target instead
-					println("$title redirecting to $redirectTarget")
-					return@let getPageContent(redirectTarget)
+					//println("$title redirecting to $redirectTarget")
+					return@let getPageContent(redirectTarget, rationale)
 				}
 			}
 			?: return "Page not found: $title"
@@ -48,7 +50,7 @@ class WikiTools : ToolSet {
 
 		val markdown = WikiTextConvert.optimizeForAgent(title, pruned)
 
-		println(markdown)
+		//println(markdown)
 
 		return markdown
 	}
