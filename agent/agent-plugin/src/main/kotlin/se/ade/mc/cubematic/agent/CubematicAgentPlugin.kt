@@ -1,10 +1,5 @@
 package se.ade.mc.cubematic.agent
 
-import ai.koog.prompt.executor.clients.openai.OpenAIClientSettings
-import ai.koog.prompt.executor.clients.openai.OpenAILLMClient
-import ai.koog.prompt.executor.llms.MultiLLMPromptExecutor
-import io.papermc.paper.command.brigadier.argument.ArgumentTypes.player
-import io.papermc.paper.event.player.AsyncChatEvent
 import io.papermc.paper.event.player.ChatEvent
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
@@ -20,8 +15,6 @@ import org.bukkit.entity.Player
 import org.bukkit.event.EventHandler
 import org.bukkit.event.Listener
 import org.bukkit.plugin.java.JavaPlugin
-import se.ade.mc.cubematic.core.agent.config.CustomLlamaModel
-import se.ade.mc.cubematic.core.agent.config.InferenceProvider
 import se.ade.mc.cubematic.config.configProvider
 import se.ade.mc.cubematic.core.agent.config.InferenceConfig
 import se.ade.mc.cubematic.core.agent.config.InferenceModelConfig
@@ -31,6 +24,7 @@ import se.ade.mc.cubematic.core.agent.main.CubeAgentConvo
 import se.ade.mc.cubematic.core.agent.main.ProcessEvent
 import se.ade.mc.cubematic.core.agent.main.QueryContext
 import se.ade.mc.cubematic.core.agent.main.ServerInfo
+import se.ade.mc.cubematic.core.agent.utils.WorldTimeFormat
 import se.ade.mc.cubematic.extensions.commands
 import java.util.UUID
 import kotlin.time.Clock
@@ -219,48 +213,9 @@ class CubematicAgentPlugin: JavaPlugin() {
 		)
 	}
 
-	/**
-	 * Returns the current time period, and seconds remaining until next period, e.g. "morning (123 seconds until noon)"
-	 *
-	 * ticks/second: 20
-	 * 		0 ticks (06:00) – sunrise start, dawn.
-	 * 		1000 ticks (07:00) – daytime start, morning.
-	 * 		6000 ticks (12:00) – noon, midday.
-	 * 		12000 ticks (18:00) – sunset start, dusk.
-	 * 		13000 ticks (19:00) – night start.
-	 * 		18000 ticks (00:00) – midnight.
-	 * 		24000 ticks (06:00) – next sunrise, day cycle repeats.
-	 */
 	private fun getTimeString(): String {
-		/*
-
-		 */
 		val world = server.worlds.firstOrNull() ?: return "unknown time"
 		val dayTime = world.time
-		val (period, nextPeriodTime) = when {
-			dayTime in 0 until 1000 -> "dawn" to 1000
-			dayTime in 1000 until 6000 -> "morning" to 6000
-			dayTime in 6000 until 12000 -> "noon" to 12000
-			dayTime in 12000 until 13000 -> "dusk" to 13000
-			dayTime in 13000 until 18000 -> "night" to 18000
-			dayTime in 18000 until 24000 -> "midnight" to 24000
-			else -> "unknown" to 0
-		}
-		val nextPeriod = mapOf(
-			"dawn" to "morning",
-			"morning" to "noon",
-			"noon" to "dusk",
-			"dusk" to "night",
-			"night" to "midnight",
-			"midnight" to "dawn",
-		)
-
-		val ticksUntilNext = if(nextPeriodTime >= dayTime) {
-			nextPeriodTime - dayTime
-		} else {
-			24000 - dayTime + nextPeriodTime
-		}
-		val secondsUntilNext = ticksUntilNext / 20
-		return "$period ($secondsUntilNext seconds until ${nextPeriod[period]})"
+		return WorldTimeFormat(dayTime).getTimeString()
 	}
 }
