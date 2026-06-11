@@ -64,16 +64,43 @@ dependencies {
 // Bundle (jar-in-jar) the external agent runtime libraries and their transitive dependencies into
 // the final mod jar, skipping anything already provided by Minecraft / Fabric / Kotlin.
 afterEvaluate {
+	// Groups that are always provided by the platform and must never be bundled.
 	val excludedGroups = setOf(
-		"org.jetbrains.kotlin",
-		"org.jetbrains.kotlinx",
+		"org.jetbrains.kotlin", // stdlib + reflect, shipped by fabric-language-kotlin
 		"net.fabricmc",
 		"net.minecraft",
 		"com.mojang",
 	)
+
+	// The ONLY org.jetbrains.kotlinx modules that fabric-language-kotlin actually ships.
+	// Anything else under that group (e.g. koog's kotlinx-schema-* schema generator, which
+	// SchemaGeneratorKt initializes statically) is NOT provided at runtime and MUST be bundled,
+	// otherwise tool/schema generation fails with:
+	//   NoClassDefFoundError: Could not initialize class ...SchemaGeneratorKt
+	val kotlinxProvidedByFlk = setOf(
+		"atomicfu",
+		"kotlinx-coroutines-core",
+		"kotlinx-coroutines-jdk8",
+		"kotlinx-datetime",
+		"kotlinx-io-bytestring",
+		"kotlinx-io-core",
+		"kotlinx-serialization-cbor",
+		"kotlinx-serialization-core",
+		"kotlinx-serialization-json",
+	)
+
+	fun isProvided(group: String, name: String): Boolean {
+		if (group in excludedGroups) return true
+		if (group == "org.jetbrains.kotlinx") {
+			// Match both the common metadata name and the resolved `-jvm` variant.
+			return kotlinxProvidedByFlk.any { name == it || name == "$it-jvm" }
+		}
+		return false
+	}
+
 	bundleRuntime.resolvedConfiguration.resolvedArtifacts
 		.map { it.moduleVersion.id }
-		.filter { it.group !in excludedGroups }
+		.filterNot { isProvided(it.group, it.name) }
 		.map { "${it.group}:${it.name}:${it.version}" }
 		.distinct()
 		.forEach { coordinate -> dependencies.add("include", coordinate) }
